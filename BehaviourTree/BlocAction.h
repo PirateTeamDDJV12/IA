@@ -10,10 +10,10 @@ namespace BehaviourTree
 {
     class BlocAction : public BaseBloc
     {
-	public:
-		BlocAction(const std::string& name = "") :
-			BaseBloc{ name }
-		{}
+    public:
+        BlocAction(const std::string& name = "") :
+            BaseBloc{ name }
+        {}
 
 
     public:
@@ -36,29 +36,29 @@ namespace BehaviourTree
 
         void disconnect(size_t iter) {}
 
-		void disconnectByName(const std::string& name) {}
+        void disconnectByName(const std::string& name) {}
 
-		virtual BaseBloc* find(size_t lvl, size_t id)
-		{
-			if (lvl == BaseBloc::m_lvlId && id == BaseBloc::m_idNode)
-			{
-				return this;
-			}
+        virtual BaseBloc* find(size_t lvl, size_t id)
+        {
+            if (lvl == BaseBloc::m_lvlId && id == BaseBloc::m_idNode)
+            {
+                return this;
+            }
 
-			return nullptr;
-		}
+            return nullptr;
+        }
 
-		virtual BaseBloc* findByName(const std::string& name)
-		{
-			if (m_name.size() == name.size() && m_name == name)
-			{
-				return this;
-			}
+        virtual BaseBloc* findByName(const std::string& name)
+        {
+            if (m_name.size() == name.size() && m_name == name)
+            {
+                return this;
+            }
 
-			return nullptr;
-		}
+            return nullptr;
+        }
 
-		virtual std::string toStdString() const noexcept { return typeToStdString<general::type::ACTION>() + m_name + "\n"; }
+        virtual std::string toStdString() const noexcept { return typeToStdString<general::type::ACTION>() + m_name + "\n"; }
 
         virtual general::result operator()() = 0;
     };

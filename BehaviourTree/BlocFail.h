@@ -18,7 +18,7 @@ namespace BehaviourTree
 
         virtual general::result operator()()
         {
-			onlyChild->operator()();
+            onlyChild->operator()();
             return general::result::FAIL;
         }
     };

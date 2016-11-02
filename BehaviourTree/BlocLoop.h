@@ -13,7 +13,7 @@ namespace BehaviourTree
 
     public:
         BlocLoop(BaseBloc* child, size_t countLoop, const std::string& name = "") noexcept :
-			BlocDecorator{ child, name },
+            BlocDecorator{ child, name },
             iterationCount{ countLoop }
         {}
 

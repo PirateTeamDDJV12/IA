@@ -8,14 +8,14 @@
 
 namespace BehaviourTree
 {
-	template<class BlocClass>
-	class Instanciator
-	{
-	public:
-		template<class Base>
-		static BlocClass* instance(Base* base) { return base; }
-	};
-	
+    template<class BlocClass>
+    class Instanciator
+    {
+    public:
+        template<class Base>
+        static BlocClass* instance(Base* base) { return base; }
+    };
+
 
     struct BlocFabric
     {

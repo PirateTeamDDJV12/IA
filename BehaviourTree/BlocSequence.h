@@ -5,15 +5,15 @@
 
 namespace BehaviourTree
 {
-	class BlocSequence : public BlocComposite
-	{
-	public:
-		BlocSequence(const std::string& name = "") :
-			BlocComposite{ name }
-		{}
+    class BlocSequence : public BlocComposite
+    {
+    public:
+        BlocSequence(const std::string& name = "") :
+            BlocComposite{ name }
+        {}
 
 
-	public:
+    public:
         virtual general::result operator()()
         {
             for (auto iter = children.begin(); iter != children.end(); ++iter)

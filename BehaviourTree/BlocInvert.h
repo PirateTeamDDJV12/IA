@@ -9,7 +9,7 @@ namespace BehaviourTree
     {
     public:
         BlocInvert(BaseBloc* child, const std::string& name = "") noexcept :
-			BlocDecorator{ child, name }
+            BlocDecorator{ child, name }
         {}
 
         BlocInvert(const BlocRef& child, const std::string& name = "") noexcept :
@@ -20,7 +20,7 @@ namespace BehaviourTree
         virtual general::result operator()()
         {
             general::result res = onlyChild->operator()();
-            
+
             switch (res)
             {
             case BehaviourTree::general::FAIL:

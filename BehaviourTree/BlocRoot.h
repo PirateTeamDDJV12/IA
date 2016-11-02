@@ -16,20 +16,20 @@ namespace BehaviourTree
     class BlocRoot : public BaseBloc
     {
     private:
-		BlocRef mRoot;
+        BlocRef mRoot;
 
 
     public:
-		BlocRoot(const BlocRef& root, const std::string& name = "") noexcept :
-			BaseBloc{ name },
+        BlocRoot(const BlocRef& root, const std::string& name = "") noexcept :
+            BaseBloc{ name },
             mRoot{ root }
         {
-			mRoot->m_idNode = 0;
-			mRoot->m_lvlId = 0;
-		}
+            mRoot->m_idNode = 0;
+            mRoot->m_lvlId = 0;
+        }
 
 
-	public:
+    public:
         BaseBloc& getRoot() noexcept
         {
             return *mRoot;
@@ -56,10 +56,10 @@ namespace BehaviourTree
             mRoot->disconnect(index);
         }
 
-		void disconnectByName(const std::string& name)
-		{
-			mRoot->disconnectByName(name);
-		}
+        void disconnectByName(const std::string& name)
+        {
+            mRoot->disconnectByName(name);
+        }
 
 
         general::type type() const noexcept
@@ -67,37 +67,37 @@ namespace BehaviourTree
             return mRoot->type();
         }
 
-		virtual BaseBloc* find(size_t lvl, size_t id)
-		{
-			return mRoot->find(lvl, id);
-		}
+        virtual BaseBloc* find(size_t lvl, size_t id)
+        {
+            return mRoot->find(lvl, id);
+        }
 
-		virtual BaseBloc* findByName(const std::string& name)
-		{
-			return mRoot->findByName(name);
-		}
+        virtual BaseBloc* findByName(const std::string& name)
+        {
+            return mRoot->findByName(name);
+        }
 
-		virtual std::string toStdString() const noexcept { return "rootBloc: " + m_name + "\n"; }
+        virtual std::string toStdString() const noexcept { return "rootBloc: " + m_name + "\n"; }
 
 
-	public:
+    public:
         general::result operator()()
         {
             return mRoot->operator()();
         }
 
         template<class ... IntegerIndex>
-		BaseBloc* operator()(IntegerIndex ... indexes)
+        BaseBloc* operator()(IntegerIndex ... indexes)
         {
-			BaseBloc* iteratorMod = *mRoot;
+            BaseBloc* iteratorMod = *mRoot;
 
             size_t argument[] = { indexes... };
 
             std::for_each(std::begin(argument),
-                std::end(argument),
-                [&iteratorMod](size_t index) {
-                    iteratorMod = iteratorMod->child(index);
-                }
+                          std::end(argument),
+                          [&iteratorMod](size_t index) {
+                iteratorMod = iteratorMod->child(index);
+            }
             );
 
             return iteratorMod;

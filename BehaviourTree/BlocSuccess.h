@@ -9,7 +9,7 @@ namespace BehaviourTree
     {
     public:
         BlocSuccess(BaseBloc* child, const std::string& name = "") noexcept :
-			BlocDecorator{ child, name }
+            BlocDecorator{ child, name }
         {}
 
         BlocSuccess(const BlocRef& child, const std::string& name = "") noexcept :
