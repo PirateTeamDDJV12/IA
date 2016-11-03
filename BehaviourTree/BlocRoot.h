@@ -30,6 +30,7 @@ namespace BehaviourTree
 
 
     public:
+        /*Get the real root bloc implemented below. Not really useful*/
         BaseBloc& getRoot() noexcept
         {
             return *mRoot;
@@ -86,6 +87,15 @@ namespace BehaviourTree
             return mRoot->operator()();
         }
 
+        /*
+        Deprecated. DO NOT USE IT FOR NOW
+        A remaining method that remains from my own BT implementation.
+        I haven't updated it in this BT refactoring situation, 
+        but will be interested in doing so in the near future if time doesn't get in my way.
+        It's the main reason this piece of code stays here until I update it correctly.
+
+        Allows to navigate from the current bloc in the behaviour Tree by calling the indexes (from child to child...).
+        */
         template<class ... IntegerIndex>
         BaseBloc* operator()(IntegerIndex ... indexes)
         {
@@ -96,8 +106,8 @@ namespace BehaviourTree
             std::for_each(std::begin(argument),
                           std::end(argument),
                           [&iteratorMod](size_t index) {
-                iteratorMod = iteratorMod->child(index);
-            }
+                              iteratorMod = iteratorMod->child(index);
+                          }
             );
 
             return iteratorMod;

@@ -5,6 +5,10 @@
 
 namespace BehaviourTree
 {
+    /*
+    Decorator bloc.
+    Bloc that executes its child and always returns false. Whatever the result of its child is
+    */
     class BlocFail : public BlocDecorator
     {
     public:

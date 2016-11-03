@@ -9,20 +9,24 @@
 
 namespace BehaviourTree
 {
+    /*Return the type parsed into a std string. Here " ??? "*/
     template<general::type type>
     std::string typeToStdString() { return " ??? "; }
 
+    /*return "Bloc Composite: "*/
     template<>
     std::string typeToStdString<general::type::COMPOSITE>() { return "Bloc Composite: "; }
 
+    /*return "Bloc Decorator: "*/
     template<>
     std::string typeToStdString<general::type::DECORATOR>() { return "Bloc Decorator: "; }
 
+    /*return "Bloc Action: "*/
     template<>
     std::string typeToStdString<general::type::ACTION>() { return "Bloc Action: "; }
 
 
-
+    /*Return the type parsed into a std string. If the type isn't known, return " ??? "*/
     std::string typeToStdString(general::type type)
     {
         switch (type)
@@ -42,6 +46,12 @@ namespace BehaviourTree
     }
 
 
+    /*
+    Output into a string every bloc you pass by parameter. 
+
+    It's the toStdString methods of each Blocs that are called and concatened together
+    in the same order you passed in the arguments
+    */
     template<class Bloc = BaseBloc*, class ... Blocs>
     std::string outputBTToStdString(Blocs ... arguments)
     {

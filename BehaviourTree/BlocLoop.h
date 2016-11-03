@@ -5,6 +5,11 @@
 
 namespace BehaviourTree
 {
+    /*
+    Decorator bloc.
+    A loop bloc for executing a predefined number of time its connected childs
+    Return the result of THE LAST execution of its child.
+    */
     class BlocLoop : public BlocDecorator
     {
     protected:
@@ -22,11 +27,17 @@ namespace BehaviourTree
             iterationCount{ countLoop }
         {}
 
+        /*
+        Get the iteration count. a.k.a the number of time the attached child must execute itself.
+        */
         size_t getIterationCount() const noexcept
         {
             return iterationCount;
         }
 
+        /*
+        Set the iteration count. a.k.a the number of time the attached child must execute itself.
+        */
         void setIterationCount(size_t newCount) noexcept
         {
             iterationCount = newCount;

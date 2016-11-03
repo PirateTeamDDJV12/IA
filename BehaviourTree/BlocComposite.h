@@ -9,6 +9,10 @@
 
 namespace BehaviourTree
 {
+    /*
+    Base of composite bloc.
+    Can have a lot of child, or no child.
+    */
     class BlocComposite : public BaseBloc
     {
     protected:
@@ -116,6 +120,11 @@ namespace BehaviourTree
 
 
     public:
+        /*
+        Specific to composite bloc.
+        Connect the specified toConnect bloc after the bloc (is one of the bloc DIRECTLY connected to this instance) specified
+        by its name. If there is no bloc with the specified name. It connects the bloc at the end of the fray.
+        */
         virtual void connectAfter(BlocRef& toConnect, const std::string& blocNameToConnectAfter)
         {
             for (auto iter = children.begin(); iter != children.end(); ++iter)

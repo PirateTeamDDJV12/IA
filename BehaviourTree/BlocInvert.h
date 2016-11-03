@@ -5,6 +5,11 @@
 
 namespace BehaviourTree
 {
+    /*
+    Decorator bloc.
+    Bloc that executes its child and returns the inverse of the result of its child 
+    (in case of success or fail only. The result as is if not).
+    */
     class BlocInvert : public BlocDecorator
     {
     public:

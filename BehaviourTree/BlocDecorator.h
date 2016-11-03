@@ -9,6 +9,10 @@
 
 namespace BehaviourTree
 {
+    /*
+    Base for a decorator bloc.
+    Has only one and only child (not many, not 0 -> cannot be disconnected).
+    */
     class BlocDecorator : public BaseBloc
     {
     protected:
@@ -45,6 +49,9 @@ namespace BehaviourTree
             return general::type::DECORATOR;
         }
 
+        /*
+        Replace its only child
+        */
         void connect(BlocRef& toConnect)
         {
             onlyChild = toConnect;

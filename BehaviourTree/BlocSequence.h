@@ -5,6 +5,14 @@
 
 namespace BehaviourTree
 {
+    /*
+    Composite bloc
+    Executes each one its childs in the order of its connections
+    - Stops the loop if one of those execution returns fail -> return fail
+    - If it has succeeded to run all its childs and no fail -> return success
+
+    TODO : No InProgress taken into account. So must be implemented.... If needed.
+    */
     class BlocSequence : public BlocComposite
     {
     public:
