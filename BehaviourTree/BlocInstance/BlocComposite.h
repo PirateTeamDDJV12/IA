@@ -122,10 +122,10 @@ namespace BehaviourTree
     public:
         /*
         Specific to composite bloc.
-        Connect the specified toConnect bloc after the bloc (is one of the bloc DIRECTLY connected to this instance) specified
+        Connect the specified toConnect bloc before the bloc (is one of the bloc DIRECTLY connected to this instance) specified
         by its name. If there is no bloc with the specified name. It connects the bloc at the end of the fray.
         */
-        virtual void connectAfter(BlocRef& toConnect, const std::string& blocNameToConnectAfter)
+        virtual void connectBefore(BlocRef& toConnect, const std::string& blocNameToConnectAfter)
         {
             for (auto iter = children.begin(); iter != children.end(); ++iter)
             {
@@ -134,6 +134,31 @@ namespace BehaviourTree
                     toConnect->m_idNode = this->children.size();
                     toConnect->learnParent(this);
                     this->children.insert(iter, toConnect);
+                    return;
+                }
+            }
+
+            this->connect(toConnect);
+        }
+
+        /*
+        Specific to composite bloc.
+        Connect the specified toConnect bloc after the bloc (is one of the bloc DIRECTLY connected to this instance) specified
+        by its name. If there is no bloc with the specified name. It connects the bloc at the end of the fray.
+        */
+        virtual void connectAfter(BlocRef& toConnect, const std::string& blocNameToConnectAfter)
+        {
+            auto lastElement = children.end() - 1;
+
+            for (auto iter = children.begin(); iter != lastElement; ++iter)
+            {
+                if ((*iter)->m_name.size() == blocNameToConnectAfter.size() && (*iter)->m_name == blocNameToConnectAfter)
+                {
+                    toConnect->m_idNode = this->children.size();
+                    toConnect->learnParent(this);
+
+                    this->children.insert(iter + 1, toConnect);
+                    
                     return;
                 }
             }
