@@ -197,7 +197,7 @@ namespace BehaviourTree
 }
 
 
-#include "Other\BTDebugString.h"
+#include "..\Other\BTDebugString.h"
 
 
 #endif//!BASEBLOC_H

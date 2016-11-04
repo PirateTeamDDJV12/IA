@@ -2,7 +2,7 @@
 #define BTDEBUGSTRING_H_INCLUDED
 
 
-#include "../BaseBloc.h"
+#include "../BlocInstance/BaseBloc.h"
 
 #include <string>
 
