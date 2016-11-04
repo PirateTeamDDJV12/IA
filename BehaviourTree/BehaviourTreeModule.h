@@ -2,20 +2,20 @@
 #define BEHAVIOR_TREE_MODULE_H_INCLUDED
 
 
-#include "BaseBloc.h"
+#include "BlocInstance/BaseBloc.h"
 
 
-#include "BlocRoot.h"
+#include "BlocInstance/BlocRoot.h"
 
-#include "GeneralAction.h"
+#include "BlocInstance/GeneralAction.h"
 
-#include "BlocSuccess.h"
-#include "BlocFail.h"
-#include "BlocInvert.h"
-#include "BlocLoop.h"
+#include "BlocInstance/BlocSuccess.h"
+#include "BlocInstance/BlocFail.h"
+#include "BlocInstance/BlocInvert.h"
+#include "BlocInstance/BlocLoop.h"
 
-#include "BlocSelect.h"
-#include "BlocSequence.h"
+#include "BlocInstance/BlocSelect.h"
+#include "BlocInstance/BlocSequence.h"
 
 
 
