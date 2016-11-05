@@ -20,7 +20,6 @@ namespace BehaviourTree
         static BlocClass* instance(Base* base) { return base; }
     };
 
-
     /*
     General fabric structure. 
     Use it to create blocs...
@@ -76,6 +75,25 @@ namespace BehaviourTree
             return BlocRef(new BlocType(blocName));
         }
 
+        /*
+        Create a general action bloc. Just specify its algorithm.
+
+        ex (one from many others. You can do what you want with it):
+
+        auto aGeneralcompositeBloc = BlocFabric::createGeneralAction(
+        [](){
+        //... Do something with children
+        return general::result::SUCCESS;
+        },
+        "smart composite bloc name"
+        );
+        */
+        template<class LambdaAction>
+        static BlocRef createGeneralComposite(LambdaAction& compositeBehavior, const std::string& name = "")
+        {
+            return BlocRef(new GeneralBloc<LambdaAction, BlocComposite>(compositeBehavior, name));
+        }
+
 
 
         /************************************************************************/
@@ -101,7 +119,7 @@ namespace BehaviourTree
         template<class LambdaAction>
         static BlocRef createGeneralAction(LambdaAction& actionBehavior, const std::string& name = "")
         {
-            return BlocRef(new GeneralAction<LambdaAction>(actionBehavior, name));
+            return BlocRef(new GeneralBloc<LambdaAction, BlocAction>(actionBehavior, name));
         }
 
 
@@ -129,26 +147,67 @@ namespace BehaviourTree
         }
 
 
+        /*
+        Create a general decorator bloc. Just specify its algorithm.
+
+        ex (one from many others. You can do what you want with it):
+
+        BlackBoard someBlackBoard;
+        //...
+
+        auto generalDecoratorBloc = BlocFabric::createGeneralDecorator(
+        [](){
+        //... do something with onlyChild;
+        return general::result::SUCCESS;
+        },
+        BlocFabric::createGeneralAction([&someBlackBoard](){ return general::result::SUCCESS; },
+        "smart decorator bloc name"
+        );
+        */
+        template<class LambdaAction>
+        static BlocRef createGeneralDecorator(LambdaAction& decoratorBehavior, const BlocRef& childBloc, const std::string& name = "")
+        {
+            return BlocRef(new GeneralBloc<LambdaAction, BlocDecorator>(decoratorBehavior, childBloc, name));
+        }
+
+
+        /*
+        Create a general decorator bloc. Just specify its algorithm.
+
+        See the other specification. 
+        */
+        template<class LambdaAction>
+        static BlocRef createGeneralDecorator(LambdaAction& decoratorBehavior, BaseBloc* child, const std::string& name = "")
+        {
+            return BlocRef(new GeneralBloc<LambdaAction, BlocDecorator>(decoratorBehavior, child, name));
+        }
+
 
         /************************************************************************/
         /*                                 Loop bloc                            */
         /************************************************************************/
 
         /*
-        Create a loop bloc. Same as the createDecoratorBloc but it's specify the loop count.
-        NOT IMPLEMENTED (and it is normal).
-        Use createLoopBloc<BlocLoop>(...); or a specific implemented fabric on the same pattern...
+        Create a loop bloc. Same as the createDecoratorBloc but it's specify the loop count
         */
         template<class BlocType>
-        static BlocRef createLoopBloc(size_t loopCount, const BlocRef& childBloc, const std::string& blocName = "");
+        static BlocRef createLoopBloc(size_t loopCount, const BlocRef& childBloc, const std::string& blocName = "")
+        {
+            static_assert(std::is_convertible<BlocType, BlocLoop>::value, "It's not a child of BlocLoop or a BlocLoop");
 
+            return BlocRef(new BlocType(childBloc, loopCount, blocName));
+        }
+
+        
         /*
         Create a loop bloc. Same as the createDecoratorBloc but it's specify the loop count
         */
-        template<>
-        static BlocRef createLoopBloc<BlocLoop>(size_t loopCount, const BlocRef& childBloc, const std::string& blocName)
+        template<class BlocType>
+        static BlocRef createLoopBloc(size_t loopCount, const BlocRef& childBloc, general::result resultOnBreak, const std::string& blocName = "")
         {
-            return BlocRef(new BlocLoop(childBloc, loopCount, blocName));
+            static_assert(std::is_convertible<BlocType, BlocLoop>::value, "It's not a child of BlocLoop or a BlocLoop");
+
+            return BlocRef(new BlocType(childBloc, loopCount, resultOnBreak, blocName));
         }
     };
 }

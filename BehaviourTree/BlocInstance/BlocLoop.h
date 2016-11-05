@@ -7,7 +7,7 @@ namespace BehaviourTree
 {
     /*
     Decorator bloc.
-    A loop bloc for executing a predefined number of time its connected childs
+    A loop bloc for executing a predefined number of time its connected child
     Return the result of THE LAST execution of its child.
     */
     class BlocLoop : public BlocDecorator

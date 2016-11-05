@@ -24,19 +24,7 @@ namespace BehaviourTree
 
         virtual general::result operator()()
         {
-            general::result res = onlyChild->operator()();
-
-            switch (res)
-            {
-            case BehaviourTree::general::FAIL:
-                return BehaviourTree::general::SUCCESS;
-
-            case BehaviourTree::general::SUCCESS:
-                return BehaviourTree::general::FAIL;
-
-            default:
-                return res;
-            }
+            return BlocMethods::invertResult(onlyChild->operator()());
         }
     };
 }

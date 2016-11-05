@@ -2,8 +2,8 @@
 #define BLOCDECORATOR_H
 
 
-
 #include "BaseBloc.h"
+#include "../Other/btMethods.h"
 
 #include <algorithm>
 
@@ -34,14 +34,10 @@ namespace BehaviourTree
 
 
     public:
-        virtual BlocRef child(size_t index) noexcept
+        /*Return the only child of this bloc*/
+        BlocRef child() const noexcept
         {
             return onlyChild;
-        }
-
-        virtual size_t nbChild() const noexcept
-        {
-            return 1;
         }
 
         virtual general::type type() const noexcept
@@ -49,28 +45,11 @@ namespace BehaviourTree
             return general::type::DECORATOR;
         }
 
-        /*
-        Replace its only child
-        */
+        /* Replace its only child */
         void connect(BlocRef& toConnect)
         {
             onlyChild = toConnect;
             toConnect->learnParent(this);
-            toConnect->m_idNode = 0;
-        }
-
-        void disconnect(size_t iter) {}
-
-        void disconnectByName(const std::string& name) {}
-
-        virtual BaseBloc* find(size_t lvl, size_t id)
-        {
-            if (lvl == BaseBloc::m_lvlId && id == BaseBloc::m_idNode)
-            {
-                return this;
-            }
-
-            return onlyChild->find(lvl, id);
         }
 
         virtual BaseBloc* findByName(const std::string& name)
@@ -83,7 +62,10 @@ namespace BehaviourTree
             return onlyChild->findByName(name);
         }
 
-        virtual std::string toStdString() const noexcept { return typeToStdString<general::type::DECORATOR>() + m_name + "\n"; }
+        virtual std::string toStdString() const noexcept 
+        { 
+            return typeToStdString<general::type::DECORATOR>() + m_name + "\n"; 
+        }
 
 
     public:

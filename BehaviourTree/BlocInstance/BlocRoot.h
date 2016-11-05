@@ -23,54 +23,20 @@ namespace BehaviourTree
         BlocRoot(const BlocRef& root, const std::string& name = "") noexcept :
             BaseBloc{ name },
             mRoot{ root }
-        {
-            mRoot->m_idNode = 0;
-            mRoot->m_lvlId = 0;
-        }
+        {}
 
 
     public:
         /*Get the real root bloc implemented below. Not really useful*/
-        BaseBloc& getRoot() noexcept
+        BaseBloc* getRoot() noexcept
         {
-            return *mRoot;
-        }
-
-
-        virtual BlocRef child(size_t index)   noexcept
-        {
-            return mRoot->child(index);
-        }
-
-        virtual size_t nbChild()       const noexcept
-        {
-            return mRoot->nbChild();
-        }
-
-        virtual void connect(BlocRef& otherModule)
-        {
-            mRoot->connect(otherModule);
-        }
-
-        virtual void disconnect(size_t index)
-        {
-            mRoot->disconnect(index);
-        }
-
-        void disconnectByName(const std::string& name)
-        {
-            mRoot->disconnectByName(name);
+            return &*mRoot;
         }
 
 
         general::type type() const noexcept
         {
             return mRoot->type();
-        }
-
-        virtual BaseBloc* find(size_t lvl, size_t id)
-        {
-            return mRoot->find(lvl, id);
         }
 
         virtual BaseBloc* findByName(const std::string& name)
