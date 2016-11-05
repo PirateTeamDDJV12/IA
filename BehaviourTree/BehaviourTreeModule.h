@@ -11,7 +11,7 @@
 
 #include "BlocInstance/BlocRoot.h"
 
-#include "BlocInstance/GeneralBloc.h"
+#include "BlocInstance/GeneralAction.h"
 
 #include "BlocInstance/BlocSuccess.h"
 #include "BlocInstance/BlocFail.h"

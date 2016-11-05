@@ -75,25 +75,6 @@ namespace BehaviourTree
             return BlocRef(new BlocType(blocName));
         }
 
-        /*
-        Create a general action bloc. Just specify its algorithm.
-
-        ex (one from many others. You can do what you want with it):
-
-        auto aGeneralcompositeBloc = BlocFabric::createGeneralAction(
-        [](){
-        //... Do something with children
-        return general::result::SUCCESS;
-        },
-        "smart composite bloc name"
-        );
-        */
-        template<class LambdaAction>
-        static BlocRef createGeneralComposite(LambdaAction& compositeBehavior, const std::string& name = "")
-        {
-            return BlocRef(new GeneralBloc<LambdaAction, BlocComposite>(compositeBehavior, name));
-        }
-
 
 
         /************************************************************************/
@@ -119,7 +100,7 @@ namespace BehaviourTree
         template<class LambdaAction>
         static BlocRef createGeneralAction(LambdaAction& actionBehavior, const std::string& name = "")
         {
-            return BlocRef(new GeneralBloc<LambdaAction, BlocAction>(actionBehavior, name));
+            return BlocRef(new GeneralAction<LambdaAction>(actionBehavior, name));
         }
 
 
@@ -146,41 +127,6 @@ namespace BehaviourTree
             return BlocRef(new BlocType(childBloc, blocName));
         }
 
-
-        /*
-        Create a general decorator bloc. Just specify its algorithm.
-
-        ex (one from many others. You can do what you want with it):
-
-        BlackBoard someBlackBoard;
-        //...
-
-        auto generalDecoratorBloc = BlocFabric::createGeneralDecorator(
-        [](){
-        //... do something with onlyChild;
-        return general::result::SUCCESS;
-        },
-        BlocFabric::createGeneralAction([&someBlackBoard](){ return general::result::SUCCESS; },
-        "smart decorator bloc name"
-        );
-        */
-        template<class LambdaAction>
-        static BlocRef createGeneralDecorator(LambdaAction& decoratorBehavior, const BlocRef& childBloc, const std::string& name = "")
-        {
-            return BlocRef(new GeneralBloc<LambdaAction, BlocDecorator>(decoratorBehavior, childBloc, name));
-        }
-
-
-        /*
-        Create a general decorator bloc. Just specify its algorithm.
-
-        See the other specification. 
-        */
-        template<class LambdaAction>
-        static BlocRef createGeneralDecorator(LambdaAction& decoratorBehavior, BaseBloc* child, const std::string& name = "")
-        {
-            return BlocRef(new GeneralBloc<LambdaAction, BlocDecorator>(decoratorBehavior, child, name));
-        }
 
 
         /************************************************************************/
