@@ -3,6 +3,7 @@
 #include "SearchMap.h"
 #include "NPCInfo.h"
 #include <Math.h>
+#include <windows.h>
 
 Map Map::m_instance;
 
@@ -11,10 +12,12 @@ void Map::setLoggerPath(const std::string &a_path)
 #ifdef BOT_LOGIC_DEBUG_MAP
     m_logger.Init(a_path, "Map.log");
     m_loggerInfluence.Init(a_path, "Map_Influence.log");
+    m_loggerEdges.Init(a_path, "Map_Edges.log");
 #endif
 
     BOT_LOGIC_MAP_LOG(m_logger, "Configure", true);
     BOT_LOGIC_MAP_LOG(m_loggerInfluence, "Configure", true);
+    BOT_LOGIC_MAP_LOG(m_loggerEdges, "Configure", true);
 }
 
 void Map::setNodeType(unsigned int tileId, Node::NodeType tileType)
@@ -561,4 +564,50 @@ void Map::initMap(unsigned row, unsigned col, unsigned range)
 
     // Connect all nodes together (neighboor)
     connectNodes();
+}
+
+void Map::updateEdges(std::map<unsigned int, ObjectInfo> objects, unsigned int nbTurn)
+{
+    BOT_LOGIC_MAP_LOG(m_loggerEdges, "\nTURN #" + std::to_string(nbTurn), true);
+
+    for(std::pair<unsigned, ObjectInfo> info : objects)
+    {
+        Node* node = getNode(info.second.tileID);
+        for(int i = N; i <= NW; ++i)
+        {
+            if(info.second.edgesCost[i] == 0)
+            {
+                BOT_LOGIC_MAP_LOG(m_loggerEdges, "\tTileID : " + std::to_string(info.second.tileID) + " - Dir : " + std::to_string(i) + " - Type : " + std::to_string(info.second.objectType), true);
+                node->setEdgeCost(static_cast<EDirection>(i), info.second.objectType + 1);
+            }
+        }
+    }
+}
+
+void Map::updateTiles(std::map<unsigned int, TileInfo> tiles)
+{
+
+    for each(auto info in tiles)
+    {
+        auto tileInfo = info.second;
+
+        auto ITisForbidden = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Forbidden);
+        auto ITisTarget = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Target);
+        auto ITisDescriptor = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Descriptor);
+        if(ITisForbidden != tileInfo.tileAttributes.end())
+        {
+            setNodeType(tileInfo.tileID, Node::FORBIDDEN);
+        }
+        else if(ITisTarget != tileInfo.tileAttributes.end())
+        {
+            setNodeType(tileInfo.tileID, Node::GOAL);
+            addGoalTile(tileInfo.tileID);
+            addSeenTile(tileInfo.tileID);
+        }
+        else if(ITisDescriptor != tileInfo.tileAttributes.end())
+        {
+            setNodeType(tileInfo.tileID, Node::PATH);
+            addSeenTile(tileInfo.tileID);
+        }
+    }
 }

@@ -10,6 +10,8 @@
 
 #include "Logger.h"
 #include <algorithm>
+#include "ObjectInfo.h"
+#include <map>
 
 #ifdef _DEBUG
 #define BOT_LOGIC_DEBUG_MAP
@@ -40,6 +42,7 @@ class Map : Singleton
     // Log stuff
     Logger m_logger;
     Logger m_loggerInfluence;
+    Logger m_loggerEdges;
 
 private:
     Map() : m_width(0), m_height(0)
@@ -136,6 +139,8 @@ public:
     void logInfluenceMap(unsigned nbTurn);
 
     void initMap(unsigned int row, unsigned int col, unsigned int range);
+    void updateEdges(std::map<unsigned, ObjectInfo> objects, unsigned nbTurn);
+    void updateTiles(std::map<unsigned, TileInfo> tiles);
 };
 
 #endif // MAP_HEADER

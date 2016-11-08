@@ -69,44 +69,11 @@ MyBotLogic::MyBotLogic()
 
     Map *myMap = Map::get();
 
-    BOT_LOGIC_LOG(mLogger, "Update Edges", true);
-    for(std::pair<unsigned, ObjectInfo> info : _turnInfo.objects)
-    {
-        Node* node = myMap->getNode(info.second.tileID);
-        for(int i = N; i <= NW; ++i)
-        {
-            if(info.second.edgesCost[i] == 0)
-            {
-                BOT_LOGIC_LOG(mLogger, "\tTileID : " + std::to_string(info.second.tileID) + " - Dir : " + std::to_string(i) + " - Type : " + std::to_string(info.second.objectType), true);
-                node->setEdgeCost(static_cast<EDirection>(i), info.second.objectType + 1);
-            }
-        }
-    }
-
     // Update graph
-    for each(auto info in _turnInfo.tiles)
-    {
-        auto tileInfo = info.second;
+    BOT_LOGIC_LOG(mLogger, "Update Edges and Tiles", true);
+    myMap->updateEdges(_turnInfo.objects, m_turnCount);
+    myMap->updateTiles(_turnInfo.tiles);
 
-        auto ITisForbidden = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Forbidden);
-        auto ITisTarget = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Target);
-        auto ITisDescriptor = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Descriptor);
-        if(ITisForbidden != tileInfo.tileAttributes.end())
-        {
-            myMap->setNodeType(tileInfo.tileID, Node::FORBIDDEN);
-        }
-        else if(ITisTarget != tileInfo.tileAttributes.end())
-        {
-            myMap->setNodeType(tileInfo.tileID, Node::GOAL);
-            myMap->addGoalTile(tileInfo.tileID);
-            myMap->addSeenTile(tileInfo.tileID);
-        }
-        else if(ITisDescriptor != tileInfo.tileAttributes.end())
-        {
-            myMap->setNodeType(tileInfo.tileID, Node::PATH);
-            myMap->addSeenTile(tileInfo.tileID);
-        }
-    }
     std::map<unsigned, unsigned> goalMap = myMap->getBestGoalTile(_turnInfo.npcs);
 
     // If any NPC are exploring, create an influence map
