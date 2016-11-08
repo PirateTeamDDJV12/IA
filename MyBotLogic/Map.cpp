@@ -540,3 +540,25 @@ void Map::logInfluenceMap(unsigned nbTurn)
 #endif
 
 }
+
+void Map::initMap(unsigned row, unsigned col, unsigned range)
+{
+    // Init parameters
+    m_height = row;
+    m_width = col;
+    setInfluenceRange(max(range + 2, 4));
+
+    // Create all Nodes
+    unsigned int countIndex = 0;
+    for(int i = 0; i < row; ++i)
+    {
+        for(int j = 0; j < col; ++j)
+        {
+            createNode(new Node{j, i, countIndex, Node::NONE});
+            countIndex++;
+        }
+    }
+
+    // Connect all nodes together (neighboor)
+    connectNodes();
+}

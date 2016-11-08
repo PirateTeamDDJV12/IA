@@ -40,30 +40,16 @@ MyBotLogic::MyBotLogic()
 
 /*virtual*/ void MyBotLogic::Init(LevelInfo& _levelInfo)
 {
-    int rowCount = _levelInfo.rowCount;
-    int colCount = _levelInfo.colCount;
-    Map *myMap = Map::get();
-    myMap->setHeight(rowCount);
-    myMap->setWidth(colCount);
-    myMap->setInfluenceRange(max(_levelInfo.visionRange + 2, 4));
-    unsigned int countIndex = 0;
-    for(int i = 0; i < rowCount; ++i)
-    {
-        for(int j = 0; j < colCount; ++j)
-        {
-            myMap->createNode(new Node{j, i, countIndex, Node::NONE});
-            countIndex++;
-        }
-    }
-
-    myMap->connectNodes();
+    // Init MAP
+    BOT_LOGIC_LOG(mLogger, "Map Initialisation", true);
+    Map::get()->initMap(_levelInfo.rowCount, _levelInfo.colCount, _levelInfo.visionRange);
 
     // Init npcs
-    BOT_LOGIC_LOG(mLogger, "init npcs", true);
+    BOT_LOGIC_LOG(mLogger, "NPCs Initialisation", true);
     for(std::pair<unsigned int, NPCInfo> curNpcs : _levelInfo.npcs)
     {
         m_npcs[curNpcs.second.npcID] = new Npc(curNpcs.second.npcID, curNpcs.second.tileID, m_logPath);
-        myMap->getNode(curNpcs.second.tileID)->setNpcIdOnNode(curNpcs.second.npcID);
+        Map::get()->getNode(curNpcs.second.tileID)->setNpcIdOnNode(curNpcs.second.npcID);
     }
 }
 

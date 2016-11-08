@@ -134,6 +134,8 @@ public:
     bool isAllNeighboorHaveSameInfluence(Node* node);
     void logMap(unsigned);
     void logInfluenceMap(unsigned nbTurn);
+
+    void initMap(unsigned int row, unsigned int col, unsigned int range);
 };
 
 #endif // MAP_HEADER
