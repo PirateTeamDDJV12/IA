@@ -127,7 +127,7 @@ public:
 
     bool canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId);
 
-    std::vector<unsigned int> getNearInfluencedTile(unsigned int a_currentId);
+    int getNearInfluencedTile(unsigned int a_currentId);
     bool isAllNeighboorHaveSameInfluence(Node* node);
     void logMap(unsigned);
     void logInfluenceMap(unsigned nbTurn);

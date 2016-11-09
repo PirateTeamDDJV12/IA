@@ -160,15 +160,23 @@ void Npc::explore()
         return;
     }
 
-    std::vector<unsigned int> v = Map::get()->getNearInfluencedTile(getCurrentTileId());
+    // Get the most influenced tile near the NPC
+    int bestTile = Map::get()->getNearInfluencedTile(getCurrentTileId());
 
-    if(v.size() <= 0)
+    // If we have not a best choice around us, let see a little bit futher
+    if(bestTile < 0)
     {
+        // TODO - Try to get the most influent tile around us in range of 2 instead of looking for a non visited tile
+        // Get all non visited tiles
         std::vector<unsigned> nonVisitedTiles = Map::get()->getNonVisitedTile();
         DisplayVector("\t-Looking for the non visited tiles : ", nonVisitedTiles);
         for(unsigned index : nonVisitedTiles)
         {
-            std::vector<unsigned> temp = Map::get()->getNpcPath(getCurrentTileId(), index, {Node::NodeType::FORBIDDEN, Node::NodeType::NONE});
+            // Test if we can have a good path to this tile
+            std::vector<unsigned> temp = Map::get()->getNpcPath(getCurrentTileId(), index, 
+                {Node::NodeType::FORBIDDEN, Node::NodeType::NONE, Node::NodeType::OCCUPIED});
+
+            // If we got a good path, let's configure this
             if(!temp.empty())
             {
                 m_path = temp;
@@ -180,15 +188,14 @@ void Npc::explore()
     }
     else
     {
-        unsigned int tileId = v[0];
-
-        m_path = {tileId, getCurrentTileId()};
-        m_historyTiles.push_back(tileId);
+        // Set the best tile in path and push the action
+        unsigned int bestTileUnsigned = bestTile;
+        m_path = {bestTileUnsigned, getCurrentTileId()};
+        m_historyTiles.push_back(bestTile);
 
         m_nextActions.push_back(new Move{m_id, Map::get()->getNextDirection(getCurrentTileId(), getNextPathTile())});
-        Map::get()->visitTile(tileId);
 
-        BOT_LOGIC_NPC_LOG(m_logger, "Deplacement vers " + std::to_string(tileId), true);
+        BOT_LOGIC_NPC_LOG(m_logger, "Deplacement vers " + std::to_string(bestTile), true);
 
         m_nextState = EXPLORING;
     }

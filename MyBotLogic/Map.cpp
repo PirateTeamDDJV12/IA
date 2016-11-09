@@ -384,18 +384,17 @@ bool Map::canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId)
     return isStateOk && !getNode(a_fromTileId)->isEdgeBlocked(dir) && !getNode(a_toTileId)->isEdgeBlocked(invDir);
 }
 
-std::vector<unsigned int> Map::getNearInfluencedTile(unsigned int a_currentId)
+int Map::getNearInfluencedTile(unsigned int a_currentId)
 {
     Node* current = getNode(a_currentId);
-    std::vector<unsigned int> v;
-
+    int bestTile = -1;
+    
     if(isAllNeighboorHaveSameInfluence(current))
     {
-        return v;
+        return bestTile;
     }
 
     float bestinf = 0.0f;
-    unsigned bestTile;
     for(int i = N; i <= NW; ++i)
     {
         Node* neighboor = current->getNeighboor(static_cast<EDirection>(i));
@@ -412,8 +411,7 @@ std::vector<unsigned int> Map::getNearInfluencedTile(unsigned int a_currentId)
             }
         }
     }
-    v.push_back(bestTile);
-    return v;
+    return bestTile;
 }
 
 bool Map::isAllNeighboorHaveSameInfluence(Node* node)
