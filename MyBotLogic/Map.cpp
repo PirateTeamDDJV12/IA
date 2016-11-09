@@ -1,9 +1,10 @@
 #include "Map.h"
 #include "TurnInfo.h"
 #include "SearchMap.h"
-#include "NPCInfo.h"
 #include <Math.h>
 #include <windows.h>
+#include "Npc.h"
+#include <algorithm>
 
 Map Map::m_instance;
 
@@ -92,27 +93,27 @@ float Map::calculateDistance(int indexStart, int indexEnd)
     return abs(x) + abs(y);
 }
 
-std::map<unsigned, unsigned> Map::getBestGoalTile(std::map<unsigned, NPCInfo> npcInfo)
+std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
 {
     std::map<unsigned, unsigned> goalMap;
     if(m_goalTiles.size() > npcInfo.size())
     {
         auto copyMapGoal = m_goalTiles;
-        for(std::pair<unsigned, NPCInfo> npc : npcInfo)
+        for(Npc* npc : npcInfo)
         {
             int bestDist = 666;
             unsigned goalId = -1;
             std::vector<unsigned>::iterator goalIt = begin(copyMapGoal);
             for(; goalIt != end(copyMapGoal); ++goalIt)
             {
-                float distance = calculateDistance(npc.second.tileID, *goalIt);
+                float distance = calculateDistance(npc->getCurrentTileId(), *goalIt);
                 if(distance < bestDist)
                 {
                     goalId = *goalIt;
                     bestDist = distance;
                 }
             }
-            goalMap[npc.second.npcID] = goalId;
+            goalMap[npc->getId()] = goalId;
             copyMapGoal.erase(std::find(begin(copyMapGoal), end(copyMapGoal), goalId));
         }
     }
@@ -126,17 +127,21 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(std::map<unsigned, NPCInfo> np
             }
             int bestDist = 666;
             int npcId = -1;
-            for(std::pair<unsigned, NPCInfo> npc : npcInfo)
+            for(Npc* npc : npcInfo)
             {
-                float distance = calculateDistance(npc.second.tileID, goal);
+                // Don't want a npc to have many goal
+                if(goalMap.find(npc->getId()) != end(goalMap))
+                {
+                    continue;
+                }
+                float distance = calculateDistance(npc->getCurrentTileId(), goal);
                 if(distance < bestDist)
                 {
-                    npcId = npc.second.npcID;
+                    npcId = npc->getId();
                     bestDist = distance;
                 }
             }
             goalMap[npcId] = goal;
-            npcInfo.erase(npcId);
         }
     }
 
@@ -586,7 +591,6 @@ void Map::updateEdges(std::map<unsigned int, ObjectInfo> objects, unsigned int n
 
 void Map::updateTiles(std::map<unsigned int, TileInfo> tiles)
 {
-
     for each(auto info in tiles)
     {
         auto tileInfo = info.second;

@@ -22,8 +22,6 @@ class MyBotLogic : public virtual BotLogicIF
     // debug stuff
     unsigned m_turnCount;
     std::string m_logPath;
-    std::map<unsigned int, unsigned int> m_nextNpcMove;
-    std::map<unsigned int, Npc*> m_npcs;
 public:
 	MyBotLogic();
 	virtual ~MyBotLogic();

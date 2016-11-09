@@ -1,17 +1,14 @@
 #ifndef MAP_HEADER
 #define MAP_HEADER
-
+//
 #include "Node.h"
-#include "Globals.h"
+#include "Singleton.h"
+#include "Logger.h"
+#include "ObjectInfo.h"
+#include "Npc.h"
+#include "TileInfo.h"
 #include <map>
 #include <vector>
-#include "Singleton.h"
-#include "NPCInfo.h"
-
-#include "Logger.h"
-#include <algorithm>
-#include "ObjectInfo.h"
-#include <map>
 
 #ifdef _DEBUG
 #define BOT_LOGIC_DEBUG_MAP
@@ -22,9 +19,6 @@
 #else
 #define BOT_LOGIC_MAP_LOG(logger, text, autoEndLine) 0
 #endif
-
-class SearchMap;
-class TileInfo;
 
 class Map : Singleton
 {
@@ -57,7 +51,7 @@ public:
     void connectNodes();
     Node* getNode(unsigned int, unsigned int);
     Node* getNode(unsigned int);
-    std::map<unsigned, unsigned> getBestGoalTile(std::map<unsigned, NPCInfo> npcInfo);
+    std::map<unsigned, unsigned> getBestGoalTile(std::vector<Npc*> npcInfo);
     EDirection getNextDirection(unsigned int a_start, unsigned int a_end);
     static Map *get() noexcept
     {
