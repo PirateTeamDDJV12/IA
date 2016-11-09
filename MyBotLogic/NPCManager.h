@@ -9,6 +9,11 @@
 class NPCManager : Singleton
 {
 private:
+    enum
+    {
+        MAX_NPCS = 50
+    };
+
     // Log stuff
     Logger m_logger; // the logger itself
     std::string m_logPath; // the log path
@@ -21,7 +26,7 @@ private:
 
     NPCManager()
     {
-        m_npcs.reserve(50);
+        m_npcs.reserve(MAX_NPCS);
     }
 public:
     // Define the log path for the NPCManager logger and save the path to give it for each npc
@@ -32,8 +37,9 @@ public:
     }
     // Instantiate an NPC and save it in the vector
     void initNpc(std::pair<unsigned int, NPCInfo> curNpcs);
+    // Instantiate all NPCs
     void initNpcs(std::map<unsigned int, NPCInfo> npcs);
-
+    // Update all NPCs
     void updateNPCs(std::vector<Action*> &_actionList);
 };
 

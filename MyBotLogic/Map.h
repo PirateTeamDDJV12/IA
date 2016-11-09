@@ -45,14 +45,27 @@ private:
     std::string getStringDirection(unsigned int, unsigned int);
     void testAddTile(std::vector<unsigned>& v, unsigned int, unsigned int tileId);
 public:
+    // Set the logger path and initialise all map logger
     void setLoggerPath(const std::string &a_path);
+
+    // Change the node type
     void setNodeType(unsigned int, Node::NodeType);
+
+    // Create a new node
     void createNode(Node*);
+
+    // Connect all the nodes together (neighboor) to create the graph
     void connectNodes();
+
     Node* getNode(unsigned int, unsigned int);
     Node* getNode(unsigned int);
+
+    // Return for each NPCs the best goal
     std::map<unsigned, unsigned> getBestGoalTile(std::vector<Npc*> npcInfo);
+
+    // return the direction between two points
     EDirection getNextDirection(unsigned int a_start, unsigned int a_end);
+
     static Map *get() noexcept
     {
         return &m_instance;
@@ -115,7 +128,8 @@ public:
         return v;
     }
 
-    std::vector<unsigned> getMostInfluencedTile();
+    //std::vector<unsigned> getMostInfluencedTile();
+    //std::vector<unsigned int> getNearUnVisitedTile(unsigned int a_currentId);
 
     void addGoalTile(unsigned int number);
     void createInfluenceMap();
@@ -123,7 +137,6 @@ public:
     void propage(Node* myNode, unsigned curDist, unsigned maxDist, float initialInfluence) const;
 
     std::vector<unsigned int> getNpcPath(unsigned int a_start, unsigned int a_end, std::set<Node::NodeType> forbiddenType = {Node::FORBIDDEN});
-    std::vector<unsigned int> getNearUnVisitedTile(unsigned int a_currentId);
 
     bool canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId);
 

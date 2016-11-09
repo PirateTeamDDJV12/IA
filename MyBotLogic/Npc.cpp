@@ -216,7 +216,6 @@ void Npc::followPath()
         return;
     }
     m_nextActions.push_back(new Move{m_id, Map::get()->getNextDirection(getCurrentTileId(), getNextPathTile())});
-    Map::get()->visitTile(getNextPathTile());
     BOT_LOGIC_NPC_LOG(m_logger, "\tDeplacement vers " + std::to_string(getNextPathTile()), true);
     m_nextState = MOVING;
 }
