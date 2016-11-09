@@ -1,6 +1,6 @@
 #ifndef MAP_HEADER
 #define MAP_HEADER
-//
+
 #include "Node.h"
 #include "Singleton.h"
 #include "Logger.h"

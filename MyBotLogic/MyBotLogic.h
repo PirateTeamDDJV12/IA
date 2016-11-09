@@ -20,6 +20,7 @@
 class MyBotLogic : public virtual BotLogicIF
 {
     // debug stuff
+    // TODO - set the turn counter in a BlackBoard or anything else more globals to have acces everywhere
     unsigned m_turnCount;
     std::string m_logPath;
 public:

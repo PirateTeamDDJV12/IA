@@ -1,5 +1,6 @@
 #include "NPCManager.h"
 #include "Map.h"
+#include <algorithm>
 
 // Init singleton
 NPCManager NPCManager::m_instance;

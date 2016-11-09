@@ -68,7 +68,6 @@ MyBotLogic::MyBotLogic()
     Map *myMap = Map::get();
 
     // Update graph
-    BOT_LOGIC_LOG(mLogger, "Update Edges and Tiles", true);
     myMap->updateEdges(_turnInfo.objects, m_turnCount);
     myMap->updateTiles(_turnInfo.tiles);
 
