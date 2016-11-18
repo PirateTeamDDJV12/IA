@@ -50,7 +50,7 @@ namespace BehaviourTree
 
         virtual std::string toStdString() const noexcept 
         { 
-            return typeToStdString<general::type::ACTION>() + m_name + "\n"; 
+            return DebugBT::typeToStdString<general::type::ACTION>() + m_name + "\n"; 
         }
 
         virtual general::result operator()() = 0;

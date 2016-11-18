@@ -102,7 +102,7 @@ namespace BehaviourTree
 
         virtual std::string toStdString() const noexcept 
         { 
-            return typeToStdString<general::type::COMPOSITE>() + m_name + "\n"; 
+            return DebugBT::typeToStdString<general::type::COMPOSITE>() + m_name + "\n";
         }
 
 

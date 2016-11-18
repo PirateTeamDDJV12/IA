@@ -6,7 +6,6 @@
 
 #include <vector>
 #include <string>
-#include <type_traits>
 
 
 class Npc;
@@ -14,19 +13,13 @@ class Npc;
 class NPCManagerBTAdministrator
 {
 public:
-    using WantAResult = std::true_type;
-    using NoResult = std::false_type;
-
-
-
-public:
-    enum : unsigned long long
+    enum
     {
         NO_INDEX = 0xFFFFFFFF
     };
 
 private:
-    enum : char
+    enum
     {
         CHAR_TO_NUMBER_ASCII = 48
     };
@@ -45,20 +38,6 @@ public:
 
 
 public:
-    template<class aType>
-    std::enable_if<std::is_same<aType, WantAResult>::value, BehaviourTree::general::result>::type
-        run()
-        {
-            return m_behaviorTreeRoot();
-        }
-
-    template<class aType>
-    std::enable_if<std::is_same<aType, NoResult>::value, void>::type
-        run()
-        {
-            m_behaviorTreeRoot();
-        }
-
     void init();
 
     void reassignNpcVectorArray(std::vector<Npc*>& npcVectorArray)
