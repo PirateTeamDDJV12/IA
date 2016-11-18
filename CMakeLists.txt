@@ -50,6 +50,26 @@ SET( AIBOT_HEADERS
 	MyBotLogic/Singleton.h
 	MyBotLogic/NPCManager.h
 	MyBotLogic/ObjectManager.h
+	
+	#MY_BOT_BT
+	MyBotLogic/BehaviourTree/BehaviourTreeModule.h
+	MyBotLogic/BehaviourTree/Other/BTUtils.h
+	MyBotLogic/BehaviourTree/Other/BTDebugString.h
+	MyBotLogic/BehaviourTree/Other/btMethods.h
+	MyBotLogic/BehaviourTree/BlocInstance/BaseBloc.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocAction.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocBreakingLoopOnFail.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocBreakingLoopOnSuccess.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocComposite.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocDecorator.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocFail.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocInvert.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocLoop.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocRoot.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocSelect.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocSequence.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocSuccess.h
+	MyBotLogic/BehaviourTree/BlocInstance/GeneralAction.h
 )
 
 SET( AIBOT_SRC 
