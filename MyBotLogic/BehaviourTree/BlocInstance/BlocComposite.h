@@ -150,6 +150,11 @@ namespace BehaviourTree
             this->connect(toConnect);
         }
 
+        virtual void connectAtBeginning(BlocRef& toConnect) //not tested
+        {
+            this->children.insert(this->children.begin(), toConnect);
+        }
+
         /* swap connected bloc with index. */
         virtual void swapBlocByIndex(size_t index1, size_t index2)
         {
