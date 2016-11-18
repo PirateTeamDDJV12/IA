@@ -580,8 +580,8 @@ void Map::updateEdges(std::map<unsigned int, ObjectInfo> objects, unsigned int n
         {
             if(info.second.edgesCost[i] == 0)
             {
-                BOT_LOGIC_MAP_LOG(m_loggerEdges, "\tTileID : " + std::to_string(info.second.tileID) + " - Dir : " + std::to_string(i) + " - Type : " + std::to_string(info.second.objectType), true);
-                node->setEdgeCost(static_cast<EDirection>(i), info.second.objectType + 1);
+                node->setEdgeCost(static_cast<EDirection>(i), info.second.objectTypes);
+                BOT_LOGIC_MAP_LOG(m_loggerEdges, "\tTileID : " + std::to_string(info.second.tileID) + " - Dir : " + std::to_string(i) + " - Type : " + std::to_string(node->getEdge(static_cast<EDirection>(i))), true);
             }
         }
     }

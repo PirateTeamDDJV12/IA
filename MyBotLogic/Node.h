@@ -2,6 +2,7 @@
 #define NODE_HEADER
 #include <cmath>
 #include "Globals.h"
+#include <set>
 
 struct Position
 {
@@ -65,9 +66,20 @@ public:
         m_type = nType;
     }
 
-    void setEdgeCost(EDirection dir, int value)
+    void setEdgeCost(EDirection dir, std::set<EObjectType> types)
     {
-        m_edgesCost[dir] = value;
+        if(std::find(begin(types), end(types), ObjectType_Door) != end(types))
+        {
+            m_edgesCost[dir] = ObjectType_Door + 1;
+        }
+        else if(std::find(begin(types), end(types), ObjectType_Window) != end(types))
+        {
+            m_edgesCost[dir] = ObjectType_Window + 1;
+        }
+        else if(std::find(begin(types), end(types), ObjectType_HighWall) != end(types))
+        {
+            m_edgesCost[dir] = ObjectType_HighWall + 1;
+        }
     }
 
     bool isEdgeBlocked(EDirection dir) const
