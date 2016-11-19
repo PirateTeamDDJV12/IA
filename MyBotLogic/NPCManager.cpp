@@ -1,5 +1,6 @@
 #include "NPCManager.h"
 #include "Map.h"
+#include "BehaviourTree/BehaviourTreeModule.h"
 #include <algorithm>
 
 // Init singleton
@@ -27,6 +28,13 @@ void NPCManager::initNpcs(std::map<unsigned, NPCInfo> npcs)
     {
         initNpc(curNpcs);
     }
+
+    initBT();
+}
+
+void NPCManager::initBT()
+{
+    m_BTAdministrator.init();
 }
 
 void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
