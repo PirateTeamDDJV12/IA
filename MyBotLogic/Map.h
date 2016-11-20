@@ -7,6 +7,7 @@
 #include "ObjectInfo.h"
 #include "Npc.h"
 #include "TileInfo.h"
+#include "NPCInfo.h"
 #include <map>
 #include <vector>
 
@@ -36,6 +37,7 @@ class Map : Singleton
     // Log stuff
     Logger m_logger;
     Logger m_loggerInfluence;
+    Logger m_loggerZone;
     Logger m_loggerEdges;
 
 private:
@@ -50,6 +52,9 @@ public:
 
     // Change the node type
     void setNodeType(unsigned int, Node::NodeType);
+
+    // Change the node zone
+    void setNodeZone(unsigned int tileId, unsigned int zoneId);
 
     // Create a new node
     void createNode(Node*);
@@ -98,7 +103,7 @@ public:
 
     void addSeenTile(unsigned tileId)
     {
-        if(m_seenTiles[tileId])
+        if (m_seenTiles[tileId])
         {
             return;
         }
@@ -118,9 +123,9 @@ public:
     std::vector<unsigned> getNonVisitedTile()
     {
         std::vector<unsigned> v;
-        for(auto seenTile : m_seenTiles)
+        for (auto seenTile : m_seenTiles)
         {
-            if(!seenTile.second)
+            if (!seenTile.second)
             {
                 v.push_back(seenTile.first);
             }
@@ -136,7 +141,7 @@ public:
     void propagateInfluence();
     void propage(Node* myNode, unsigned curDist, unsigned maxDist, float initialInfluence) const;
 
-    std::vector<unsigned int> getNpcPath(unsigned int a_start, unsigned int a_end, std::set<Node::NodeType> forbiddenType = {Node::FORBIDDEN});
+    std::vector<unsigned int> getNpcPath(unsigned int a_start, unsigned int a_end, std::set<Node::NodeType> forbiddenType = { Node::FORBIDDEN });
 
     bool canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId);
 
@@ -144,10 +149,15 @@ public:
     bool isAllNeighboorHaveSameInfluence(Node* node);
     void logMap(unsigned);
     void logInfluenceMap(unsigned nbTurn);
+    void logZoneMap(unsigned nbTurn);
 
     void initMap(unsigned int row, unsigned int col, unsigned int range);
     void updateEdges(std::map<unsigned, ObjectInfo> objects, unsigned nbTurn);
     void updateTiles(std::map<unsigned, TileInfo> tiles);
+
+    // Update Zones
+    void updateTileZone(Node* currentTile, std::set<Node *> &beingDone, NPCInfo npcInfo, Npc *npc);
+    void updateZones(std::map<unsigned int, NPCInfo> npcInfo, std::vector<Npc *> npcs);
 };
 
 #endif // MAP_HEADER

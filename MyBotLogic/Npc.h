@@ -33,9 +33,10 @@ private:
     npcState m_currentState, m_nextState;
     unsigned int m_id;
     unsigned int m_goal;
+    bool m_hasGoal;
     unsigned int m_target;
     unsigned int m_turnCount;
-    bool m_hasGoal;
+    unsigned int m_zone;
     std::vector<unsigned int> m_path;
     std::vector<unsigned int> m_historyTiles;
     std::vector<Action*> m_nextActions;
@@ -101,6 +102,15 @@ public:
     bool hasGoal() const
     {
         return m_hasGoal;
+    }
+
+    unsigned int getZone() const
+    {
+        return m_zone;
+    }
+    void setZone(unsigned int zone)
+    {
+        m_zone = zone;
     }
 
     void moveForwardOnPath() // remove last tileId from m_path

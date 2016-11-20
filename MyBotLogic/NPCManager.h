@@ -20,6 +20,7 @@ private:
 
     //std::map<unsigned int, Npc*> m_npcs;
     std::vector<Npc*> m_npcs;
+    unsigned int m_visionRange;
 
     // Singleton instance
     static NPCManager m_instance;
@@ -35,12 +36,26 @@ public:
     {
         return &m_instance;
     }
+    void init(unsigned int visionRange)
+    {
+        m_visionRange = visionRange;
+    }
     // Instantiate an NPC and save it in the vector
     void initNpc(std::pair<unsigned int, NPCInfo> curNpcs);
     // Instantiate all NPCs
     void initNpcs(std::map<unsigned int, NPCInfo> npcs);
     // Update all NPCs
     void updateNPCs(std::vector<Action*> &_actionList);
+    // Npc Getter
+    const std::vector<Npc *> &getNpcs() const
+    {
+        return m_npcs;
+    }
+    // visionRange Getter
+    unsigned int getVisionRange() const
+    {
+        return m_visionRange;
+    }
 };
 
 #endif //NPC_MANAGER_HEADER

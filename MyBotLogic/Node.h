@@ -9,7 +9,7 @@ struct Position
     int x;
     int y;
     Position(int xVal, int yVal)
-        :x{xVal}, y{yVal}
+        :x{ xVal }, y{ yVal }
     {}
 };
 
@@ -32,12 +32,13 @@ public:
     };
 private:
     Position* m_pos;
-    unsigned int m_ID;
     NodeType m_type;
-    unsigned int m_edgesCost[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    Node* m_neighboors[8] = {nullptr};
-    unsigned int m_npcId = {0};
-    float m_influence = {0};
+    Node* m_neighboors[8] = { nullptr };
+    unsigned int m_ID;
+    unsigned int m_edgesCost[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    unsigned int m_npcId = { 0 };
+    unsigned int m_zone = { 0 };
+    float m_influence = { 0 };
     // TODO - Faire en sorte de definir si on sait tout du node ou pas pour eviter d'aller dessus, pour optimiser la recherche de chemin
     bool m_knowEverythingAboutIt;
 
@@ -66,17 +67,27 @@ public:
         m_type = nType;
     }
 
+    void setZone(unsigned int zoneId)
+    {
+        m_zone = zoneId;
+    }
+
+    unsigned int getZone() const noexcept
+    {
+        return m_zone;
+    }
+
     void setEdgeCost(EDirection dir, std::set<EObjectType> types)
     {
-        if(std::find(begin(types), end(types), ObjectType_Door) != end(types))
+        if (std::find(begin(types), end(types), ObjectType_Door) != end(types))
         {
             m_edgesCost[dir] = ObjectType_Door + 1;
         }
-        else if(std::find(begin(types), end(types), ObjectType_Window) != end(types))
+        else if (std::find(begin(types), end(types), ObjectType_Window) != end(types))
         {
             m_edgesCost[dir] = ObjectType_Window + 1;
         }
-        else if(std::find(begin(types), end(types), ObjectType_HighWall) != end(types))
+        else if (std::find(begin(types), end(types), ObjectType_HighWall) != end(types))
         {
             m_edgesCost[dir] = ObjectType_HighWall + 1;
         }
@@ -95,6 +106,20 @@ public:
     Node* getNeighboor(EDirection dir)
     {
         return m_neighboors[dir];
+    }
+
+    Node* getNeighboor(unsigned int tileId)
+    {
+        // Peut etre optimisé en gardant un set des id des neighbours direct
+        for (auto nodes : m_neighboors)
+        {
+            if (nodes != nullptr)
+            {
+                if (nodes->m_ID == tileId)
+                    return nodes;
+            }
+        }
+        return nullptr;
     }
 
     void setNpcIdOnNode(unsigned npcId)
