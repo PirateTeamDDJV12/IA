@@ -59,11 +59,10 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
 
 
     // Move Npcs
+    m_BTAdministrator();
+
     for each(auto myNpc in m_npcs)
     {
-        // If my npc path is not correct anymore, we try to find another path
-        myNpc->update();
-
         // Get next npc tile
         int nextNpcTile = myNpc->getNextPathTile();
 
