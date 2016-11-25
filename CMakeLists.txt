@@ -53,6 +53,8 @@ SET( AIBOT_HEADERS
 	MyBotLogic/Object.h
 	MyBotLogic/NPCManagerBTAdministrator.h
 	MyBotLogic/TimeManager.h
+	MyBotLogic/Mission.h
+	MyBotLogic/MissionManager.h
 	
 	#MY_BOT_BT
 	MyBotLogic/BehaviourTree/BehaviourTreeModule.h
@@ -95,6 +97,8 @@ SET( AIBOT_SRC
 	MyBotLogic/Object.cpp
 	MyBotLogic/NPCManagerBTAdministrator.cpp
 	MyBotLogic/TimeManager.cpp
+	MyBotLogic/Mission.cpp
+	MyBotLogic/MissionManager.cpp
 	
 	#Main
 	Main.cpp
