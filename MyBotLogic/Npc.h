@@ -43,7 +43,7 @@ private:
     Logger m_logger;
 
 public:
-    Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path);
+    Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone);
 
     unsigned int getId()
     {

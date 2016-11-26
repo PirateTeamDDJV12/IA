@@ -7,8 +7,8 @@
 #include <algorithm>
 
 
-Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path)
-    : m_currentState{NONE}, m_nextState{EXPLORING}, m_id{a_id}, m_goal{}, m_hasGoal{false}, m_path{a_tileId}, m_nextActions{}, m_historyTiles{a_tileId}, m_turnCount{0}, m_zone {a_id}
+Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone)
+    : m_currentState{NONE}, m_nextState{EXPLORING}, m_id{a_id}, m_goal{}, m_hasGoal{false}, m_path{a_tileId}, m_nextActions{}, m_historyTiles{a_tileId}, m_turnCount{0}, m_zone {zone}
 {
 #ifdef BOT_LOGIC_DEBUG_NPC
     m_logger.Init(a_path, "Npc_" + std::to_string(m_id) + ".log");

@@ -48,7 +48,6 @@ MyBotLogic::MyBotLogic()
 
     // Init npcs
     BOT_LOGIC_LOG(mLogger, "NPCs Initialisation", true);
-    NPCManager::get()->init(_levelInfo.visionRange);
     NPCManager::get()->initNpcs(_levelInfo.npcs);
 }
 

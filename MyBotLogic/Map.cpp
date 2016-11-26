@@ -575,7 +575,7 @@ void Map::logZoneMap(unsigned nbTurn)
             unsigned int zone = tempNode->getZone();
             if (tempNode->getNpcIdOnNode() > 0)
             {
-                myLog +=  std::to_string(zone);
+                myLog += std::to_string(zone);
             }
             else
             {
@@ -590,7 +590,7 @@ void Map::logZoneMap(unsigned nbTurn)
 
 }
 
-void Map::initMap(unsigned row, unsigned col, unsigned range)
+void Map::initMap(unsigned int row, unsigned int col, unsigned int range)
 {
     // Init parameters
     m_height = row;
@@ -657,30 +657,37 @@ void Map::updateTiles(std::map<unsigned int, TileInfo> tiles)
     }
 }
 
-void Map::updateTileZone(Node* currentTile, std::set<Node *> &beingDone, NPCInfo npcInfo, Npc *npc)
+void Map::updateTileZone(Node* currentTile, std::set<Node *> &done, std::vector<Node *> &toDo)
 {
     for (unsigned int dir = EDirection::N; dir <= EDirection::NW; ++dir)
     {
         // Get the neighbour
         Node *neighbour = currentTile->getNeighboor(static_cast<EDirection>(dir));
-        if (neighbour != nullptr)
+        if (neighbour != nullptr && neighbour->getType() != Node::NONE)
         {
             // Check if there is no obstacle between them
             EDirection direction = static_cast<EDirection>(dir);
             EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
-
-            // If I see the tile ?
-            if (std::find(npcInfo.visibleTiles.begin(), npcInfo.visibleTiles.end(), neighbour->getId()) != npcInfo.visibleTiles.end())
+            // If there is no obstacle between the neighbour and the current tile
+            if (std::find(done.begin(), done.end(), neighbour) == done.end())
             {
-                // If there is no obstacle between the neighbour and the current tile
-                if (neighbour != nullptr && (!currentTile->isEdgeBlocked(direction) && !neighbour->isEdgeBlocked(invDir)))
+                if ((!currentTile->isEdgeBlocked(direction) && !neighbour->isEdgeBlocked(invDir)))
                 {
-                    if (std::find(beingDone.begin(), beingDone.end(), neighbour) == beingDone.end())
-                    {
-                        beingDone.insert(neighbour);
-                        updateTileZone(neighbour, beingDone, npcInfo, npc);
-                        neighbour->setZone(npc->getZone());
+                    auto itNeighbour = std::find(begin(toDo), end(toDo), neighbour);
+                    if (itNeighbour != end(toDo)) {
+                        toDo.erase(itNeighbour);
                     }
+                    done.insert(neighbour);
+                    neighbour->setZone(currentTile->getZone());
+                    BOT_LOGIC_MAP_LOG(m_loggerZone, "\tTileID : " + std::to_string(currentTile->getId()) + " - " + std::to_string(currentTile->getZone()) + " - " + std::to_string(neighbour->getId()) + " - " + std::to_string(neighbour->getZone()), true);
+                    updateTileZone(neighbour, done, toDo);
+                }
+                else if (neighbour->getZone() == 0)
+                {
+                    Map *map = Map::get();
+                    map->setZoneCount(map->getZoneCount() + 1);
+                    neighbour->setZone(map->getZoneCount());
+                    toDo.push_back(neighbour);
                 }
             }
         }
@@ -689,21 +696,29 @@ void Map::updateTileZone(Node* currentTile, std::set<Node *> &beingDone, NPCInfo
 
 void Map::updateZones(std::map<unsigned int, NPCInfo> npcInfo, std::vector<Npc *> npcs)
 {
+    std::vector<Node*> toDo;
+    std::set<Node*> done;
     // Pour chaque npc
     for (auto npc : npcs)
     {
-        std::set<Node*> beingDone;
         Node *npcNode = m_nodeMap[npc->getCurrentTileId()];
         if (npcNode->getZone() == 0)
         {
-            npcNode->setZone(npc->getId());
+            npcNode->setZone(npc->getZone());
         }
         else
         {
             npc->setZone(npcNode->getZone());
         }
-        beingDone.insert(npcNode);
-        updateTileZone(npcNode, beingDone, npcInfo.at(npc->getId()), npc);
-        beingDone.clear();
+        done.insert(npcNode);
+        updateTileZone(npcNode, done, toDo);
+        done.clear();
+    }
+    while (!toDo.empty())
+    {
+        done.insert(toDo[0]);
+        updateTileZone(toDo[0], done, toDo);
+        toDo.erase(std::find(toDo.begin(), toDo.end(), toDo[0]));
+        done.clear();
     }
 }

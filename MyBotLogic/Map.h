@@ -28,6 +28,7 @@ class Map : Singleton
     unsigned int m_width;
     unsigned int m_height;
     unsigned int m_influenceRange;
+    unsigned int m_zoneCount;
     std::map<unsigned int, Node*> m_nodeMap;
     std::vector<unsigned int> m_goalTiles;
     std::map<unsigned, bool> m_seenTiles;
@@ -101,6 +102,15 @@ public:
         m_influenceRange = range;
     }
 
+    unsigned int getZoneCount() const
+    {
+        return m_zoneCount;
+    }
+    void setZoneCount(unsigned int w)
+    {
+        m_zoneCount = w;
+    }
+
     void addSeenTile(unsigned tileId)
     {
         if (m_seenTiles[tileId])
@@ -156,7 +166,7 @@ public:
     void updateTiles(std::map<unsigned, TileInfo> tiles);
 
     // Update Zones
-    void updateTileZone(Node* currentTile, std::set<Node *> &beingDone, NPCInfo npcInfo, Npc *npc);
+    void updateTileZone(Node* currentTile, std::set<Node *> &beingDone, std::vector<Node *> &toDo);
     void updateZones(std::map<unsigned int, NPCInfo> npcInfo, std::vector<Npc *> npcs);
 };
 

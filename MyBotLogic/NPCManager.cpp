@@ -17,8 +17,11 @@ void NPCManager::setLoggerPath(const std::string &a_path)
 
 void NPCManager::initNpc(std::pair<unsigned, NPCInfo> curNpcs)
 {
-    m_npcs.push_back(new Npc(curNpcs.second.npcID, curNpcs.second.tileID, m_logPath));
-    Map::get()->getNode(curNpcs.second.tileID)->setNpcIdOnNode(curNpcs.second.npcID);
+    Map *map = Map::get();
+    map->setZoneCount(map->getZoneCount() + 1);
+    unsigned int zone = map->getZoneCount();
+    m_npcs.push_back(new Npc(curNpcs.second.npcID, curNpcs.second.tileID, m_logPath, zone));
+    map->getNode(curNpcs.second.tileID)->setNpcIdOnNode(curNpcs.second.npcID);
 }
 
 void NPCManager::initNpcs(std::map<unsigned, NPCInfo> npcs)
