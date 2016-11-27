@@ -50,6 +50,7 @@ SET( AIBOT_HEADERS
 	MyBotLogic/Singleton.h
 	MyBotLogic/NPCManager.h
 	MyBotLogic/ObjectManager.h
+	MyBotLogic/Object.h
 )
 
 SET( AIBOT_SRC 
@@ -69,6 +70,8 @@ SET( AIBOT_SRC
 	MyBotLogic/SearchNode.cpp
 	MyBotLogic/NPCManager.cpp
 	MyBotLogic/ObjectManager.cpp
+	MyBotLogic/Object.cpp
+
 	
 	#Main
 	Main.cpp
