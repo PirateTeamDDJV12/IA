@@ -17,7 +17,6 @@ public:
     {
         PORTE,
         BOUTON,
-        SENTINELLE,
         PRESSURE_PLATE
     };
 

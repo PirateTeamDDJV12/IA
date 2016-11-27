@@ -12,7 +12,6 @@ ObjectManager::ObjectManager()
 {
     m_allObjects[Object::ObjectType::PORTE].reserve(MAX_OBJECTS);
     m_allObjects[Object::ObjectType::BOUTON].reserve(MAX_OBJECTS);
-    m_allObjects[Object::ObjectType::SENTINELLE].reserve(MAX_OBJECTS);
     m_allObjects[Object::ObjectType::PRESSURE_PLATE].reserve(MAX_OBJECTS);
 }
 
