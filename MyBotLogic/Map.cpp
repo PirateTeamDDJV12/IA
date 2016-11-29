@@ -537,7 +537,7 @@ void Map::logInfluenceMap(unsigned nbTurn)
         for (int col = 0; col < m_width; ++col)
         {
             Node* tempNode = getNode(currentTileId++);
-            float influ = tempNode->getZone();
+            float influ = std::trunc(100 * tempNode->getInfluence()) / 100;
             if (tempNode->getNpcIdOnNode() > 0)
             {
                 myLog += std::to_string(tempNode->getNpcIdOnNode()) + "-" + std::to_string(influ);
