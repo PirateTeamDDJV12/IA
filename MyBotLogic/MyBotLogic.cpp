@@ -37,9 +37,9 @@ MyBotLogic::MyBotLogic()
 /*virtual*/ void MyBotLogic::Load()
 {
     //Write Code Here
-//#ifdef BOT_LOGIC_DEBUG
+#ifdef BOT_LOGIC_DEBUG
     Sleep(5000);
-//#endif
+#endif
 }
 
 /*virtual*/ void MyBotLogic::Init(LevelInfo& _levelInfo)
@@ -86,7 +86,7 @@ MyBotLogic::MyBotLogic()
     NPCManager::get()->updateNPCs(_actionList);
 
     // Update ObjectManager by adding all new discovered objects
-    ObjectManager::get()->updateObjects(_turnInfo);
+    ObjectManager::get()->updateObjects(_turnInfo.objects, _turnInfo.tiles);
 
     // Update loggers
     ObjectManager::get()->updateLogger(_turnInfo);

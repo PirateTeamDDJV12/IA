@@ -40,12 +40,26 @@ void ObjectManager::updateLogger(const TurnInfo& turnInfo)
 
 void ObjectManager::initObjects(const std::map<unsigned int, ObjectInfo>& objects, const std::map<unsigned int, TileInfo>& tiles)
 {
+    updateObjects(objects, tiles);
+}
+
+void ObjectManager::updateObjects(const std::map<unsigned int, ObjectInfo>& objects, const std::map<unsigned int, TileInfo>& tiles)
+{
     for (auto curObject : objects)
     {
-        std::shared_ptr<Object> obj = initObject(curObject.second);
-        m_allObjects[obj->getType()].push_back(obj);
+        for (auto curObjectType : curObject.second.objectTypes)
+        {
+            if (curObjectType == ObjectType_Door)
+            {
+                updateDoorObject(curObject.second);
+            }
+        }
     }
-    linkObjects(tiles);
+
+    for (auto curTile : tiles)
+    {
+        updatePressurePlateObject(curTile.second);
+    }
 }
 
 const Object& ObjectManager::getObjectById(Object::ObjectType type, size_t index) const
@@ -107,53 +121,78 @@ const std::vector<ObjectRef>& ObjectManager::getAllActivatedObjects() const
     return activatedObjects;
 }
 
-void ObjectManager::updateObjects(TurnInfo& turnInfo)
+void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
 {
-
-}
-
-std::shared_ptr<Object> ObjectManager::initObject(const ObjectInfo& objectInfo)
-{
-    std::shared_ptr<Object> obj{ new Object(objectInfo.objectID, objectInfo.tileID) };
-
-    obj->setObjectType(objectInfo.objectTypes);
-    obj->setObjectState(objectInfo.objectStates);
-
-    return obj;
-}
-
-void ObjectManager::linkObjects(const std::map<unsigned int, TileInfo>& tiles)
-{
-    for (auto curTile : tiles)
+    // Check if the objet is already found
+    for (auto curObject : m_allObjects[Object::ObjectType::PORTE])
     {
-        for (auto curAttribute : curTile.second.tileAttributes)
+        if (curObject->getId() == objectInfo.objectID)
         {
-            if (curAttribute == TileAttribute_PressurePlate)
-            {
-                ObjectRef obj{ new Object(curTile.second.tileID, curTile.second.tileID) };
-                obj->m_type = Object::ObjectType::PRESSURE_PLATE;
-                obj->m_isActive = true;
-
-                // Get all object that is a door
-                auto doors = m_allObjects[Object::ObjectType::PORTE];
-
-                // Finds the specific door linked to the pressure plate
-                auto it = std::find_if(doors.begin(), doors.end(),
-                    [&curTile](ObjectRef it)->bool
-                    {
-                        return it->m_id == curTile.second.controlledDeviceID;
-                    }
-                );
-
-                // Link the pressure plate to the door
-                obj->getLinkedObjects().push_back(*it._Ptr);
-
-                // Link the door to the pressure plate
-                (*it._Ptr)->getLinkedObjects().push_back(obj);
-
-                // Add the new object to the manager's data structure
-                m_allObjects[obj->getType()].push_back(obj);
-            }
+            return;
         }
     }
+
+    // Check if the door is activated (open)
+    bool isActive;
+    for (auto curState : objectInfo.objectStates)
+    {
+        switch (curState)
+        {
+        case ObjectState_Opened:
+            isActive = true;
+            break;
+
+        case ObjectState_Closed:
+            isActive = false;
+            break;
+        }
+    }
+
+    std::shared_ptr<Object> obj{ new Object(objectInfo.objectID, objectInfo.tileID, Object::ObjectType::PORTE, isActive) };
+    m_allObjects[obj->getType()].push_back(obj);
+}
+
+void ObjectManager::updatePressurePlateObject(const TileInfo& tileInfo)
+{
+    // Check if the objet is already found
+    for (auto curObject : m_allObjects[Object::ObjectType::PRESSURE_PLATE])
+    {
+        if (curObject->getId() == tileInfo.tileID)
+        {
+            return;
+        }
+    }
+
+    for (auto curTileAttribute : tileInfo.tileAttributes)
+    {
+        if (curTileAttribute == TileAttribute_PressurePlate)
+        {
+            ObjectRef obj{ new Object(tileInfo.tileID, tileInfo.tileID, Object::ObjectType::PRESSURE_PLATE, true) };
+
+            linkObjects(tileInfo, obj);
+        }
+    }
+}
+
+void ObjectManager::linkObjects(const TileInfo& tileInfo, ObjectRef obj)
+{
+    // Get all object that is a door
+    auto doors = m_allObjects[Object::ObjectType::PORTE];
+
+    // Finds the specific door linked to the pressure plate
+    auto it = std::find_if(doors.begin(), doors.end(),
+        [&tileInfo](ObjectRef it)->bool
+    {
+        return it->m_id == tileInfo.controlledDeviceID;
+    }
+    );
+
+    // Link the pressure plate to the door
+    obj->getLinkedObjects().push_back(*it._Ptr);
+
+    // Link the door to the pressure plate
+    (*it._Ptr)->getLinkedObjects().push_back(obj);
+
+    // Add the new object to the manager's data structure
+    m_allObjects[obj->getType()].push_back(obj);
 }

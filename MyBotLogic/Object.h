@@ -32,7 +32,12 @@ private:
 
 public:
     Object() = delete;
-    Object(unsigned int a_id, unsigned int a_tileId) : m_id{ a_id }, m_tileId{ a_tileId } {}
+    Object(unsigned int a_id, unsigned int a_tileId, ObjectType a_type, bool is_active) :
+        m_id{ a_id },
+        m_tileId{ a_tileId },
+        m_type{ a_type },
+        m_isActive{ is_active }
+    {}
 
 public:
     // Getters
@@ -42,12 +47,11 @@ public:
     bool isActive() const { return m_isActive; }
     std::vector<std::shared_ptr<Object>>& getLinkedObjects() { return m_linkedObjects; }
 
-    void toString(std::stringstream& sstream);
+    // Setter
+    void setIsActive(bool isActive) { m_isActive = isActive; }
 
-private:
-    //Setters
-    void setObjectType(const std::set<EObjectType>& objectTypes);
-    void setObjectState(const std::set<EObjectState>& objectStates);
+    // For logger
+    void toString(std::stringstream& sstream);
 };
 
 using ObjectRef = std::shared_ptr<Object>;

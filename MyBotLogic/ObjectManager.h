@@ -68,6 +68,9 @@ public:
     // Instantiate all Objects
     void initObjects(const std::map<unsigned int, ObjectInfo>& objects, const std::map<unsigned int, TileInfo>& tiles);
 
+    // Update all objects
+    void updateObjects(const std::map<unsigned int, ObjectInfo>& objects, const std::map<unsigned int, TileInfo>& tiles);
+
     // Get an object by its Id
     const Object& getObjectById(Object::ObjectType type, size_t index) const;
 
@@ -86,16 +89,18 @@ public:
     // Get all objects
     const std::map<Object::ObjectType, std::vector<ObjectRef>>& getAllObjects() const { return m_allObjects; }
 
-    // Update all objects
-    void updateObjects(TurnInfo& turnInfo);
 
 private:
 
     // Instantiate an object and save it in the vector
-    ObjectRef initObject(const ObjectInfo& objectInfo);
+    void updateDoorObject(const ObjectInfo& objectInfo);
+
+    // Update pressure plates if the npc found a new one
+    void updatePressurePlateObject(const TileInfo& tile);
 
     // Link all devices to its object
-    void linkObjects(const std::map<unsigned int, TileInfo>& tiles);
+    void linkObjects(const TileInfo& tileInfo, ObjectRef obj);
+
 };
 
 #endif // OBJECT_MANAGER_HEADER
