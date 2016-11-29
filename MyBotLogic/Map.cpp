@@ -668,9 +668,9 @@ void Map::updateTileZone(Node* currentTile, std::set<Node *> &done, std::vector<
             // Check if there is no obstacle between them
             EDirection direction = static_cast<EDirection>(dir);
             EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
-            // If there is no obstacle between the neighbour and the current tile
             if (std::find(done.begin(), done.end(), neighbour) == done.end())
             {
+                // If there is no obstacle between the neighbour and the current tile
                 if ((!currentTile->isEdgeBlocked(direction) && !neighbour->isEdgeBlocked(invDir)))
                 {
                     auto itNeighbour = std::find(begin(toDo), end(toDo), neighbour);
