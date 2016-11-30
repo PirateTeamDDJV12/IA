@@ -102,7 +102,7 @@ namespace BehaviourTree
 
         virtual std::string toStdString() const noexcept 
         { 
-            return typeToStdString<general::type::COMPOSITE>() + m_name + "\n"; 
+            return DebugBT::typeToStdString<general::type::COMPOSITE>() + m_name + "\n";
         }
 
 
@@ -148,6 +148,11 @@ namespace BehaviourTree
             }
 
             this->connect(toConnect);
+        }
+
+        virtual void connectAtBeginning(BlocRef& toConnect) //not tested
+        {
+            this->children.insert(this->children.begin(), toConnect);
         }
 
         /* swap connected bloc with index. */

@@ -3,8 +3,10 @@
 #include "Singleton.h"
 #include "Npc.h"
 #include "NPCInfo.h"
+#include "NPCManagerBTAdministrator.h"
 #include <vector>
 #include <map>
+#include <string>
 
 class NPCManager : Singleton
 {
@@ -21,13 +23,20 @@ private:
     //std::map<unsigned int, Npc*> m_npcs;
     std::vector<Npc*> m_npcs;
 
+    //BT administrator to manage NPCs via BT. Has plenty of useful methods...
+    NPCManagerBTAdministrator m_BTAdministrator;
+
     // Singleton instance
     static NPCManager m_instance;
 
-    NPCManager()
+    NPCManager() :
+        m_BTAdministrator{}
     {
         m_npcs.reserve(MAX_NPCS);
+        m_BTAdministrator.reassignNpcVectorArray(m_npcs);
     }
+
+
 public:
     // Define the log path for the NPCManager logger and save the path to give it for each npc
     void setLoggerPath(const std::string &a_path);
@@ -39,8 +48,15 @@ public:
     void initNpc(std::pair<unsigned int, NPCInfo> curNpcs);
     // Instantiate all NPCs
     void initNpcs(std::map<unsigned int, NPCInfo> npcs);
+    // Create BT and attach all NPCs to it
+    void initBT();
     // Update all NPCs
     void updateNPCs(std::vector<Action*> &_actionList);
+    // Npc Getter
+    const std::vector<Npc *> &getNpcs() const
+    {
+        return m_npcs;
+    }
 };
 
 #endif //NPC_MANAGER_HEADER

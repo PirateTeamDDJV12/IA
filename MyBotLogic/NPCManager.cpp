@@ -1,5 +1,6 @@
 #include "NPCManager.h"
 #include "Map.h"
+#include "BehaviourTree/BehaviourTreeModule.h"
 #include <algorithm>
 
 // Init singleton
@@ -17,8 +18,11 @@ void NPCManager::setLoggerPath(const std::string &a_path)
 
 void NPCManager::initNpc(std::pair<unsigned, NPCInfo> curNpcs)
 {
-    m_npcs.push_back(new Npc(curNpcs.second.npcID, curNpcs.second.tileID, m_logPath));
-    Map::get()->getNode(curNpcs.second.tileID)->setNpcIdOnNode(curNpcs.second.npcID);
+    Map *map = Map::get();
+    map->setZoneCount(map->getZoneCount() + 1);
+    unsigned int zone = map->getZoneCount();
+    m_npcs.push_back(new Npc(curNpcs.second.npcID, curNpcs.second.tileID, m_logPath, zone));
+    map->getNode(curNpcs.second.tileID)->setNpcIdOnNode(curNpcs.second.npcID);
 }
 
 void NPCManager::initNpcs(std::map<unsigned, NPCInfo> npcs)
@@ -27,6 +31,13 @@ void NPCManager::initNpcs(std::map<unsigned, NPCInfo> npcs)
     {
         initNpc(curNpcs);
     }
+
+    initBT();
+}
+
+void NPCManager::initBT()
+{
+    m_BTAdministrator.init();
 }
 
 void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
@@ -51,11 +62,10 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
 
 
     // Move Npcs
+    m_BTAdministrator();
+
     for each(auto myNpc in m_npcs)
     {
-        // If my npc path is not correct anymore, we try to find another path
-        myNpc->update();
-
         // Get next npc tile
         int nextNpcTile = myNpc->getNextPathTile();
 
