@@ -6,8 +6,8 @@
 #include <algorithm>
 #include "Map.h"
 #include "NPCManager.h"
-#include <chrono>
-#include <sstream>
+#include "ObjectManager.h"
+
 
 MyBotLogic::MyBotLogic()
 {
@@ -29,6 +29,7 @@ MyBotLogic::MyBotLogic()
     BOT_LOGIC_LOG(mLogger, "Configure", true);
     Map::get()->setLoggerPath(_logpath);
     NPCManager::get()->setLoggerPath(_logpath);
+    ObjectManager::get()->setLoggerPath(_logpath);
     m_turnCount = 0;
 
     //Write Code Here
@@ -47,10 +48,15 @@ MyBotLogic::MyBotLogic()
     // Init MAP
     BOT_LOGIC_LOG(mLogger, "Map Initialisation", true);
     Map::get()->initMap(_levelInfo.rowCount, _levelInfo.colCount, _levelInfo.visionRange);
+    
+    // Init objects
+    BOT_LOGIC_LOG(mLogger, "Objects Initialisation", true);
+    ObjectManager::get()->initObjects(_levelInfo.objects, _levelInfo.tiles);
 
     // Init npcs
     BOT_LOGIC_LOG(mLogger, "NPCs Initialisation", true);
     NPCManager::get()->initNpcs(_levelInfo.npcs);
+
 }
 
 /*virtual*/ void MyBotLogic::OnBotInitialized()
@@ -65,8 +71,6 @@ MyBotLogic::MyBotLogic()
 
 /*virtual*/ void MyBotLogic::FillActionList(TurnInfo& _turnInfo, std::vector<Action*>& _actionList)
 {
-    BOT_LOGIC_LOG(mLogger, "\nTURN #" + std::to_string(++m_turnCount), true);
-
     Map *myMap = Map::get();
    
     // Update graph
@@ -82,9 +86,14 @@ MyBotLogic::MyBotLogic()
     myMap->logInfluenceMap(m_turnCount);
     myMap->logMap(m_turnCount);
 
+    // Update ObjectManager by adding all new discovered objects
+    ObjectManager::get()->updateObjects(_turnInfo.objects, _turnInfo.tiles);
+
     // Update all NPCs and fill the action list
     NPCManager::get()->updateNPCs(_actionList);
 
+    // Update loggers
+    ObjectManager::get()->updateLogger(_turnInfo);
 }
 
 /*virtual*/ void MyBotLogic::Exit()
