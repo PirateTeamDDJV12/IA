@@ -27,7 +27,7 @@ void NPCManager::initNpc(std::pair<unsigned, NPCInfo> curNpcs)
 
 void NPCManager::initNpcs(std::map<unsigned, NPCInfo> npcs)
 {
-    for(std::pair<unsigned int, NPCInfo> curNpcs : npcs)
+    for (std::pair<unsigned int, NPCInfo> curNpcs : npcs)
     {
         initNpc(curNpcs);
     }
@@ -48,10 +48,10 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
     std::map<unsigned, unsigned> goalMap = myMap->getBestGoalTile(m_npcs);
 
     // Calcul path for npc and set goal tile
-    for(Npc* curNpc : m_npcs)
+    for (Npc* curNpc : m_npcs)
     {
         myMap->visitTile(curNpc->getCurrentTileId());
-        if(!curNpc->hasGoal() && goalMap.find(curNpc->getId()) != end(goalMap))
+        if (!curNpc->hasGoal() && goalMap.find(curNpc->getId()) != end(goalMap))
         {
             unsigned int goalTile = goalMap[curNpc->getId()];
             curNpc->setGoal(goalTile);
@@ -69,24 +69,24 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
         // Get next npc tile
         int nextNpcTile = myNpc->getNextPathTile();
 
-        if(nextNpcTile >= 0)
+        if (nextNpcTile >= 0)
         {
             // check if npc can move on nextTile
-            for(Npc* curP : m_npcs)
+            for (Npc* curP : m_npcs)
             {
 
-                if(curP->getId() != myNpc->getId()
-                   && curP->getNextPathTile() == nextNpcTile)
+                if (curP->getId() != myNpc->getId()
+                    && curP->getNextPathTile() == nextNpcTile)
                 {
                     // Handle
-                    if(myNpc->getPathSize() < curP->getPathSize())
+                    if (myNpc->getPathSize() < curP->getPathSize())
                     {
                         myNpc->stopMoving();
                         break;
                     }
                     // else prioritize by npcs id
-                    if(curP->getId() < myNpc->getId()
-                       && myNpc->getPathSize() == curP->getPathSize())
+                    if (curP->getId() < myNpc->getId()
+                        && myNpc->getPathSize() == curP->getPathSize())
                     {
                         myNpc->stopMoving();
                         break;
@@ -94,7 +94,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
                 }
             }
             // copy npc's action list into the action list
-            for(Action* curAction : myNpc->getActions())
+            for (Action* curAction : myNpc->getActions())
             {
                 _actionList.push_back(curAction->Clone());
 
@@ -108,8 +108,8 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
 
     // Empty all NPCs list
     std::for_each(begin(m_npcs),
-                  end(m_npcs),
-                  [](Npc* myNpc) {myNpc->unstackActions(); });
+        end(m_npcs),
+        [](Npc* myNpc) {myNpc->unstackActions(); });
 }
 void NPCManager::createMission(Mission::MissionType type, unsigned objectif)
 {
