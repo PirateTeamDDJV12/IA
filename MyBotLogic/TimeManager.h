@@ -1,12 +1,11 @@
 #ifndef TIME_MANAGER_HEADER
 #define TIME_MANAGER_HEADER
-#include "../PetitMoteur3D/PetitMoteur3D/Singleton.h"
 #include <chrono>
 #include <map>
 
 using namespace std::chrono;
 
-class TimeManager : public PM3D::CSingleton<TimeManager>
+class TimeManager
 {
     float m_echelleTemps = 0.00001f;
     milliseconds m_ecartTemps = 1000ms / 60;
@@ -20,7 +19,19 @@ class TimeManager : public PM3D::CSingleton<TimeManager>
     time_point<system_clock> m_startGameTime = system_clock::now();
     milliseconds m_turnTimeLimit = 0ms;
     std::map<std::string, time_point<system_clock>> m_saveTimePoints;
+
+    static TimeManager m_instance;
+
+    TimeManager() = default;
+    TimeManager(const TimeManager &) = delete;
+    TimeManager &operator=(const TimeManager &) = delete;
+
 public:
+    static TimeManager&getInstance()
+    {
+        return m_instance;
+    }
+
     static time_point<system_clock> now()
     {
         return system_clock::now();

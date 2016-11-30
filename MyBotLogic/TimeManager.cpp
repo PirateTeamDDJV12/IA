@@ -1,5 +1,7 @@
 #include "TimeManager.h"
 
+TimeManager TimeManager::m_instance;
+
 time_point<system_clock> TimeManager::savePoint(std::string name)
 {
     m_saveTimePoints[name] = system_clock::now();
