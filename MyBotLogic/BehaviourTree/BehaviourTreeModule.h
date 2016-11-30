@@ -23,6 +23,7 @@
 
 #include "BlocInstance/BlocSelect.h"
 #include "BlocInstance/BlocSequence.h"
+#include "BlocInstance/BlocTernarySelector.h"
 
 
 
