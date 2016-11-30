@@ -33,7 +33,7 @@ private:
 
 public:
     NPCManagerBTNpcUpdateAdministrator() :
-        m_behaviorTreeRoot{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocSequence>("NpcManagerRoot") }
+        m_behaviorTreeRoot{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocSequence>("UpdateNpcManagerRoot") }
     {}
 
 
