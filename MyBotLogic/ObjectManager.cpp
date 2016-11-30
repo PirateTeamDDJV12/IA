@@ -73,7 +73,7 @@ const Object& ObjectManager::getObjectById(Object::ObjectType type, size_t index
     }
 }
 
-const std::vector<ObjectRef>& ObjectManager::getAllObjectsOnTile(unsigned int tileId) const
+const std::vector<ObjectRef> ObjectManager::getAllObjectsOnTile(unsigned int tileId) const
 {
     std::vector<ObjectRef> objectsOnTile;
     for (auto iterPair : m_allObjects)
@@ -89,7 +89,7 @@ const std::vector<ObjectRef>& ObjectManager::getAllObjectsOnTile(unsigned int ti
     return objectsOnTile;
 }
 
-const std::vector<ObjectRef>& ObjectManager::getAllUnactivatedObjects() const
+const std::vector<ObjectRef> ObjectManager::getAllUnactivatedObjects() const
 {
     std::vector<ObjectRef> unactivatedObjects;
     for (auto iterPair : m_allObjects)
@@ -105,7 +105,7 @@ const std::vector<ObjectRef>& ObjectManager::getAllUnactivatedObjects() const
     return unactivatedObjects;
 }
 
-const std::vector<ObjectRef>& ObjectManager::getAllActivatedObjects() const
+const std::vector<ObjectRef> ObjectManager::getAllActivatedObjects() const
 {
     std::vector<ObjectRef> activatedObjects;
     for (auto iterPair : m_allObjects)
