@@ -13,15 +13,15 @@ public:
 private:
     MissionType m_mType;
     unsigned m_objective;
+    bool m_possible;
     Mission* m_prev = nullptr;
     Mission* m_next = nullptr;
     bool m_status = false;
 public:
 
     Mission(MissionType t, unsigned obj)
-        : m_mType{t}, m_objective{obj}
+        : m_mType{ t }, m_objective{ obj }
     {
-        //MissionManager::get()->subscribeMission(*this); TODO IN NPCManager
     }
 
     unsigned getObjective() const
@@ -31,6 +31,17 @@ public:
     MissionType GetMissionType()
     {
         return m_mType;
+    }
+
+
+    bool isPossible()
+    {
+        return m_possible;
+    }
+
+    void isPossible(bool possible)
+    {
+        m_possible = possible;
     }
 
     void setDependanceMission(Mission *m)
