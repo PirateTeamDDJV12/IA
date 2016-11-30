@@ -17,7 +17,9 @@ namespace BehaviourTree
     public:
         BlocTernarySelector(const std::string& name = "") :
             BlocComposite{ name }
-        {}
+        {
+            children.reserve(3);
+        }
 
 
     public:
