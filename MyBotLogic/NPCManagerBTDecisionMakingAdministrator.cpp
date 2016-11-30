@@ -53,7 +53,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     // yes : go to the next layer : a door is there ?
     // no : regular explore assignement
 
-    // a door is there checker bloc
+    // the area is explored checker bloc
     exploredAreaTernarySelector->connect(
         BlocFabric::createGeneralAction(
             []() {
@@ -88,4 +88,42 @@ void NPCManagerBTDecisionMakingAdministrator::init()
 
     // before because the yes case must be before the no case.
     exploredAreaTernarySelector->connectBefore(aDoorIsThereTernaryRef, exploredAreaNoCaseOrRegularExploreBlocName);
+
+
+    // Third Layer => a door is there ? 
+    // yes : Change area
+    // no : find hidden door
+
+    // a door is there checker bloc
+    aDoorIsThereTernarySelector->connect(
+        BlocFabric::createGeneralAction(
+            []() {
+                // TODO
+                return /*a door is there ?*/true ? general::result::SUCCESS : general::result::FAIL;
+            },
+            "ADoorIsThere"
+        )
+    );
+
+
+    //YES : change area
+    exploredAreaTernarySelector->connect(
+        BlocFabric::createGeneralAction(
+            []() {
+                // TODO
+            },
+            "ChangeArea"
+        )
+    );
+
+
+    //NO : Find hidden door
+    exploredAreaTernarySelector->connect(
+        BlocFabric::createGeneralAction(
+            []() {
+                // TODO
+            },
+            "FindHiddenDoor"
+        )
+    );
 }
