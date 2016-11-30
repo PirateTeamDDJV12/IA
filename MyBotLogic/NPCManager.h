@@ -52,6 +52,11 @@ public:
     void initBT();
     // Update all NPCs
     void updateNPCs(std::vector<Action*> &_actionList);
+    // Npc Getter
+    const std::vector<Npc *> &getNpcs() const
+    {
+        return m_npcs;
+    }
 };
 
 #endif //NPC_MANAGER_HEADER

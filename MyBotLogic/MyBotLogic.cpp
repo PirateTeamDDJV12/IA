@@ -70,11 +70,13 @@ MyBotLogic::MyBotLogic()
     // Update graph
     myMap->updateEdges(_turnInfo.objects, m_turnCount);
     myMap->updateTiles(_turnInfo.tiles);
+    myMap->updateZones(_turnInfo.npcs, NPCManager::get()->getNpcs());
 
     // Create Influence map
     myMap->createInfluenceMap();
 
     // Log this
+    myMap->logZoneMap(m_turnCount);
     myMap->logInfluenceMap(m_turnCount);
     myMap->logMap(m_turnCount);
 
