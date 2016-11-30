@@ -665,7 +665,6 @@ void Map::updateTileZone(Node* currentTile, std::set<Node *> &done, std::vector<
         Node *neighbour = currentTile->getNeighboor(static_cast<EDirection>(dir));
         if (neighbour != nullptr && neighbour->getType() != Node::NONE)
         {
-            // Check if there is no obstacle between them
             EDirection direction = static_cast<EDirection>(dir);
             EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
             if (std::find(done.begin(), done.end(), neighbour) == done.end())
