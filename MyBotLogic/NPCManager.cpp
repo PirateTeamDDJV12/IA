@@ -37,7 +37,7 @@ void NPCManager::initNpcs(std::map<unsigned, NPCInfo> npcs)
 
 void NPCManager::initBT()
 {
-    m_BTAdministrator.init();
+    m_BTNpcUpdateAdministrator.init();
 }
 
 void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
@@ -62,7 +62,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
 
 
     // Move Npcs
-    m_BTAdministrator();
+    m_BTNpcUpdateAdministrator();
 
     for each(auto myNpc in m_npcs)
     {
