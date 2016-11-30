@@ -1,8 +1,10 @@
+
 #ifndef _MISSION_H_
 #define _MISSION_H_
 
 class Mission
 {
+public:
     enum MissionType
     {
         CHANGE_ZONE,
@@ -18,11 +20,17 @@ public:
 
     Mission(MissionType t, unsigned obj)
         : m_mType{t}, m_objective{obj}
-    {}
+    {
+        //MissionManager::get()->subscribeMission(*this); TODO IN NPCManager
+    }
 
     unsigned getObjective() const
     {
         return m_objective;
+    }
+    MissionType GetMissionType()
+    {
+        return m_mType;
     }
 
     void setDependanceMission(Mission *m)
