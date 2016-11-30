@@ -121,3 +121,8 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
         end(m_npcs),
         [](Npc* myNpc) {myNpc->unstackActions(); });
 }
+void NPCManager::createMission(Mission::MissionType type, unsigned objectif)
+{
+    Mission mission = Mission(type, objectif);
+    MissionManager::get()->subscribeMission(mission);
+}
