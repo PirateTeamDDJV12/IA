@@ -71,6 +71,7 @@ SET( AIBOT_HEADERS
 	MyBotLogic/BehaviourTree/BlocInstance/BlocRoot.h
 	MyBotLogic/BehaviourTree/BlocInstance/BlocSelect.h
 	MyBotLogic/BehaviourTree/BlocInstance/BlocSequence.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocTernarySelector.h
 	MyBotLogic/BehaviourTree/BlocInstance/BlocSuccess.h
 	MyBotLogic/BehaviourTree/BlocInstance/GeneralAction.h
 )
