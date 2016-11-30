@@ -47,14 +47,15 @@ MyBotLogic::MyBotLogic()
     // Init MAP
     BOT_LOGIC_LOG(mLogger, "Map Initialisation", true);
     Map::get()->initMap(_levelInfo.rowCount, _levelInfo.colCount, _levelInfo.visionRange);
+    
+    // Init objects
+    BOT_LOGIC_LOG(mLogger, "Objects Initialisation", true);
+    ObjectManager::get()->initObjects(_levelInfo.objects, _levelInfo.tiles);
 
     // Init npcs
     BOT_LOGIC_LOG(mLogger, "NPCs Initialisation", true);
     NPCManager::get()->initNpcs(_levelInfo.npcs);
 
-    // Init objects
-    BOT_LOGIC_LOG(mLogger, "Objects Initialisation", true);
-    ObjectManager::get()->initObjects(_levelInfo.objects, _levelInfo.tiles);
 }
 
 /*virtual*/ void MyBotLogic::OnBotInitialized()
@@ -82,11 +83,11 @@ MyBotLogic::MyBotLogic()
     myMap->logInfluenceMap(m_turnCount);
     myMap->logMap(m_turnCount);
 
-    // Update all NPCs and fill the action list
-    NPCManager::get()->updateNPCs(_actionList);
-
     // Update ObjectManager by adding all new discovered objects
     ObjectManager::get()->updateObjects(_turnInfo.objects, _turnInfo.tiles);
+
+    // Update all NPCs and fill the action list
+    NPCManager::get()->updateNPCs(_actionList);
 
     // Update loggers
     ObjectManager::get()->updateLogger(_turnInfo);

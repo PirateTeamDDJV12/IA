@@ -8,11 +8,11 @@ void Object::toString(std::stringstream& sstream)
     std::string type;
     switch (m_type)
     {
-    case PORTE:
-        type = "PORTE";
+    case DOOR:
+        type = "DOOR";
         break;
-    case BOUTON:
-        type = "BOUTON";
+    case BUTTON:
+        type = "BUTTON";
         break;
     case PRESSURE_PLATE:
         type = "PRESSURE_PLATE";

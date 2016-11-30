@@ -8,6 +8,11 @@
 #include <memory>
 
 
+class Object;
+
+using ObjectRef = std::shared_ptr<Object>;
+
+
 class Object
 {
     friend class ObjectManager;
@@ -15,8 +20,8 @@ class Object
 public:
     enum ObjectType
     {
-        PORTE,
-        BOUTON,
+        DOOR,
+        BUTTON,
         PRESSURE_PLATE
     };
 
@@ -25,7 +30,7 @@ private:
     ObjectType m_type;
     unsigned int m_tileId;
     bool m_isActive;
-    std::vector<std::shared_ptr<Object>> m_linkedObjects;
+    std::vector<ObjectRef> m_linkedObjects;
 
     //unsigned int m_activeTurnInfo; // 3;        // TODO WHEN INFORMATION WILL BE DELIVERED
     //unsigned int m_counter; // 3--;             // TODO WHEN INFORMATION WILL BE DELIVERED
@@ -45,7 +50,7 @@ public:
     ObjectType getType() const { return m_type; }
     unsigned int getTileId() const { return m_tileId; }
     bool isActive() const { return m_isActive; }
-    std::vector<std::shared_ptr<Object>>& getLinkedObjects() { return m_linkedObjects; }
+    std::vector<ObjectRef>& getLinkedObjects() { return m_linkedObjects; }
 
     // Setter
     void setIsActive(bool isActive) { m_isActive = isActive; }
@@ -53,7 +58,5 @@ public:
     // For logger
     void toString(std::stringstream& sstream);
 };
-
-using ObjectRef = std::shared_ptr<Object>;
 
 #endif // OBJECT_HEADER
