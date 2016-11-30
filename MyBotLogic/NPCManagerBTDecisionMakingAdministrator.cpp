@@ -31,6 +31,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
         BlocFabric::createGeneralAction(
             []() {
                 // TODO
+                return general::result::SUCCESS;
             },
             "AStar"
         )
@@ -72,6 +73,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
         BlocFabric::createGeneralAction(
             []() {
                 // TODO
+                return general::result::SUCCESS;
             },
             exploredAreaNoCaseOrRegularExploreBlocName
         )
@@ -111,6 +113,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
         BlocFabric::createGeneralAction(
             []() {
                 // TODO
+                return general::result::SUCCESS;
             },
             "ChangeArea"
         )
@@ -122,6 +125,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
         BlocFabric::createGeneralAction(
             []() {
                 // TODO
+                return general::result::SUCCESS;
             },
             "FindHiddenDoor"
         )
