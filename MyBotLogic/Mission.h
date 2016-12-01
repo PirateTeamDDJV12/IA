@@ -3,6 +3,7 @@
 
 class Mission
 {
+public:
     enum MissionType
     {
         CHANGE_ZONE,

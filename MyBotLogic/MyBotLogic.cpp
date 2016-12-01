@@ -35,7 +35,7 @@ MyBotLogic::MyBotLogic()
     //Write Code Here
 }
 
-/*virtual*/ void MyBotLogic::Load()
+/*virtual*/ void MyBotLogic::Start()
 {
     //Write Code Here
 #ifdef BOT_LOGIC_DEBUG
@@ -57,11 +57,6 @@ MyBotLogic::MyBotLogic()
     BOT_LOGIC_LOG(mLogger, "NPCs Initialisation", true);
     NPCManager::get()->initNpcs(_levelInfo.npcs);
 
-}
-
-/*virtual*/ void MyBotLogic::OnBotInitialized()
-{
-    //Write Code Here
 }
 
 /*virtual*/ void MyBotLogic::OnGameStarted()
