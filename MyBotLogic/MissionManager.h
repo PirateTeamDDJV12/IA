@@ -6,6 +6,7 @@
 
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 // Type de Retour du planificateur. Il suffira de remplacer ici une fois que
 //le vrai planificateur sera fait
@@ -37,15 +38,17 @@ public:
 class MissionManager : public Singleton
 {
 private:
-
+    
     static MissionManager m_instance;
     retourPlanificateur m_missions;
-    std::vector<std::pair<unsigned, unsigned>> m_objectifs;
+    std::vector<std::pair<unsigned, unsigned>> m_objectives;
     enum { MissionMax = 200 };
-    MissionManager()
+    unsigned int m_missionsCount;
+    unsigned int m_objectivesCount;
+    MissionManager() :m_missionsCount{ 0 }, m_objectivesCount{0}
     {
         m_missions.reserve(MissionMax);
-        m_objectifs.reserve(MissionMax);
+        m_objectives.reserve(MissionMax);
     }
 public:
     static MissionManager* get()
@@ -64,6 +67,14 @@ public:
     //Ajouter une mission (Se déplacer/ intéragir)
     void subscribeMission(Mission mission, unsigned int npcId);
     
+    //Supprimer une mission
+    void deleteMission(unsigned int npcId)
+    {
+        //Une seule mission par npc, on la place à la fin
+        std::remove_if(m_missions.begin(), m_missions.end(), [npcId](Mission mission) {return mission.getId() == npcId; });
+        //et on l'efface
+        m_missions.erase(m_missions.end());
+    }
 
 
 };
