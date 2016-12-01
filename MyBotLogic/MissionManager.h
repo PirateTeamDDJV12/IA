@@ -19,7 +19,7 @@ class Planificateur
 public:
 
 
-    static retourPlanificateur planifiedMissions(Mission mission, unsigned int npcID)
+    static retourPlanificateur planifyMissions(Mission mission, unsigned int npcID)
     {
         std::vector<Mission> subMissions;
         subMissions.push_back(mission);
