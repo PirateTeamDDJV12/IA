@@ -92,7 +92,7 @@ MyBotLogic::MyBotLogic()
     ObjectManager::get()->updateObjects(_turnInfo.objects, _turnInfo.tiles);
 
     // Update all NPCs and fill the action list
-    //NPCManager::get()->updateNPCs(_actionList);
+    NPCManager::get()->updateNPCs(_actionList);
 
     // Update loggers
     ObjectManager::get()->updateLogger(_turnInfo);

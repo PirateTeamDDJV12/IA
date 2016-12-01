@@ -12,9 +12,22 @@ ZoneManager::~ZoneManager()
 {
 }
 
+unsigned int ZoneManager::getZoneCount() const
+{
+    return m_zones.size();
+}
+
+
 Zone *ZoneManager::getZone(unsigned int zoneId) const
 {
     return m_zones.at(zoneId);
+}
+
+Zone *ZoneManager::addZone()
+{
+    unsigned int zoneId = m_zones.size() + 1;
+    m_zones[zoneId] = new Zone(zoneId);
+    return m_zones[zoneId];
 }
 
 void ZoneManager::addZone(Zone *zone)
@@ -46,11 +59,7 @@ void ZoneManager::updateZones()
     for (auto npc : npcs)
     {
         Node *npcNode = Map::get()->getNode(npc->getCurrentTileId());
-        if (npcNode->getZone() == 0)
-        {
-            npcNode->setZone(npc->getZone());
-        }
-        else
+        if (npcNode->getZone() != npc->getZone())
         {
             npc->setZone(npcNode->getZone());
         }

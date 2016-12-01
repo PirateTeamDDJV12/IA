@@ -17,7 +17,9 @@ public:
         return m_instance;
     }
 
+    unsigned int getZoneCount() const;
     Zone *getZone(unsigned int zoneId) const;
+    Zone *addZone();
     void addZone(Zone *zone);
     bool addJunction(unsigned int firstZone, unsigned int secondZone, Object *object);
     void updateZones();

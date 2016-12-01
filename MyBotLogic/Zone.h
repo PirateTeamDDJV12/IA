@@ -24,7 +24,8 @@ public:
     };
 
     // Zone Class
-    Zone();
+    Zone() = delete;
+    Zone(unsigned int id);
     ~Zone();
 
     const Junction  &getZoneJunction(unsigned int zoneId) const;

@@ -6,7 +6,7 @@ Zone::Junction::Junction(unsigned int destZone, Object *object) : m_destinationZ
 }
 
 // Zone class Implementation
-Zone::Zone()
+Zone::Zone(unsigned int id) : m_id{id}
 {
 }
 
