@@ -1,4 +1,4 @@
-#include "NPCManagerBTAdministrator.h"
+#include "NPCManagerBTNpcUpdateAdministrator.h"
 #include "Npc.h"
 
 #include <algorithm>
@@ -6,7 +6,7 @@
 using namespace BehaviourTree;
 
 
-void NPCManagerBTAdministrator::init()
+void NPCManagerBTNpcUpdateAdministrator::init()
 {
     BlocSequence* sequenceRoot = this->getBTRootAs<BlocSequence>();
 
@@ -22,7 +22,7 @@ void NPCManagerBTAdministrator::init()
     );
 }
 
-BlocRef NPCManagerBTAdministrator::createNpcBloc(Npc* npc, const std::string& npcName)
+BlocRef NPCManagerBTNpcUpdateAdministrator::createNpcBloc(Npc* npc, const std::string& npcName)
 {
     return BlocFabric::createGeneralAction(
                 [npc]() {
@@ -37,7 +37,7 @@ BlocRef NPCManagerBTAdministrator::createNpcBloc(Npc* npc, const std::string& np
 //////////////////////////////////////////////////////////////////////////
 
 
-void NPCManagerBTAdministrator::stopANpcByID(unsigned int npcID)
+void NPCManagerBTNpcUpdateAdministrator::stopANpcByID(unsigned int npcID)
 {
     std::string npcName = std::move(this->getNpcNameByID(npcID));
 
@@ -51,7 +51,7 @@ void NPCManagerBTAdministrator::stopANpcByID(unsigned int npcID)
 //////////////////////////////////////////////////////////////////////////
 
 
-void NPCManagerBTAdministrator::restartANpcByID(unsigned int NpcID, const std::string& npcNameBefore)
+void NPCManagerBTNpcUpdateAdministrator::restartANpcByID(unsigned int NpcID, const std::string& npcNameBefore)
 {
     if (!npcNameBefore.empty())
     {
@@ -69,7 +69,7 @@ void NPCManagerBTAdministrator::restartANpcByID(unsigned int NpcID, const std::s
     }
 }
 
-void NPCManagerBTAdministrator::restartANpcByIndex(size_t npcIndex, const std::string& npcNameBefore)
+void NPCManagerBTNpcUpdateAdministrator::restartANpcByIndex(size_t npcIndex, const std::string& npcNameBefore)
 {
     if (npcIndex < m_npcs->size() && this->getIndexByNpcName(npcNameBefore) < m_npcs->size())
     {
@@ -84,7 +84,7 @@ void NPCManagerBTAdministrator::restartANpcByIndex(size_t npcIndex, const std::s
 //////////////////////////////////////////////////////////////////////////
 
 
-std::string NPCManagerBTAdministrator::getNpcNameByID(unsigned int npcID)
+std::string NPCManagerBTNpcUpdateAdministrator::getNpcNameByID(unsigned int npcID)
 {
     for (size_t iter = 0; iter < m_npcs->size(); ++iter)
     {
@@ -97,24 +97,24 @@ std::string NPCManagerBTAdministrator::getNpcNameByID(unsigned int npcID)
     return "";
 }
 
-size_t NPCManagerBTAdministrator::getIndexByNpcName(const std::string& npcName)
+size_t NPCManagerBTNpcUpdateAdministrator::getIndexByNpcName(const std::string& npcName)
 {
     if (npcName.length() > 2)
     {
-        size_t unit = static_cast<size_t>(npcName.back() - NPCManagerBTAdministrator::CHAR_TO_NUMBER_ASCII);
-        size_t digit = static_cast<size_t>(npcName[npcName.length() - 2] - NPCManagerBTAdministrator::CHAR_TO_NUMBER_ASCII);
+        size_t unit = static_cast<size_t>(npcName.back() - NPCManagerBTNpcUpdateAdministrator::CHAR_TO_NUMBER_ASCII);
+        size_t digit = static_cast<size_t>(npcName[npcName.length() - 2] - NPCManagerBTNpcUpdateAdministrator::CHAR_TO_NUMBER_ASCII);
 
         return digit * 10 + unit;
     }
     
-    return NPCManagerBTAdministrator::NO_INDEX;
+    return NPCManagerBTNpcUpdateAdministrator::NO_INDEX;
 }
 
 
 //////////////////////////////////////////////////////////////////////////
 
 
-void NPCManagerBTAdministrator::swapNpcByIDs(unsigned int npc1ID, unsigned int npc2ID)
+void NPCManagerBTNpcUpdateAdministrator::swapNpcByIDs(unsigned int npc1ID, unsigned int npc2ID)
 {
     std::string npc1Name = std::move(this->getNpcNameByID(npc1ID));
 
@@ -133,7 +133,7 @@ void NPCManagerBTAdministrator::swapNpcByIDs(unsigned int npc1ID, unsigned int n
 //////////////////////////////////////////////////////////////////////////
 
 
-void NPCManagerBTAdministrator::restartANpcByNameAtBegin(const std::string& npcName)
+void NPCManagerBTNpcUpdateAdministrator::restartANpcByNameAtBegin(const std::string& npcName)
 {
     size_t npcIndex = this->getIndexByNpcName(npcName);
 
@@ -143,7 +143,7 @@ void NPCManagerBTAdministrator::restartANpcByNameAtBegin(const std::string& npcN
     }
 }
 
-void NPCManagerBTAdministrator::restartANpcByIDAtBegin(unsigned int npcID)
+void NPCManagerBTNpcUpdateAdministrator::restartANpcByIDAtBegin(unsigned int npcID)
 {
     std::string npcName = std::move(this->getNpcNameByID(npcID));
     if (!npcName.empty())
@@ -152,7 +152,7 @@ void NPCManagerBTAdministrator::restartANpcByIDAtBegin(unsigned int npcID)
     }
 }
 
-void NPCManagerBTAdministrator::restartANpcByIndexAtBegin(size_t npcIndex)
+void NPCManagerBTNpcUpdateAdministrator::restartANpcByIndexAtBegin(size_t npcIndex)
 {
     if (npcIndex < m_npcs->size())
     {
@@ -164,7 +164,7 @@ void NPCManagerBTAdministrator::restartANpcByIndexAtBegin(size_t npcIndex)
 //////////////////////////////////////////////////////////////////////////
 
 
-void NPCManagerBTAdministrator::restartANpcByNameAtEnd(const std::string& npcName)
+void NPCManagerBTNpcUpdateAdministrator::restartANpcByNameAtEnd(const std::string& npcName)
 {
     size_t npcIndex = this->getIndexByNpcName(npcName);
 
@@ -174,7 +174,7 @@ void NPCManagerBTAdministrator::restartANpcByNameAtEnd(const std::string& npcNam
     }
 }
 
-void NPCManagerBTAdministrator::restartANpcByIDAtEnd(unsigned int npcID)
+void NPCManagerBTNpcUpdateAdministrator::restartANpcByIDAtEnd(unsigned int npcID)
 {
     std::string npcName = std::move(this->getNpcNameByID(npcID));
 
@@ -184,7 +184,7 @@ void NPCManagerBTAdministrator::restartANpcByIDAtEnd(unsigned int npcID)
     }
 }
 
-void NPCManagerBTAdministrator::restartANpcByIndexAtEnd(size_t npcIndex)
+void NPCManagerBTNpcUpdateAdministrator::restartANpcByIndexAtEnd(size_t npcIndex)
 {
     if (npcIndex < m_npcs->size())
     {

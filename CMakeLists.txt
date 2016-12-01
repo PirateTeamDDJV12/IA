@@ -51,7 +51,8 @@ SET( AIBOT_HEADERS
 	MyBotLogic/NPCManager.h
 	MyBotLogic/ObjectManager.h
 	MyBotLogic/Object.h
-	MyBotLogic/NPCManagerBTAdministrator.h
+	MyBotLogic/NPCManagerBTNpcUpdateAdministrator.h
+	MyBotLogic/NPCManagerBTDecisionMakingAdministrator.h
 	MyBotLogic/TimeManager.h
 	
 	#MY_BOT_BT
@@ -71,6 +72,7 @@ SET( AIBOT_HEADERS
 	MyBotLogic/BehaviourTree/BlocInstance/BlocRoot.h
 	MyBotLogic/BehaviourTree/BlocInstance/BlocSelect.h
 	MyBotLogic/BehaviourTree/BlocInstance/BlocSequence.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocTernarySelector.h
 	MyBotLogic/BehaviourTree/BlocInstance/BlocSuccess.h
 	MyBotLogic/BehaviourTree/BlocInstance/GeneralAction.h
 )
@@ -93,7 +95,8 @@ SET( AIBOT_SRC
 	MyBotLogic/NPCManager.cpp
 	MyBotLogic/ObjectManager.cpp
 	MyBotLogic/Object.cpp
-	MyBotLogic/NPCManagerBTAdministrator.cpp
+	MyBotLogic/NPCManagerBTNpcUpdateAdministrator.cpp
+	MyBotLogic/NPCManagerBTDecisionMakingAdministrator.cpp
 	MyBotLogic/TimeManager.cpp
 	
 	#Main
