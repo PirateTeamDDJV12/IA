@@ -3,7 +3,8 @@
 #include "Singleton.h"
 #include "Npc.h"
 #include "NPCInfo.h"
-#include "NPCManagerBTAdministrator.h"
+#include "NPCManagerBTNpcUpdateAdministrator.h"
+#include "NPCManagerBTDecisionMakingAdministrator.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -24,16 +25,19 @@ private:
     std::vector<Npc*> m_npcs;
 
     //BT administrator to manage NPCs via BT. Has plenty of useful methods...
-    NPCManagerBTAdministrator m_BTAdministrator;
+    NPCManagerBTNpcUpdateAdministrator m_BTNpcUpdateAdministrator;
+
+    //BT that stores the decision making algorithm
+    NPCManagerBTDecisionMakingAdministrator m_BTDecisionMakingAdministrator;
 
     // Singleton instance
     static NPCManager m_instance;
 
     NPCManager() :
-        m_BTAdministrator{}
+        m_BTNpcUpdateAdministrator{}
     {
         m_npcs.reserve(MAX_NPCS);
-        m_BTAdministrator.reassignNpcVectorArray(m_npcs);
+        m_BTNpcUpdateAdministrator.reassignNpcVectorArray(m_npcs);
     }
 
 

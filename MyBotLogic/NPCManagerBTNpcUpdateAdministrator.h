@@ -1,5 +1,5 @@
-#ifndef NPCMANAGERBTADMINISTRATOR_H_INCLUDED
-#define NPCMANAGERBTADMINISTRATOR_H_INCLUDED
+#ifndef NPCMANAGERBTNPCUPDATEADMINISTRATOR_H_INCLUDED
+#define NPCMANAGERBTNPCUPDATEADMINISTRATOR_H_INCLUDED
 
 
 #include "BehaviourTree/BehaviourTreeModule.h"
@@ -10,7 +10,7 @@
 
 class Npc;
 
-class NPCManagerBTAdministrator
+class NPCManagerBTNpcUpdateAdministrator
 {
 public:
     enum
@@ -32,8 +32,8 @@ private:
 
 
 public:
-    NPCManagerBTAdministrator() :
-        m_behaviorTreeRoot{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocSequence>("NpcManagerRoot") }
+    NPCManagerBTNpcUpdateAdministrator() :
+        m_behaviorTreeRoot{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocSequence>("UpdateNpcManagerRoot") }
     {}
 
 
@@ -143,4 +143,4 @@ public:
     }
 };
 
-#endif //NPCMANAGERBTADMINISTRATOR_H_INCLUDED
+#endif //NPCMANAGERBTNPCUPDATEADMINISTRATOR_H_INCLUDED

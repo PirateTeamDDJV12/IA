@@ -35,7 +35,7 @@ MyBotLogic::MyBotLogic()
     //Write Code Here
 }
 
-/*virtual*/ void MyBotLogic::Load()
+/*virtual*/ void MyBotLogic::Start()
 {
     //Write Code Here
 #ifdef BOT_LOGIC_DEBUG
