@@ -4,9 +4,6 @@
 
 #include "BehaviourTree/BehaviourTreeModule.h"
 
-#include <vector>
-#include <string>
-
 
 
 class NPCManagerBTDecisionMakingAdministrator
