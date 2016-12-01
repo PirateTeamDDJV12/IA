@@ -4,7 +4,6 @@
 #include "Npc.h"
 #include "NPCInfo.h"
 #include "NPCManagerBTAdministrator.h"
-#include "MissionManager.h"
 #include "Mission.h"
 #include "NPCManagerBTNpcUpdateAdministrator.h"
 #include "NPCManagerBTDecisionMakingAdministrator.h"
@@ -64,8 +63,6 @@ public:
     {
         return m_npcs;
     }
-    //Create a mission and send it to the MissionManager
-    void createMission(Mission::MissionType type, unsigned objectif);
     
 };
 
