@@ -16,9 +16,7 @@ private:
 
 
 public:
-    NPCManagerBTDecisionMakingAdministrator() :
-        m_behaviorTreeRoot{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocTernarySelector>("DecisionMakingNpcManagerRoot") }
-    {}
+    NPCManagerBTDecisionMakingAdministrator();
 
 
 public:

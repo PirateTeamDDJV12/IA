@@ -6,9 +6,17 @@
 using namespace BehaviourTree;
 
 
+
+NPCManagerBTDecisionMakingAdministrator::NPCManagerBTDecisionMakingAdministrator() :
+    m_behaviorTreeRoot{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocTernarySelector>("DecisionMakingNpcManagerRoot") }
+{
+    this->init();
+}
+
+
 void NPCManagerBTDecisionMakingAdministrator::init()
 {
-    BlocTernarySelector* ternarySelectorRoot = m_behaviorTreeRoot.as<BlocTernarySelector>();
+    BlocTernarySelector* ternarySelectorRoot = m_behaviorTreeRoot.getRoot()->as<BlocTernarySelector>();
 
 
     // First Layer => has a goal? 
@@ -18,7 +26,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     // Has a goal check bloc
     ternarySelectorRoot->connect(
         BlocFabric::createGeneralAction(
-            [&]() {
+            [this]() {
                 // TODO
                 return /*Has a goal*/true ? general::result::SUCCESS : general::result::FAIL;
             },
@@ -26,17 +34,17 @@ void NPCManagerBTDecisionMakingAdministrator::init()
         )
     );
 
+
     // YES : assign AStar
     ternarySelectorRoot->connect(
         BlocFabric::createGeneralAction(
-            [&]() {
+            [this]() {
                 // TODO
                 return general::result::SUCCESS;
             },
             "AStar"
         )
     );
-
 
     // Second Layer node creation
     BlocRef exploredAreaTernaryRef = BlocFabric::createCompositeBloc<BlocTernarySelector>("ExploredAreaNode");
@@ -57,7 +65,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     // the area is explored checker bloc
     exploredAreaTernarySelector->connect(
         BlocFabric::createGeneralAction(
-            [&]() {
+            [this]() {
                 // TODO
                 return /*is the area explored ?*/true ? general::result::SUCCESS : general::result::FAIL;
             },
@@ -71,7 +79,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
 
     exploredAreaTernarySelector->connect(
         BlocFabric::createGeneralAction(
-            [&]() {
+            [this]() {
                 // TODO
                 return general::result::SUCCESS;
             },
@@ -99,7 +107,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     // a door is there checker bloc
     aDoorIsThereTernarySelector->connect(
         BlocFabric::createGeneralAction(
-            [&]() {
+            [this]() {
                 // TODO
                 return /*a door is there ?*/true ? general::result::SUCCESS : general::result::FAIL;
             },
@@ -111,7 +119,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     //YES : change area
     exploredAreaTernarySelector->connect(
         BlocFabric::createGeneralAction(
-            []() {
+            [this]() {
                 // TODO
                 return general::result::SUCCESS;
             },
@@ -123,7 +131,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     //NO : Find hidden door
     exploredAreaTernarySelector->connect(
         BlocFabric::createGeneralAction(
-            []() {
+            [this]() {
                 // TODO
                 return general::result::SUCCESS;
             },
