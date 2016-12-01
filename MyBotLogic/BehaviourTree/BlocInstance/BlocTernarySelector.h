@@ -25,8 +25,6 @@ namespace BehaviourTree
     public:
         virtual general::result operator()()
         {
-            assert(children.size() == 3, "Ahhhh. This TernaryBlocSelector named " + name() + " is not equal to 3");
-
             if ((*children[0])() == general::result::SUCCESS)
             {
                 return (*children[1])();

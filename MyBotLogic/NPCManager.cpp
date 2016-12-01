@@ -37,6 +37,7 @@ void NPCManager::initNpcs(std::map<unsigned, NPCInfo> npcs)
 
 void NPCManager::initBT()
 {
+    m_BTDecisionMakingAdministrator.init();
     m_BTNpcUpdateAdministrator.init();
 }
 

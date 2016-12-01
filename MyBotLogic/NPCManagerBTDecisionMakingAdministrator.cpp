@@ -18,7 +18,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     // Has a goal check bloc
     ternarySelectorRoot->connect(
         BlocFabric::createGeneralAction(
-            []() {
+            [&]() {
                 // TODO
                 return /*Has a goal*/true ? general::result::SUCCESS : general::result::FAIL;
             },
@@ -29,7 +29,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     // YES : assign AStar
     ternarySelectorRoot->connect(
         BlocFabric::createGeneralAction(
-            []() {
+            [&]() {
                 // TODO
                 return general::result::SUCCESS;
             },
@@ -57,7 +57,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     // the area is explored checker bloc
     exploredAreaTernarySelector->connect(
         BlocFabric::createGeneralAction(
-            []() {
+            [&]() {
                 // TODO
                 return /*is the area explored ?*/true ? general::result::SUCCESS : general::result::FAIL;
             },
@@ -71,7 +71,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
 
     exploredAreaTernarySelector->connect(
         BlocFabric::createGeneralAction(
-            []() {
+            [&]() {
                 // TODO
                 return general::result::SUCCESS;
             },
@@ -99,7 +99,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     // a door is there checker bloc
     aDoorIsThereTernarySelector->connect(
         BlocFabric::createGeneralAction(
-            []() {
+            [&]() {
                 // TODO
                 return /*a door is there ?*/true ? general::result::SUCCESS : general::result::FAIL;
             },

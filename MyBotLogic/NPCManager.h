@@ -4,6 +4,7 @@
 #include "Npc.h"
 #include "NPCInfo.h"
 #include "NPCManagerBTNpcUpdateAdministrator.h"
+#include "NPCManagerBTDecisionMakingAdministrator.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -25,6 +26,9 @@ private:
 
     //BT administrator to manage NPCs via BT. Has plenty of useful methods...
     NPCManagerBTNpcUpdateAdministrator m_BTNpcUpdateAdministrator;
+
+    //BT that stores the decision making algorithm
+    NPCManagerBTDecisionMakingAdministrator m_BTDecisionMakingAdministrator;
 
     // Singleton instance
     static NPCManager m_instance;
