@@ -7,8 +7,17 @@
 #include <algorithm>
 
 
-Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone)
-    : m_currentState{NONE}, m_nextState{EXPLORING}, m_id{a_id}, m_goal{}, m_hasGoal{false}, m_path{a_tileId}, m_nextActions{}, m_historyTiles{a_tileId}, m_turnCount{0}, m_zone {zone}
+Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone) : 
+    m_currentState{ NONE }, 
+    m_nextState{ EXPLORING }, 
+    m_id{ a_id }, m_goal{}, 
+    m_hasGoal{ false }, 
+    m_path{ a_tileId }, 
+    m_nextActions{}, 
+    m_historyTiles{ a_tileId }, 
+    m_turnCount{ 0 }, 
+    m_zone{ zone },
+    m_exploreBT{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocSelect>("NpcExploreRoot") }
 {
 #ifdef BOT_LOGIC_DEBUG_NPC
     m_logger.Init(a_path, "Npc_" + std::to_string(m_id) + ".log");
@@ -16,6 +25,7 @@ Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned 
 
     BOT_LOGIC_NPC_LOG(m_logger, "Configure", true);
 
+    this->initExploreBT();
 };
 
 void Npc::update()
@@ -36,7 +46,7 @@ void Npc::update()
                 wait();
                 break;
             case(EXPLORING):
-                explore();
+                m_exploreBT();
                 break;
             case(INTERACTING):
                 interact();
@@ -120,7 +130,7 @@ void Npc::calculPath()
 bool Npc::updatePath()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "\tUpdating Path ", true);
-    DisplayVector("\t\tOld path: ", m_path);
+    displayVector("\t\tOld path: ", m_path);
     std::vector<unsigned> reversePath;
     reversePath.resize(m_path.size());
     std::reverse_copy(begin(m_path), end(m_path), begin(reversePath));
@@ -130,7 +140,7 @@ bool Npc::updatePath()
         if(!Map::get()->canMoveOnTile(oldTileId, tileId))
         {
             m_path = Map::get()->getNpcPath(getCurrentTileId(), m_goal);
-            DisplayVector("\t\tPath Updated : ", m_path);
+            displayVector("\t\tPath Updated : ", m_path);
             return true;
         }
         oldTileId = tileId;
@@ -155,10 +165,11 @@ void Npc::explore()
     if(hasGoal())
     {
         BOT_LOGIC_NPC_LOG(m_logger, "\tNPC have a goal : " + std::to_string(m_goal), true);
-        DisplayVector("\tNpc base path :", m_path);
+        displayVector("\tNpc base path :", m_path);
         m_nextState = MOVING;
         return;
     }
+    m_exploreBT();
 
     // Get the most influenced tile near the NPC
     int bestTile = Map::get()->getNearInfluencedTile(getCurrentTileId());
@@ -169,7 +180,7 @@ void Npc::explore()
         // TODO - Try to get the most influent tile around us in range of 2 instead of looking for a non visited tile
         // Get all non visited tiles
         std::vector<unsigned> nonVisitedTiles = Map::get()->getNonVisitedTile();
-        DisplayVector("\t-Looking for the non visited tiles : ", nonVisitedTiles);
+        displayVector("\t-Looking for the non visited tiles : ", nonVisitedTiles);
         for(unsigned index : nonVisitedTiles)
         {
             // Test if we can have a good path to this tile
@@ -233,7 +244,7 @@ void Npc::interact()
 }
 
 template<class T>
-void Npc::DisplayVector(std::string info, const std::vector<T> v)
+void Npc::displayVector(std::string info, const std::vector<T> v)
 {
     std::string s{""};
     for(T u : v)
@@ -242,3 +253,116 @@ void Npc::DisplayVector(std::string info, const std::vector<T> v)
     }
     BOT_LOGIC_NPC_LOG(m_logger, info + s, true);
 }
+
+///////////////////////////////////////////////
+
+void Npc::initExploreBT()
+{
+    /************************************************************************/
+    /* First layer                                                          */
+    /************************************************************************/
+
+    // Root of the Exploration's BT
+    BehaviourTree::BlocComposite* rootSelect = m_exploreBT.getRoot()->as<BehaviourTree::BlocComposite>();
+
+
+    /************************************************************************/
+    /* Second layer                                                         */
+    /************************************************************************/
+
+    // rootSelect's first child (sequence)
+    BehaviourTree::BlocRef tileExplorationSequenceRef = BehaviourTree::BlocFabric::createCompositeBloc<BehaviourTree::BlocSequence>("TileExplorationSequence");
+    BehaviourTree::BlocSequence* tileExplorationSequence = tileExplorationSequenceRef->as<BehaviourTree::BlocSequence>();
+
+    // rootSelect's second child (sequence)
+    BehaviourTree::BlocRef wallExplorationSequenceRef = BehaviourTree::BlocFabric::createCompositeBloc<BehaviourTree::BlocSequence>("WallExplorationSequence");
+    BehaviourTree::BlocSequence* wallExplorationSequence = wallExplorationSequenceRef->as<BehaviourTree::BlocSequence>();
+
+    // Connecting rootSelect's childs to itself
+    rootSelect->connect(tileExplorationSequenceRef);
+    rootSelect->connect(wallExplorationSequenceRef);
+
+
+    /************************************************************************/
+    /* Third layer                                                          */
+    /************************************************************************/
+
+    // tileExplorationSequence's first child (loop) - The loop will iterate for each directions (6x max)
+    BehaviourTree::BlocRef checkSequenceRef = BehaviourTree::BlocFabric::createCompositeBloc<BehaviourTree::BlocSequence>("CheckLoop");
+    BehaviourTree::BlocSequence* checkSequence = checkSequenceRef->as<BehaviourTree::BlocSequence>();
+
+    BehaviourTree::BlocRef checkLoopRef =  BehaviourTree::BlocFabric::createLoopBloc<BehaviourTree::BlocBreakingLoopOnSuccess>(6, checkSequenceRef, "Loop");
+    BehaviourTree::BlocBreakingLoopOnSuccess* checkLoop = checkLoopRef->as<BehaviourTree::BlocBreakingLoopOnSuccess>();
+
+    // tileExplorationSequence's second child (action)
+    BehaviourTree::BlocRef moveToTileActionRef = createMoveToTileAction();
+
+    // Connecting tileExplorationSequence's childs to itself
+    tileExplorationSequence->connect(checkLoopRef);
+    tileExplorationSequence->connect(moveToTileActionRef);
+
+
+    /************************************************************************/
+    /* Fourth layer                                                         */
+    /************************************************************************/
+
+    // checkSequence's first child (action)
+    BehaviourTree::BlocRef moveToNextTileActionRef = createCheckTileAction();
+
+    // checkSequence's second child (action)
+    BehaviourTree::BlocRef moveToNextTileActionRef = createModifyMoveDirectionAction();
+}
+
+BehaviourTree::BlocRef Npc::createCheckTileAction()
+{
+    return BehaviourTree::BlocFabric::createGeneralAction(
+        [this]()
+    {
+
+
+
+        return BehaviourTree::general::result::FAIL;
+    },
+        "CheckTile"
+        );
+}
+
+BehaviourTree::BlocRef Npc::createModifyMoveDirectionAction()
+{
+    return BehaviourTree::BlocFabric::createGeneralAction(
+        [this]()
+    {
+
+
+
+        return BehaviourTree::general::result::FAIL;
+    },
+        "ChangeDirection"
+        );
+}
+
+BehaviourTree::BlocRef Npc::createMoveToTileAction()
+{
+    return BehaviourTree::BlocFabric::createGeneralAction(
+        [this]()
+    {
+
+
+
+        return BehaviourTree::general::result::FAIL;
+    },
+        "CheckTile"
+        );
+}
+
+//void Npc::swapToExplore()
+//{
+//    getBTRootAs<BehaviourTree::BlocComposite>()->disconnect(0);
+//    getBTRootAs<BehaviourTree::BlocComposite>()->connect(createExploreAction());
+//}
+//
+//void Npc::swapToExploreWall()
+//{
+//    getBTRootAs<BehaviourTree::BlocComposite>()->disconnect(0);
+//    getBTRootAs<BehaviourTree::BlocComposite>()->connect(createExploreWallAction());
+//}

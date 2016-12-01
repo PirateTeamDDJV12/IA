@@ -3,8 +3,11 @@
 
 #include "Logger.h"
 
+#include "BehaviourTree/BehaviourTreeModule.h" 
+
 #include <string>
 #include <vector>
+
 
 #ifdef _DEBUG
 #define BOT_LOGIC_DEBUG_NPC
@@ -16,12 +19,15 @@
 #define BOT_LOGIC_NPC_LOG(logger, text, autoEndLine) 0
 #endif
 
+
 struct Action;
+
 
 class Npc 
 {
 private:
-    enum npcState {
+    enum npcState
+    {
         NONE,
         MOVING,
         WAITING,
@@ -41,6 +47,7 @@ private:
     std::vector<unsigned int> m_historyTiles;
     std::vector<Action*> m_nextActions;
     Logger m_logger;
+    BehaviourTree::BlocRoot m_exploreBT;
 
 public:
     Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone);
@@ -70,7 +77,7 @@ public:
     bool updatePath();
 
     template<class T>
-    void DisplayVector(std::string, const std::vector<T>);
+    void displayVector(std::string, const std::vector<T>);
 
     unsigned int getCurrentTileId()
     {
@@ -122,6 +129,28 @@ public:
     {
         return m_nextActions;
     }
+
+    ///////////////////////////////////////
+    void initExploreBT();
+
+    BehaviourTree::BlocRef createCheckTileAction();
+    BehaviourTree::BlocRef createModifyMoveDirectionAction();
+    BehaviourTree::BlocRef createMoveToTileAction();
+
+    //void swapToExplore();
+    //void swapToExploreWall();
+
+    template<class RootBase>
+    RootBase* getBTRootAs() noexcept
+    {
+        static_assert(
+            std::is_base_of<BehaviourTree::BlocComposite, RootBase>::value ||
+            std::is_same<BehaviourTree::BlocComposite, RootBase>::value
+            , "Not a valid root casting");
+
+        return m_exploreBT.getRoot()->as<RootBase>();
+    }
+    ///////////////////////////////////////
 
 private:
     void explore();
