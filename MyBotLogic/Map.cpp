@@ -92,7 +92,7 @@ Node* Map::getNode(unsigned int index)
     return m_nodeMap[index];
 }
 
-float Map::calculateDistance(int indexStart, int indexEnd)
+int Map::calculateDistance(int indexStart, int indexEnd)
 {
     Node* start = m_nodeMap[indexStart];
     Node* end = m_nodeMap[indexEnd];
@@ -114,7 +114,7 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
             std::vector<unsigned>::iterator goalIt = begin(copyMapGoal);
             for (; goalIt != end(copyMapGoal); ++goalIt)
             {
-                float distance = calculateDistance(npc->getCurrentTileId(), *goalIt);
+                int distance = calculateDistance(npc->getCurrentTileId(), *goalIt);
                 if (distance < bestDist)
                 {
                     goalId = *goalIt;
@@ -142,7 +142,7 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
                 {
                     continue;
                 }
-                float distance = calculateDistance(npc->getCurrentTileId(), goal);
+                int distance = calculateDistance(npc->getCurrentTileId(), goal);
                 if (distance < bestDist)
                 {
                     npcId = npc->getId();
@@ -476,13 +476,13 @@ void Map::logMap(unsigned nbTurn)
     // Printing the map
     myLog += "Map : \n";
     unsigned int currentTileId{};
-    for (int row = 0; row < m_height; ++row)
+    for (unsigned int row = 0; row < m_height; ++row)
     {
         if (row % 2)
         {
             myLog += "   ";
         }
-        for (int col = 0; col < m_width; ++col)
+        for (unsigned int col = 0; col < m_width; ++col)
         {
             Node* tempNode = getNode(currentTileId++);
             if (tempNode->getNpcIdOnNode() > 0)
@@ -523,18 +523,18 @@ void Map::logMap(unsigned nbTurn)
 void Map::logInfluenceMap(unsigned nbTurn)
 {
 #ifdef BOT_LOGIC_DEBUG_MAP
-    std::string myLog = "\nTurn #" + std::to_string(nbTurn) + "\n";
+    std::string myLog = std::move("\nTurn #" + std::to_string(nbTurn) + "\n");
 
     // Printing the map
     myLog += "Map : \n";
     unsigned int currentTileId{};
-    for (int row = 0; row < m_height; ++row)
+    for (unsigned int row = 0; row < m_height; ++row)
     {
         if (row % 2)
         {
             myLog += "   ";
         }
-        for (int col = 0; col < m_width; ++col)
+        for (unsigned int col = 0; col < m_width; ++col)
         {
             Node* tempNode = getNode(currentTileId++);
             float influ = std::trunc(100 * tempNode->getInfluence()) / 100;
@@ -558,18 +558,18 @@ void Map::logInfluenceMap(unsigned nbTurn)
 void Map::logZoneMap(unsigned nbTurn)
 {
 #ifdef BOT_LOGIC_DEBUG_MAP
-    std::string myLog = "\nTurn #" + std::to_string(nbTurn) + "\n";
+    std::string myLog = std::move("\nTurn #" + std::to_string(nbTurn) + "\n");
 
     // Printing the map
     myLog += "Map : \n";
     unsigned int currentTileId{};
-    for (int row = 0; row < m_height; ++row)
+    for (unsigned int row = 0; row < m_height; ++row)
     {
         if (row % 2)
         {
             myLog += "  ";
         }
-        for (int col = 0; col < m_width; ++col)
+        for (unsigned int col = 0; col < m_width; ++col)
         {
             Node* tempNode = getNode(currentTileId++);
             unsigned int zone = tempNode->getZone();
@@ -599,9 +599,9 @@ void Map::initMap(unsigned int row, unsigned int col, unsigned int range)
 
     // Create all Nodes
     unsigned int countIndex = 0;
-    for (int i = 0; i < row; ++i)
+    for (unsigned int i = 0; i < row; ++i)
     {
-        for (int j = 0; j < col; ++j)
+        for (unsigned int j = 0; j < col; ++j)
         {
             createNode(new Node{ j, i, countIndex, Node::NONE });
             countIndex++;

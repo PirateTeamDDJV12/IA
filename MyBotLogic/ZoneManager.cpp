@@ -12,7 +12,7 @@ ZoneManager::~ZoneManager()
 {
 }
 
-unsigned int ZoneManager::getZoneCount() const
+size_t ZoneManager::getZoneCount() const
 {
     return m_zones.size();
 }
@@ -25,7 +25,7 @@ Zone *ZoneManager::getZone(unsigned int zoneId) const
 
 Zone *ZoneManager::addZone()
 {
-    unsigned int zoneId = m_zones.size() + 1;
+    unsigned int zoneId = static_cast<unsigned int>(m_zones.size() + 1);
     m_zones[zoneId] = new Zone(zoneId);
     return m_zones[zoneId];
 }

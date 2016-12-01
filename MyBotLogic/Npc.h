@@ -43,7 +43,7 @@ private:
     Logger m_logger;
 
 public:
-    Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone);
+    Npc(unsigned int a_id, unsigned int a_tileId, const std::string& a_path, unsigned int zone);
 
     unsigned int getId()
     {
@@ -77,7 +77,7 @@ public:
         return m_path.back();
     }
     int getNextPathTile()const;
-    unsigned int getPathSize() const
+    size_t getPathSize() const
     {
         return m_path.size();
     }

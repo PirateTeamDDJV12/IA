@@ -62,15 +62,17 @@ void ObjectManager::updateObjects(const std::map<unsigned int, ObjectInfo>& obje
     }
 }
 
-const Object& ObjectManager::getObjectById(Object::ObjectType type, size_t index) const
+const ObjectRef ObjectManager::getObjectById(Object::ObjectType type, size_t index) const
 {
     for (auto iterPair : m_allObjects)
     {
         if (iterPair.first == type)
         {
-            return *iterPair.second[index];
+            return iterPair.second[index];
         }
     }
+
+    return ObjectRef();
 }
 
 const std::vector<ObjectRef> ObjectManager::getAllObjectsOnTile(unsigned int tileId) const

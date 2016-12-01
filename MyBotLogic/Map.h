@@ -44,7 +44,7 @@ class Map : Singleton
 private:
     Map() : m_width(0), m_height(0)
     {}
-    float calculateDistance(int start, int end);
+    int calculateDistance(int start, int end);
     std::string getStringDirection(unsigned int, unsigned int);
     void testAddTile(std::vector<unsigned>& v, unsigned int, unsigned int tileId);
 public:

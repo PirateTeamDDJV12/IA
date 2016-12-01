@@ -72,7 +72,7 @@ public:
     void updateObjects(const std::map<unsigned int, ObjectInfo>& objects, const std::map<unsigned int, TileInfo>& tiles);
 
     // Get an object by its Id
-    const Object& getObjectById(Object::ObjectType type, size_t index) const;
+    const ObjectRef getObjectById(Object::ObjectType type, size_t index) const;
 
     // Get all objects on a specific tile
     const std::vector<ObjectRef> getAllObjectsOnTile(unsigned int tileId) const;

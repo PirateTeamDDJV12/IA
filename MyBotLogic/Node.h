@@ -6,9 +6,9 @@
 
 struct Position
 {
-    int x;
-    int y;
-    Position(int xVal, int yVal)
+    unsigned int x;
+    unsigned int y;
+    Position(unsigned int xVal, unsigned int yVal)
         :x{ xVal }, y{ yVal }
     {}
 };
@@ -45,7 +45,7 @@ private:
     // TODO - Ajouter une zone a nos nodes pour les differencier et permettre de tout de suite savoir si on peut acceder a ce node ou pas
 public:
     Node() = delete;
-    Node(int xVal, int yVal, unsigned int idVal, NodeType typeVal);
+    Node(unsigned int xVal, unsigned int yVal, unsigned int idVal, NodeType typeVal);
 
     NodeType getType() const noexcept
     {

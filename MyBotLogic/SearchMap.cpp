@@ -76,6 +76,8 @@ std::vector<unsigned int> SearchMap::search()
             }
         }
     }
+
+    return std::vector<unsigned int>();
 }
 
 SearchMap::SearchMap(Node* start, Node* goal)

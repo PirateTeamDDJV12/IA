@@ -118,12 +118,12 @@ public:
     /* Utilitary */
     bool npcByNameIsConnected(const std::string& npcName)
     {
-        return this->getBTRootAs<BehaviourTree::BlocComposite>()->findByName(npcName);
+        return this->getBTRootAs<BehaviourTree::BlocComposite>()->findByName(npcName) != nullptr;
     }
 
     bool npcByIndexIsConnected(size_t npcIndex)
     {
-        return npcIndex < m_npcs->size() ? npcByNameIsConnected(this->getNpcNameByID(npcIndex)) : false;
+        return npcIndex < m_npcs->size() ? npcByNameIsConnected(this->getNpcNameByIndex(npcIndex)) : false;
     }
 
     bool npcByIdIsConnected(unsigned int npcID)
