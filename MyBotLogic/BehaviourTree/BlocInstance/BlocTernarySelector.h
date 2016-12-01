@@ -2,7 +2,7 @@
 #define BLOCTERNARYSELECTOR_H
 
 #include "BlocComposite.h"
-#include <assert.h>
+
 
 namespace BehaviourTree
 {
