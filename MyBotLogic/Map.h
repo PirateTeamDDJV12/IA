@@ -164,10 +164,6 @@ public:
     void initMap(unsigned int row, unsigned int col, unsigned int range);
     void updateEdges(std::map<unsigned, ObjectInfo> objects, unsigned nbTurn);
     void updateTiles(std::map<unsigned, TileInfo> tiles);
-
-    // Update Zones
-    void updateTileZone(Node* currentTile, std::set<Node *> &beingDone, std::vector<Node *> &toDo);
-    void updateZones(std::map<unsigned int, NPCInfo> npcInfo, std::vector<Npc *> npcs);
 };
 
 #endif // MAP_HEADER

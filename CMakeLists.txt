@@ -54,6 +54,8 @@ SET( AIBOT_HEADERS
 	MyBotLogic/NPCManagerBTNpcUpdateAdministrator.h
 	MyBotLogic/NPCManagerBTDecisionMakingAdministrator.h
 	MyBotLogic/TimeManager.h
+	MyBotLogic/Zone.h
+	MyBotLogic/ZoneManager.h
 	
 	#MY_BOT_BT
 	MyBotLogic/BehaviourTree/BehaviourTreeModule.h
@@ -98,6 +100,8 @@ SET( AIBOT_SRC
 	MyBotLogic/NPCManagerBTNpcUpdateAdministrator.cpp
 	MyBotLogic/NPCManagerBTDecisionMakingAdministrator.cpp
 	MyBotLogic/TimeManager.cpp
+	MyBotLogic/Zone.cpp
+	MyBotLogic/ZoneManager.cpp
 	
 	#Main
 	Main.cpp
