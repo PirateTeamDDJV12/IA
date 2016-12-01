@@ -68,10 +68,10 @@ public:
     void subscribeMission(Mission mission, unsigned int npcId);
     
     //Supprimer une mission
-    void deleteMission(unsigned int npcId)
+    void deleteMission(unsigned int missionId)
     {
         //Une seule mission par npc, on la place à la fin
-        std::remove_if(m_missions.begin(), m_missions.end(), [npcId](Mission mission) {return mission.getId() == npcId; });
+        std::remove_if(m_missions.begin(), m_missions.end(), [missionId](Mission mission) {return mission.getId() == missionId; });
         //et on l'efface
         m_missions.erase(m_missions.end());
     }
