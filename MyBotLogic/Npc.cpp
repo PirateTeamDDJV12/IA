@@ -114,7 +114,13 @@ void Npc::calculPath()
     {
         return;
     }
-    m_path = Map::get()->getNpcPath(getCurrentTileId(), m_goal);
+    std::vector<unsigned> path = Map::get()->getNpcPath(getCurrentTileId(), m_goal);
+    if(path.size() <= 0)
+    {
+        m_hasGoal = false;
+        return;
+    }
+    m_path = path;
 }
 
 bool Npc::updatePath()
