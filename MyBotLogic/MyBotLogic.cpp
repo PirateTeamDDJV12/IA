@@ -7,6 +7,7 @@
 #include "Map.h"
 #include "NPCManager.h"
 #include "ObjectManager.h"
+#include "ZoneManager.h"
 
 
 MyBotLogic::MyBotLogic()
@@ -76,7 +77,8 @@ MyBotLogic::MyBotLogic()
     // Update graph
     myMap->updateEdges(_turnInfo.objects, m_turnCount);
     myMap->updateTiles(_turnInfo.tiles);
-    myMap->updateZones(_turnInfo.npcs, NPCManager::get()->getNpcs());
+    
+    ZoneManager::get().updateZones();
 
     // Create Influence map
     myMap->createInfluenceMap();
@@ -90,7 +92,7 @@ MyBotLogic::MyBotLogic()
     ObjectManager::get()->updateObjects(_turnInfo.objects, _turnInfo.tiles);
 
     // Update all NPCs and fill the action list
-    NPCManager::get()->updateNPCs(_actionList);
+    //NPCManager::get()->updateNPCs(_actionList);
 
     // Update loggers
     ObjectManager::get()->updateLogger(_turnInfo);
