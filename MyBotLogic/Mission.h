@@ -13,7 +13,6 @@ public:
 private:
     MissionType m_mType;
     unsigned m_objective;
-    bool m_possible;
     Mission* m_prev = nullptr;
     Mission* m_next = nullptr;
     bool m_status = false;
@@ -34,15 +33,7 @@ public:
     }
 
 
-    bool isPossible()
-    {
-        return m_possible;
-    }
-
-    void isPossible(bool possible)
-    {
-        m_possible = possible;
-    }
+   
 
     void setDependanceMission(Mission *m)
     {
