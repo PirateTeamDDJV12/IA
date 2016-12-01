@@ -133,9 +133,11 @@ public:
     ///////////////////////////////////////
     void initExploreBT();
 
+    BehaviourTree::BlocRef createHasTargetAction();
     BehaviourTree::BlocRef createCheckTileAction();
-    BehaviourTree::BlocRef createModifyMoveDirectionAction();
-    BehaviourTree::BlocRef createMoveToTileAction();
+    BehaviourTree::BlocRef createChangeDirectionAction();
+    BehaviourTree::BlocRef createMoveAction();
+
 
     //void swapToExplore();
     //void swapToExploreWall();

@@ -7,6 +7,9 @@
 #include <algorithm>
 
 
+using namespace BehaviourTree;
+
+
 Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone) : 
     m_currentState{ NONE }, 
     m_nextState{ EXPLORING }, 
@@ -17,7 +20,7 @@ Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned 
     m_historyTiles{ a_tileId }, 
     m_turnCount{ 0 }, 
     m_zone{ zone },
-    m_exploreBT{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocSelect>("NpcExploreRoot") }
+    m_exploreBT{ BlocFabric::initiateRootAsCompositeBloc<BlocSelect>("NpcExploreRoot") }
 {
 #ifdef BOT_LOGIC_DEBUG_NPC
     m_logger.Init(a_path, "Npc_" + std::to_string(m_id) + ".log");
@@ -169,7 +172,6 @@ void Npc::explore()
         m_nextState = MOVING;
         return;
     }
-    m_exploreBT();
 
     // Get the most influenced tile near the NPC
     int bestTile = Map::get()->getNearInfluencedTile(getCurrentTileId());
@@ -263,7 +265,7 @@ void Npc::initExploreBT()
     /************************************************************************/
 
     // Root of the Exploration's BT
-    BehaviourTree::BlocComposite* rootSelect = m_exploreBT.getRoot()->as<BehaviourTree::BlocComposite>();
+    BlocComposite* rootSelect = m_exploreBT.getRoot()->as<BlocComposite>();
 
 
     /************************************************************************/
@@ -271,89 +273,123 @@ void Npc::initExploreBT()
     /************************************************************************/
 
     // rootSelect's first child (sequence)
-    BehaviourTree::BlocRef tileExplorationSequenceRef = BehaviourTree::BlocFabric::createCompositeBloc<BehaviourTree::BlocSequence>("TileExplorationSequence");
-    BehaviourTree::BlocSequence* tileExplorationSequence = tileExplorationSequenceRef->as<BehaviourTree::BlocSequence>();
-
-    // rootSelect's second child (sequence)
-    BehaviourTree::BlocRef wallExplorationSequenceRef = BehaviourTree::BlocFabric::createCompositeBloc<BehaviourTree::BlocSequence>("WallExplorationSequence");
-    BehaviourTree::BlocSequence* wallExplorationSequence = wallExplorationSequenceRef->as<BehaviourTree::BlocSequence>();
+    BlocRef tileExplorationSequenceRef = BlocFabric::createCompositeBloc<BlocSequence>("TileExplorationSequence");
+    BlocSequence* tileExplorationSequence = tileExplorationSequenceRef->as<BlocSequence>();
 
     // Connecting rootSelect's childs to itself
     rootSelect->connect(tileExplorationSequenceRef);
-    rootSelect->connect(wallExplorationSequenceRef);
 
 
     /************************************************************************/
     /* Third layer                                                          */
     /************************************************************************/
 
-    // tileExplorationSequence's first child (loop) - The loop will iterate for each directions (6x max)
-    BehaviourTree::BlocRef checkSequenceRef = BehaviourTree::BlocFabric::createCompositeBloc<BehaviourTree::BlocSequence>("CheckLoop");
-    BehaviourTree::BlocSequence* checkSequence = checkSequenceRef->as<BehaviourTree::BlocSequence>();
-
-    BehaviourTree::BlocRef checkLoopRef =  BehaviourTree::BlocFabric::createLoopBloc<BehaviourTree::BlocBreakingLoopOnSuccess>(6, checkSequenceRef, "Loop");
-    BehaviourTree::BlocBreakingLoopOnSuccess* checkLoop = checkLoopRef->as<BehaviourTree::BlocBreakingLoopOnSuccess>();
+    // tileExplorationSequence's first child (select)
+    BlocRef hasTargetSelectRef = BlocFabric::createCompositeBloc<BlocSelect>("HasTarget");
+    BlocSelect* hasTargetSelect = hasTargetSelectRef->as<BlocSelect>();
 
     // tileExplorationSequence's second child (action)
-    BehaviourTree::BlocRef moveToTileActionRef = createMoveToTileAction();
+    BlocRef moveActionRef = createMoveAction();
 
     // Connecting tileExplorationSequence's childs to itself
-    tileExplorationSequence->connect(checkLoopRef);
-    tileExplorationSequence->connect(moveToTileActionRef);
+    tileExplorationSequence->connect(hasTargetSelectRef);
+    tileExplorationSequence->connect(moveActionRef);
 
 
     /************************************************************************/
     /* Fourth layer                                                         */
     /************************************************************************/
 
+    // tileExplorationSequence's first child (action)
+    BlocRef hasTargetActionRef = createHasTargetAction();
+
+    // tileExplorationSequence's second child (loop) - We need to create the loop's child before creating the loop
+    BlocRef checkTileSequenceRef = BlocFabric::createCompositeBloc<BlocSequence>("CheckTileSequence");
+    BlocSequence* checkTileSequence = checkTileSequenceRef->as<BlocSequence>();
+
+    BlocRef checkTileLoopRef = BlocFabric::createLoopBloc<BlocBreakingLoopOnSuccess>(6, checkTileSequenceRef, "CheckTileLoop");
+    BlocBreakingLoopOnSuccess* checkTileLoop = checkTileLoopRef->as<BlocBreakingLoopOnSuccess>();
+
+    // Connecting tileExplorationSequence's childs to itself
+    hasTargetSelect->connect(hasTargetActionRef);
+    hasTargetSelect->connect(checkTileLoopRef);
+
+
+    /************************************************************************/
+    /* Fifth layer                                                          */
+    /************************************************************************/
+
     // checkSequence's first child (action)
-    BehaviourTree::BlocRef moveToNextTileActionRef = createCheckTileAction();
+    BlocRef checkTileActionRef = createCheckTileAction();
 
     // checkSequence's second child (action)
-    BehaviourTree::BlocRef moveToNextTileActionRef = createModifyMoveDirectionAction();
+    BlocRef changeDirectionActionRef = createChangeDirectionAction();
+
+    checkTileSequence->connect(checkTileActionRef);
+    checkTileSequence->connect(changeDirectionActionRef);
 }
 
-BehaviourTree::BlocRef Npc::createCheckTileAction()
+BlocRef Npc::createHasTargetAction()
 {
-    return BehaviourTree::BlocFabric::createGeneralAction(
+    return BlocFabric::createGeneralAction(
+        [this]()
+    {
+        BOT_LOGIC_NPC_LOG(m_logger, "-Explore", true);
+        if (hasGoal())
+        {
+            BOT_LOGIC_NPC_LOG(m_logger, "\tNPC have a goal : " + std::to_string(m_goal), true);
+            displayVector("\tNpc base path :", m_path);
+            m_nextState = MOVING;
+            return general::result::SUCCESS;
+        }
+        return general::result::FAIL;
+    },
+        "HasTarget"
+        );
+}
+
+BlocRef Npc::createCheckTileAction()
+{
+    return BlocFabric::createGeneralAction(
         [this]()
     {
 
 
 
-        return BehaviourTree::general::result::FAIL;
+        return general::result::FAIL;
     },
         "CheckTile"
         );
 }
 
-BehaviourTree::BlocRef Npc::createModifyMoveDirectionAction()
+BlocRef Npc::createChangeDirectionAction()
 {
-    return BehaviourTree::BlocFabric::createGeneralAction(
+    return BlocFabric::createGeneralAction(
         [this]()
     {
 
 
 
-        return BehaviourTree::general::result::FAIL;
+        return general::result::FAIL;
     },
         "ChangeDirection"
         );
 }
 
-BehaviourTree::BlocRef Npc::createMoveToTileAction()
+BlocRef Npc::createMoveAction()
 {
-    return BehaviourTree::BlocFabric::createGeneralAction(
+    return BlocFabric::createGeneralAction(
         [this]()
     {
 
 
 
-        return BehaviourTree::general::result::FAIL;
+        return general::result::FAIL;
     },
-        "CheckTile"
+        "Move"
         );
 }
+
 
 //void Npc::swapToExplore()
 //{
