@@ -3,24 +3,37 @@
 
 #include "Singleton.h"
 #include "Mission.h"
-#include "NPCManager.h"
+
 #include <utility>
 #include <vector>
 
+// Type de Retour du planificateur. Il suffira de remplacer ici une fois que
+//le vrai planificateur sera fait
 typedef std::vector<Mission> retourPlanificateur;
+
+
+// A enlever quand le vrai Planif sera fait
 class Planificateur
 {
 public:
 
-    //A changer quand le vrai Planif sera fait
-    static retourPlanificateur planifiedMissions(Mission mission)
+
+    static retourPlanificateur planifiedMissions(Mission mission, unsigned int npcID)
     {
         std::vector<Mission> subMissions;
         subMissions.push_back(mission);
+        return subMissions;
     }
-    static retourPlanificateur createMissionsToReachGoal(unsigned from, unsigned destination);
+    static retourPlanificateur createMissionsToReachGoal(unsigned from, unsigned destination)
+    {
+        std::vector<Mission> subMissions;
+        return subMissions;
+    }
 
 };
+
+
+//MissionManager
 class MissionManager : public Singleton
 {
 private:
@@ -28,10 +41,11 @@ private:
     static MissionManager m_instance;
     retourPlanificateur m_missions;
     std::vector<std::pair<unsigned, unsigned>> m_objectifs;
-
+    enum { MissionMax = 200 };
     MissionManager()
     {
-        m_missions.reserve(10*(NPCManager::get()->getNpcs().size()));
+        m_missions.reserve(MissionMax);
+        m_objectifs.reserve(MissionMax);
     }
 public:
     static MissionManager* get()
@@ -43,19 +57,13 @@ public:
         return m_missions;
     }
 
-
-    void subscribeGoal(unsigned from, unsigned destination)
-    {
-        retourPlanificateur stepsToReachGoal = Planificateur::createMissionsToReachGoal(from, destination);
-        m_missions.insert(m_missions.end(), stepsToReachGoal.begin(), stepsToReachGoal.end());
-    }
-
-    void subscribeMission(Mission mission)
-    {
-        //Consulter Planificateur pour obtenir les sous missions
-        retourPlanificateur subMissions = Planificateur::planifiedMissions(mission);
-        m_missions.insert(m_missions.end(), subMissions.begin(), subMissions.end());
-    }
+    //ajouter un Objectif (Changer de Zone)
+    void subscribeGoal(unsigned fromZone, unsigned destinationZone);
+    
+    
+    //Ajouter une mission (Se déplacer/ intéragir)
+    void subscribeMission(Mission mission, unsigned int npcId);
+    
 
 
 };
