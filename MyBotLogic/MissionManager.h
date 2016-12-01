@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 // Type de Retour du planificateur. Il suffira de remplacer ici une fois que
 //le vrai planificateur sera fait
@@ -25,7 +26,7 @@ public:
         subMissions.push_back(mission);
         return subMissions;
     }
-    static retourPlanificateur createMissionsToReachGoal(unsigned from, unsigned destination)
+    static retourPlanificateur createMissionsToReachGoal(Objectif newObj)
     {
         std::vector<Mission> subMissions;
         return subMissions;
@@ -34,6 +35,15 @@ public:
 };
 
 
+struct Objectif
+{
+    unsigned int m_id;
+    unsigned int m_from;
+    unsigned int m_destinaton;
+    Objectif(unsigned int id, unsigned int from, unsigned int dest) : m_id{ id }, m_from{ from }, m_destinaton{dest}
+    {}
+};
+
 //MissionManager
 class MissionManager : public Singleton
 {
@@ -41,14 +51,13 @@ private:
     
     static MissionManager m_instance;
     retourPlanificateur m_missions;
-    std::vector<std::pair<unsigned, unsigned>> m_objectives;
+    std::map<Objectif, std::vector<Mission>> m_objectives;
     enum { MissionMax = 200 };
     unsigned int m_missionsCount;
     unsigned int m_objectivesCount;
     MissionManager() :m_missionsCount{ 0 }, m_objectivesCount{0}
     {
         m_missions.reserve(MissionMax);
-        m_objectives.reserve(MissionMax);
     }
 public:
     static MissionManager* get()
@@ -70,11 +79,13 @@ public:
     //Supprimer une mission
     void deleteMission(unsigned int missionId)
     {
-        //Une seule mission par npc, on la place à la fin
+        //on met la mission à la fin du vector
         std::remove_if(m_missions.begin(), m_missions.end(), [missionId](Mission mission) {return mission.getId() == missionId; });
         //et on l'efface
         m_missions.erase(m_missions.end());
     }
+
+
 
 
 };

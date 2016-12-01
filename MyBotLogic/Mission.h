@@ -14,8 +14,6 @@ private:
     MissionType m_mType;
     unsigned int m_id; //attribué par MissionManager lors de l'assignation
     unsigned m_objective;
-    Mission* m_prev = nullptr;
-    Mission* m_next = nullptr;
     bool m_status = false;
 public:
 
@@ -33,20 +31,6 @@ public:
         return m_mType;
     }
 
-    //Ne pasn appeler, passer par setDependanceMission
-    Mission setPrevMission(Mission* m)
-    {
-        m_prev = m;
-    }
-
-   
-
-    void setDependanceMission(Mission *m)
-    {
-        m_next = m;
-        m->setPrevMission(this);
-    }
-
     bool isSuccess() const
     {
         return m_status;
@@ -55,15 +39,9 @@ public:
     void success()
     {
         m_status = true;
-        delete m_next;
-        m_next = nullptr;
     }
 
-private:
-    void setSuccesDependanceMission() const
-    {
-        m_next->success();
-    }
+    
 public:
     void setId(unsigned id)
     {
