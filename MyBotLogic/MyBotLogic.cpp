@@ -59,11 +59,6 @@ MyBotLogic::MyBotLogic()
 
 }
 
-/*virtual*/ void MyBotLogic::OnBotInitialized()
-{
-    //Write Code Here
-}
-
 /*virtual*/ void MyBotLogic::OnGameStarted()
 {
     //Write Code Here

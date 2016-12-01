@@ -95,7 +95,15 @@ public:
 
     bool isEdgeBlocked(EDirection dir) const
     {
-        return m_edgesCost[dir] == 0 ? false : true;
+        switch(m_edgesCost[dir])
+        {
+            case 0: //No wall or anything blocking (default state)
+            case ObjectType_Door + 1: // Add +1 because of the default state which is 0 and HighWall is 0 to, so we save the edges with +1
+                return false;
+            default:
+                return true;
+
+        }
     }
 
     void setNeighboor(EDirection dir, Node* p)
