@@ -28,8 +28,7 @@ public:
 	virtual ~MyBotLogic();
 
 	virtual void Configure(int argc, char *argv[], const std::string& _logpath);
-	virtual void Load();
-	virtual void OnBotInitialized();
+	virtual void Start();
 	virtual void Init(LevelInfo& _levelInfo);
 	virtual void OnGameStarted();
 	virtual void FillActionList(TurnInfo& _turnInfo, std::vector<Action*>& _actionList);   //calculate moves for a single turn
