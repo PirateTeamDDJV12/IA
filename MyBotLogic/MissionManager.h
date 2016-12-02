@@ -18,9 +18,20 @@ struct Objectif
     unsigned int m_id;
     unsigned int m_from;
     unsigned int m_destinaton;
+    bool operator==(Objectif other) const
+    {
+        return (m_from == other.m_from && m_destinaton ==other.m_destinaton);
+    }
+    bool operator>(Objectif other) const
+    {
+        return false;
+    }
+    bool  operator<( Objectif other) const
+    {
+        return true;
+    }
     Objectif(unsigned int id, unsigned int from, unsigned int dest) : m_id{ id }, m_from{ from }, m_destinaton{ dest }
     {}
-    std::vector<Mission> m_missionsObjectif;
 };
 
 
@@ -59,7 +70,7 @@ private:
     //Missions sans objectifs (il yen aura ?)
     retourPlanificateur m_missions;
     //objectifs et missions associées
-    std::vector<Objectif> m_objectives;
+    std::map<Objectif, std::vector<Mission>> m_objectives;
     enum { MissionMax = 200 };
 
     unsigned int m_missionsCount;
@@ -67,7 +78,6 @@ private:
     MissionManager() :m_missionsCount{ 0 }, m_objectivesCount{ 0 }
     {
         m_missions.reserve(MissionMax);
-        m_objectives.reserve(MissionMax);
     }
 public:
     static MissionManager* get()
@@ -75,7 +85,7 @@ public:
         return &m_instance;
     }
 
-    std::vector<Objectif>* getObjectives()
+    std::map<Objectif, std::vector<Mission>>* getObjectives()
     {
         return &m_objectives;
     }
@@ -94,22 +104,22 @@ public:
     void subscribeMission(Mission mission, unsigned int npcId);
 
     //Supprimer un Objectif
-    void deleteObjectif(unsigned int idToDelete)
+    void deleteObjectif(unsigned int idToDelete, unsigned int from, unsigned int dest )
     {
-        m_objectives.erase(std::remove_if(m_objectives.begin(), m_objectives.end(), [idToDelete](Objectif obj) {return obj.m_id == idToDelete; }));
+        m_objectives.erase(Objectif(idToDelete, from, dest));
     }
 
     //Supprimer une mission d'un objectif
 
     void deleteMissionFromObjective(unsigned int idObjective)
     {
-        auto itObjectiveToCheck = std::find_if(m_objectives.begin(), m_objectives.end(), [idObjective](Objectif obj)
-        {return obj.m_id == idObjective; });
+        auto itObjectiveToCheck = std::find_if(m_objectives.begin(), m_objectives.end(), [idObjective](std::pair<Objectif, std::vector<Mission>> obj)
+        {return obj.first.m_id == idObjective; });
         //on met la mission à la fin du vector
-        std::remove_if(itObjectiveToCheck->m_missionsObjectif.begin(), itObjectiveToCheck->m_missionsObjectif.end(), [itObjectiveToCheck](Mission mission)
-        {return (mission.getId() == itObjectiveToCheck->m_missionsObjectif.front().getId()); });
+        std::remove_if(itObjectiveToCheck->second.begin(), itObjectiveToCheck->second.end(), [itObjectiveToCheck](Mission mission)
+        {return (mission.getId() == itObjectiveToCheck->second.front().getId()); });
         //et on l'efface
-        itObjectiveToCheck->m_missionsObjectif.erase(itObjectiveToCheck->m_missionsObjectif.end());
+        itObjectiveToCheck->second.erase(itObjectiveToCheck->second.end());
     }
 
     //Supprimer une mission indépendante
@@ -120,9 +130,6 @@ public:
         //et on l'efface
         m_missions.erase(m_missions.end());
     }
-
-
-
 
 };
 

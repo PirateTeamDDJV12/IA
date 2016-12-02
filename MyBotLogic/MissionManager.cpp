@@ -5,14 +5,13 @@ MissionManager MissionManager::m_instance;
 //ajout objectif et découpage en mission
 void MissionManager::subscribeGoal(unsigned fromZone, unsigned destinationZone)
 {
-    
+
     //Consulter Planificateur pour obtenir les sous missions
     Objectif newObj = Objectif(m_objectivesCount, fromZone, destinationZone);
     ++m_objectivesCount;
     retourPlanificateur stepsToReachGoal = Planificateur::createMissionsToReachGoal(newObj);
-    //enregistrer missions dans Objectif et register Objectif
-    newObj.m_missionsObjectif.insert(m_missions.end(), stepsToReachGoal.begin(), stepsToReachGoal.end());
-    m_objectives.push_back(newObj);
+
+    m_objectives.insert(std::make_pair(newObj, stepsToReachGoal));
 }
 
 
