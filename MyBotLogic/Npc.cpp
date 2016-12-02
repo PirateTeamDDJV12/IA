@@ -127,19 +127,17 @@ bool Npc::updatePath()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "\tUpdating Path ", true);
     DisplayVector("\t\tOld path: ", m_path);
-    std::vector<unsigned> reversePath;
-    reversePath.resize(m_path.size());
-    std::reverse_copy(begin(m_path), end(m_path), begin(reversePath));
-    unsigned int oldTileId{reversePath.front()};
-    for(unsigned int tileId : reversePath)
+    unsigned int oldTileId{ m_path.back()};
+    Map* mapManager = Map::get();
+    for(auto reverseIter = m_path.rbegin(); reverseIter != m_path.rend(); ++reverseIter)
     {
-        if(!Map::get()->canMoveOnTile(oldTileId, tileId))
+        if(!mapManager->canMoveOnTile(oldTileId, (*reverseIter)))
         {
-            m_path = Map::get()->getNpcPath(getCurrentTileId(), m_goal);
+            m_path = mapManager->getNpcPath(getCurrentTileId(), m_goal);
             DisplayVector("\t\tPath Updated : ", m_path);
             return true;
         }
-        oldTileId = tileId;
+        oldTileId = (*reverseIter);
     }
     BOT_LOGIC_NPC_LOG(m_logger, "\t\tNo update needed", true);
     return false;
