@@ -108,7 +108,7 @@ public:
     std::string getNpcNameByID(unsigned int NpcID);
     std::string getNpcNameByIndex(size_t NpcIndex) const noexcept
     {
-        return "Npc" + std::to_string(NpcIndex);
+        return std::move("Npc" + std::to_string(NpcIndex));
     }
     
     /* Get Npc Index (from its name) */

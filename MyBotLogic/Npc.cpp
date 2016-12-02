@@ -166,26 +166,28 @@ void Npc::explore()
         return;
     }
 
+    Map* mapPtr = Map::get();
+
     // Get the most influenced tile near the NPC
-    int bestTile = Map::get()->getNearInfluencedTile(getCurrentTileId());
+    int bestTile = mapPtr->getNearInfluencedTile(getCurrentTileId());
 
     // If we have not a best choice around us, let see a little bit futher
     if(bestTile < 0)
     {
         // TODO - Try to get the most influent tile around us in range of 2 instead of looking for a non visited tile
         // Get all non visited tiles
-        std::vector<unsigned> nonVisitedTiles = Map::get()->getNonVisitedTile();
+        std::vector<unsigned> nonVisitedTiles = std::move(mapPtr->getNonVisitedTile());
         DisplayVector("\t-Looking for the non visited tiles : ", nonVisitedTiles);
         for(unsigned index : nonVisitedTiles)
         {
             // Test if we can have a good path to this tile
-            std::vector<unsigned> temp = Map::get()->getNpcPath(getCurrentTileId(), index, 
-                {Node::NodeType::FORBIDDEN, Node::NodeType::NONE, Node::NodeType::OCCUPIED});
+            std::vector<unsigned> temp = std::move(mapPtr->getNpcPath(getCurrentTileId(), index,
+                {Node::NodeType::FORBIDDEN, Node::NodeType::NONE, Node::NodeType::OCCUPIED}));
 
             // If we got a good path, let's configure this
             if(!temp.empty())
             {
-                m_path = temp;
+                m_path = std::move(temp);
                 m_target = index;
                 m_nextState = MOVING;
                 break;
@@ -199,9 +201,9 @@ void Npc::explore()
         m_path = {bestTileUnsigned, getCurrentTileId()};
         m_historyTiles.push_back(bestTile);
 
-        m_nextActions.push_back(new Move{m_id, Map::get()->getNextDirection(getCurrentTileId(), getNextPathTile())});
+        m_nextActions.push_back(new Move{m_id, mapPtr->getNextDirection(getCurrentTileId(), getNextPathTile())});
 
-        BOT_LOGIC_NPC_LOG(m_logger, "Deplacement vers " + std::to_string(bestTile), true);
+        BOT_LOGIC_NPC_LOG(m_logger, std::move("Deplacement vers " + std::to_string(bestTile)), true);
 
         m_nextState = EXPLORING;
     }

@@ -75,16 +75,16 @@ public:
     const ObjectRef getObjectById(Object::ObjectType type, size_t index) const;
 
     // Get all objects on a specific tile
-    const std::vector<ObjectRef> getAllObjectsOnTile(unsigned int tileId) const;
+    std::vector<ObjectRef> getAllObjectsOnTile(unsigned int tileId) const;
 
     // Get all objects of a specific type
     const std::vector<ObjectRef>& getAllObjectsByType(Object::ObjectType type) const { return m_allObjects.at(type); }
 
     // Get all objects that is not activated
-    const std::vector<ObjectRef> getAllUnactivatedObjects() const;
+    std::vector<ObjectRef> getAllUnactivatedObjects() const;
 
     // Get all objects that is activated
-    const std::vector<ObjectRef> getAllActivatedObjects() const;
+    std::vector<ObjectRef> getAllActivatedObjects() const;
 
     // Get all objects
     const std::map<Object::ObjectType, std::vector<ObjectRef>>& getAllObjects() const { return m_allObjects; }

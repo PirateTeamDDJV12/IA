@@ -67,7 +67,7 @@ public:
     Node* getNode(unsigned int);
 
     // Return for each NPCs the best goal
-    std::map<unsigned, unsigned> getBestGoalTile(std::vector<Npc*> npcInfo);
+    std::map<unsigned, unsigned> getBestGoalTile(const std::vector<Npc*>& npcInfo);
 
     // return the direction between two points
     EDirection getNextDirection(unsigned int a_start, unsigned int a_end);
@@ -140,7 +140,7 @@ public:
                 v.push_back(seenTile.first);
             }
         }
-        return v;
+        return std::move(v);
     }
 
     //std::vector<unsigned> getMostInfluencedTile();
@@ -162,8 +162,8 @@ public:
     void logZoneMap(unsigned nbTurn);
 
     void initMap(unsigned int row, unsigned int col, unsigned int range);
-    void updateEdges(std::map<unsigned, ObjectInfo> objects, unsigned nbTurn);
-    void updateTiles(std::map<unsigned, TileInfo> tiles);
+    void updateEdges(const std::map<unsigned int, ObjectInfo>& objects, unsigned nbTurn);
+    void updateTiles(const std::map<unsigned int, TileInfo>& tiles);
 };
 
 #endif // MAP_HEADER

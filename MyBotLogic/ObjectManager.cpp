@@ -75,7 +75,7 @@ const ObjectRef ObjectManager::getObjectById(Object::ObjectType type, size_t ind
     return ObjectRef();
 }
 
-const std::vector<ObjectRef> ObjectManager::getAllObjectsOnTile(unsigned int tileId) const
+std::vector<ObjectRef> ObjectManager::getAllObjectsOnTile(unsigned int tileId) const
 {
     std::vector<ObjectRef> objectsOnTile;
     for (auto iterPair : m_allObjects)
@@ -88,10 +88,10 @@ const std::vector<ObjectRef> ObjectManager::getAllObjectsOnTile(unsigned int til
             }
         }
     }
-    return objectsOnTile;
+    return std::move(objectsOnTile);
 }
 
-const std::vector<ObjectRef> ObjectManager::getAllUnactivatedObjects() const
+std::vector<ObjectRef> ObjectManager::getAllUnactivatedObjects() const
 {
     std::vector<ObjectRef> unactivatedObjects;
     for (auto iterPair : m_allObjects)
@@ -104,10 +104,10 @@ const std::vector<ObjectRef> ObjectManager::getAllUnactivatedObjects() const
             }
         }
     }
-    return unactivatedObjects;
+    return std::move(unactivatedObjects);
 }
 
-const std::vector<ObjectRef> ObjectManager::getAllActivatedObjects() const
+std::vector<ObjectRef> ObjectManager::getAllActivatedObjects() const
 {
     std::vector<ObjectRef> activatedObjects;
     for (auto iterPair : m_allObjects)
@@ -120,7 +120,7 @@ const std::vector<ObjectRef> ObjectManager::getAllActivatedObjects() const
             }
         }
     }
-    return activatedObjects;
+    return std::move(activatedObjects);
 }
 
 void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)

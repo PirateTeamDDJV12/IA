@@ -101,7 +101,7 @@ int Map::calculateDistance(int indexStart, int indexEnd)
     return abs(x) + abs(y);
 }
 
-std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
+std::map<unsigned, unsigned> Map::getBestGoalTile(const std::vector<Npc*>& npcInfo)
 {
     std::map<unsigned, unsigned> goalMap;
     if (m_goalTiles.size() > npcInfo.size())
@@ -112,6 +112,7 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
             int bestDist = 666;
             unsigned goalId = -1;
             std::vector<unsigned>::iterator goalIt = begin(copyMapGoal);
+            std::vector<unsigned>::iterator saveGoalIt = end(copyMapGoal);
             for (; goalIt != end(copyMapGoal); ++goalIt)
             {
                 int distance = calculateDistance(npc->getCurrentTileId(), *goalIt);
@@ -119,17 +120,18 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
                 {
                     goalId = *goalIt;
                     bestDist = distance;
+                    saveGoalIt = goalIt;
                 }
             }
             goalMap[npc->getId()] = goalId;
-            copyMapGoal.erase(std::find(begin(copyMapGoal), end(copyMapGoal), goalId));
+            copyMapGoal.erase(saveGoalIt);
         }
     }
     else
     {
         for (unsigned goal : m_goalTiles)
         {
-            if (npcInfo.size() <= 0)
+            if (npcInfo.empty())
             {
                 break;
             }
@@ -153,7 +155,7 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
         }
     }
 
-    return goalMap;
+    return std::move(goalMap);
 }
 
 // TODO - See if we can implement this
@@ -290,7 +292,7 @@ void Map::propage(Node* myNode, unsigned curDist, unsigned maxDist, float initia
 
 EDirection Map::getNextDirection(unsigned int a_start, unsigned int a_end)
 {
-    std::string direction = getStringDirection(a_start, a_end);
+    std::string direction = std::move(getStringDirection(a_start, a_end));
 
     if (direction == "N")
     {
@@ -370,13 +372,13 @@ std::string Map::getStringDirection(unsigned int start, unsigned int end)
         }
     }
 
-    return direction;
+    return std::move(direction);
 }
 
 std::vector<unsigned int> Map::getNpcPath(unsigned int a_start, unsigned int a_end, std::set<Node::NodeType> forbiddenType)
 {
     SearchMap mySearch{ getNode(a_start), getNode(a_end), forbiddenType };
-    return mySearch.search();
+    return std::move(mySearch.search());
 }
 
 bool Map::canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId)
@@ -468,7 +470,7 @@ void Map::testAddTile(std::vector<unsigned int>& v, unsigned int fromTileId, uns
 void Map::logMap(unsigned nbTurn)
 {
 #ifdef BOT_LOGIC_DEBUG_MAP
-    std::string myLog = "\nTurn #" + std::to_string(nbTurn) + "\n";
+    std::string myLog = std::move("\nTurn #" + std::to_string(nbTurn) + "\n");
 
     // Printing some infos
     myLog += "\tAccessible Goal Number : " + std::to_string(m_goalTiles.size()) + "\n";
@@ -612,9 +614,9 @@ void Map::initMap(unsigned int row, unsigned int col, unsigned int range)
     connectNodes();
 }
 
-void Map::updateEdges(std::map<unsigned int, ObjectInfo> objects, unsigned int nbTurn)
+void Map::updateEdges(const std::map<unsigned int, ObjectInfo>& objects, unsigned int nbTurn)
 {
-    BOT_LOGIC_MAP_LOG(m_loggerEdges, "\nTURN #" + std::to_string(nbTurn), true);
+    BOT_LOGIC_MAP_LOG(m_loggerEdges, std::move("\nTURN #" + std::to_string(nbTurn)), true);
 
     for (std::pair<unsigned, ObjectInfo> info : objects)
     {
@@ -624,35 +626,41 @@ void Map::updateEdges(std::map<unsigned int, ObjectInfo> objects, unsigned int n
             if (info.second.edgesCost[i] == 0)
             {
                 node->setEdgeCost(static_cast<EDirection>(i), info.second.objectTypes);
-                BOT_LOGIC_MAP_LOG(m_loggerEdges, "\tTileID : " + std::to_string(info.second.tileID) + " - Dir : " + std::to_string(i) + " - Type : " + std::to_string(node->getEdge(static_cast<EDirection>(i))), true);
+                BOT_LOGIC_MAP_LOG(m_loggerEdges, std::move("\tTileID : " + std::to_string(info.second.tileID) + " - Dir : " + std::to_string(i) + " - Type : " + std::to_string(node->getEdge(static_cast<EDirection>(i)))), true);
             }
         }
     }
 }
 
-void Map::updateTiles(std::map<unsigned int, TileInfo> tiles)
+void Map::updateTiles(const std::map<unsigned int, TileInfo>& tiles)
 {
     for each(auto info in tiles)
     {
         auto tileInfo = info.second;
 
         auto ITisForbidden = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Forbidden);
-        auto ITisTarget = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Target);
-        auto ITisDescriptor = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Descriptor);
         if (ITisForbidden != tileInfo.tileAttributes.end())
         {
             setNodeType(tileInfo.tileID, Node::FORBIDDEN);
         }
-        else if (ITisTarget != tileInfo.tileAttributes.end())
+        else 
         {
-            setNodeType(tileInfo.tileID, Node::GOAL);
-            addGoalTile(tileInfo.tileID);
-            addSeenTile(tileInfo.tileID);
-        }
-        else if (ITisDescriptor != tileInfo.tileAttributes.end())
-        {
-            setNodeType(tileInfo.tileID, Node::PATH);
-            addSeenTile(tileInfo.tileID);
+            auto ITisTarget = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Target);
+            if (ITisTarget != tileInfo.tileAttributes.end())
+            {
+                setNodeType(tileInfo.tileID, Node::GOAL);
+                addGoalTile(tileInfo.tileID);
+                addSeenTile(tileInfo.tileID);
+            }
+            else
+            {
+                auto ITisDescriptor = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Descriptor);
+                if (ITisDescriptor != tileInfo.tileAttributes.end())
+                {
+                    setNodeType(tileInfo.tileID, Node::PATH);
+                    addSeenTile(tileInfo.tileID);
+                }
+            }
         }
     }
 }

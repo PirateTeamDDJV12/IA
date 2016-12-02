@@ -48,7 +48,7 @@ std::vector<unsigned int> SearchMap::search()
     {
         if (openList.empty())
         {
-            return std::vector<unsigned int>{};
+            return std::move(std::vector<unsigned int>{});
         }
 
         SearchNode* currentSearchNode = getNextNodeToSearch();
@@ -62,7 +62,7 @@ std::vector<unsigned int> SearchMap::search()
                 m_pathToGoal.push_back(getPath->getId());
             }
             m_isGoalFound = true;
-            return m_pathToGoal;
+            return std::move(m_pathToGoal);
         }
 
         for (int i = N; i <= NW; ++i)
@@ -77,7 +77,7 @@ std::vector<unsigned int> SearchMap::search()
         }
     }
 
-    return std::vector<unsigned int>();
+    return std::move(std::vector<unsigned int>{});
 }
 
 SearchMap::SearchMap(Node* start, Node* goal)
@@ -93,7 +93,7 @@ void SearchMap::initSearchMap(Node* start, Node* goal, std::set<Node::NodeType> 
 {
     if(!m_isInitialized)
     {
-        m_forbiddenType = forbiddenType;
+        m_forbiddenType = std::move(forbiddenType);
 
         for(int i = 0; i < openList.size(); i++)
         {
