@@ -77,15 +77,7 @@ void ZoneManager::initZones(std::map<unsigned int, NPCInfo> &npcsInfo)
     {
         Node *npcNode = Map::get()->getNode(npc->getCurrentTileId());
         unsigned int npcZone = npc->getZone();
-        // If the npcNode zone has been modified
-        // May be a problem when npc changes zone
-        //if(npcNode->getZone() != npcZone)
-        //{
-        //    // We delete the useless zone
-        //    removeZone(npcZone);
-        //    // We change the npc zone
-        //    npc->setZone(npcNode->getZone());
-        //}
+
         done[npcNode->getId()] = npcNode;
         updateZoneFromNpc(npcNode, npcsInfo.at(npc->getId()));
         done.clear();
@@ -218,43 +210,3 @@ void ZoneManager::updateZoneFromNpc(Node* currentTile, NPCInfo &npcInfo)
         }
     }
 }
-
-
-//void ZoneManager::updateZoneFromTile(Node* currentTile, std::map<unsigned int, Node *> &done, std::map<unsigned int, Node *> &toDo)
-//{
-//    for(unsigned int dir = EDirection::NE; dir <= EDirection::NW; ++dir)
-//    {
-//         Get the neighbour
-//        Node *neighbour = currentTile->getNeighboor(static_cast<EDirection>(dir));
-//        if(neighbour != nullptr)
-//        {
-//            unsigned int neighbourId = neighbour->getId();
-//             If the node has not been done
-//            if(done.find(neighbourId) == done.end())
-//            {
-//                EDirection direction = static_cast<EDirection>(dir);
-//                EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
-//                 If there is no wall
-//                if((!currentTile->isEdgeBlocked(direction) && !neighbour->isEdgeBlocked(invDir)))
-//                {
-//                     If the neighbour was in a zone this zone needs to be deleted
-//                    if(neighbour->getZone() != 0)
-//                        removeZone(neighbour->getZone());
-//                     we then change his zone to the currentTile zone
-//                    done[neighbourId] = neighbour;
-//                    neighbour->setZone(currentTile->getZone());
-//                    neighbour->sure();
-//                    updateZoneFromTile(neighbour, done, toDo, npcInfo);
-//                }
-//                 Else if there is a wall (Omniscient or window)
-//                else if(neighbour->getZone() == 0)
-//                {
-//                    ZoneManager::get().addZone();
-//                    neighbour->setZone(ZoneManager::get().getZoneCount());
-//                    done[neighbourId] = neighbour;
-//                    neighbour->sure();
-//                }
-//            }
-//        }
-//    }
-//}
