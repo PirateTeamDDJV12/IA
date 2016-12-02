@@ -41,7 +41,7 @@ public:
         m_status = true;
     }
 
-    
+
 public:
     void setId(unsigned id)
     {
