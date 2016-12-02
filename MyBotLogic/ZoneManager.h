@@ -17,6 +17,8 @@ public:
         return m_instance;
     }
 
+    void initZones();
+
     size_t getZoneCount() const;
     Zone *getZone(unsigned int zoneId) const;
     Zone *addZone();

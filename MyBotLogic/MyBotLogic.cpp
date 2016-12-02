@@ -46,10 +46,15 @@ MyBotLogic::MyBotLogic()
 
 /*virtual*/ void MyBotLogic::Init(LevelInfo& _levelInfo)
 {
+    Map *myMap = Map::get();
+    m_omniscient = _levelInfo.bOmnicientMode;
     // Init MAP
     BOT_LOGIC_LOG(mLogger, "Map Initialisation", true);
-    Map::get()->initMap(_levelInfo.rowCount, _levelInfo.colCount, _levelInfo.visionRange);
-    
+    myMap->initMap(_levelInfo.rowCount, _levelInfo.colCount, _levelInfo.visionRange);
+    // Update graph
+    myMap->updateEdges(_levelInfo.objects, 0);
+    myMap->updateTiles(_levelInfo.tiles);
+
     // Init objects
     BOT_LOGIC_LOG(mLogger, "Objects Initialisation", true);
     ObjectManager::get()->initObjects(_levelInfo.objects, _levelInfo.tiles);
@@ -58,6 +63,9 @@ MyBotLogic::MyBotLogic()
     BOT_LOGIC_LOG(mLogger, "NPCs Initialisation", true);
     NPCManager::get()->initNpcs(_levelInfo.npcs);
 
+    // Init zones
+    BOT_LOGIC_LOG(mLogger, "NPCs Initialisation", true);
+    ZoneManager::get().initZones();
 }
 
 /*virtual*/ void MyBotLogic::OnGameStarted()
@@ -73,7 +81,8 @@ MyBotLogic::MyBotLogic()
     myMap->updateEdges(_turnInfo.objects, m_turnCount);
     myMap->updateTiles(_turnInfo.tiles);
     
-    ZoneManager::get().updateZones();
+    if (!m_omniscient)
+        ZoneManager::get().updateZones();
 
     // Create Influence map
     myMap->createInfluenceMap();

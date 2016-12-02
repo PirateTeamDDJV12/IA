@@ -51,6 +51,33 @@ bool ZoneManager::addJunction(unsigned int firstZone, unsigned int secondZone, O
     return false;
 }
 
+void ZoneManager::initZones()
+{
+    std::vector<Node*> toDo;
+    std::set<Node*> done;
+
+    // Pour chaque npc
+    std::vector<Npc *> npcs = NPCManager::get()->getNpcs();
+    for(auto npc : npcs)
+    {
+        Node *npcNode = Map::get()->getNode(npc->getCurrentTileId());
+        if(npcNode->getZone() != npc->getZone())
+        {
+            npc->setZone(npcNode->getZone());
+        }
+        done.insert(npcNode);
+        updateTileZone(npcNode, done, toDo);
+        done.clear();
+    }
+    while(!toDo.empty())
+    {
+        done.insert(toDo[0]);
+        updateTileZone(toDo[0], done, toDo);
+        toDo.erase(std::find(toDo.begin(), toDo.end(), toDo[0]));
+        done.clear();
+    }
+}
+
 void ZoneManager::updateZones()
 {
     std::vector<Node*> toDo;
