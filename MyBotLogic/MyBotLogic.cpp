@@ -8,6 +8,7 @@
 #include "NPCManager.h"
 #include "ObjectManager.h"
 #include "ZoneManager.h"
+#include <chrono>
 
 
 MyBotLogic::MyBotLogic()
@@ -23,14 +24,15 @@ MyBotLogic::MyBotLogic()
 /*virtual*/ void MyBotLogic::Configure(int argc, char *argv[], const std::string& _logpath)
 {
     m_logPath = _logpath;
-#ifdef BOT_LOGIC_DEBUG
     mLogger.Init(_logpath, "MyBotLogic.log");
+#ifdef BOT_LOGIC_DEBUG
 #endif
 
     BOT_LOGIC_LOG(mLogger, "Configure", true);
     Map::get()->setLoggerPath(_logpath);
     NPCManager::get()->setLoggerPath(_logpath);
     ObjectManager::get()->setLoggerPath(_logpath);
+    ZoneManager::get().setLoggerPath(_logpath);
     m_turnCount = 0;
 
     //Write Code Here
@@ -46,10 +48,16 @@ MyBotLogic::MyBotLogic()
 
 /*virtual*/ void MyBotLogic::Init(LevelInfo& _levelInfo)
 {
+    m_omniscient = _levelInfo.bOmnicientMode;
+
+    Map *myMap = Map::get();
     // Init MAP
     BOT_LOGIC_LOG(mLogger, "Map Initialisation", true);
-    Map::get()->initMap(_levelInfo.rowCount, _levelInfo.colCount, _levelInfo.visionRange);
-    
+    myMap->initMap(_levelInfo.rowCount, _levelInfo.colCount, _levelInfo.visionRange);
+    // Update graph
+    myMap->updateEdges(_levelInfo.objects, 0);
+    myMap->updateTiles(_levelInfo.tiles);
+
     // Init objects
     BOT_LOGIC_LOG(mLogger, "Objects Initialisation", true);
     ObjectManager::get()->initObjects(_levelInfo.objects, _levelInfo.tiles);
@@ -57,6 +65,16 @@ MyBotLogic::MyBotLogic()
     // Init npcs
     BOT_LOGIC_LOG(mLogger, "NPCs Initialisation", true);
     NPCManager::get()->initNpcs(_levelInfo.npcs);
+
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    ZoneManager::get().initZones(_levelInfo.npcs);
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::stringstream ss;
+
+    ss << "Zone intialization = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "µs " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
+
+    BOT_LOGIC_LOG(mLogger, ss.str(), true);
+    myMap->logZoneMap(0);
 
 }
 
@@ -73,20 +91,30 @@ MyBotLogic::MyBotLogic()
 /*virtual*/ void MyBotLogic::FillActionList(TurnInfo& _turnInfo, std::vector<Action*>& _actionList)
 {
     Map *myMap = Map::get();
-   
+
     // Update graph
-    myMap->updateEdges(_turnInfo.objects, m_turnCount);
+    myMap->updateEdges(_turnInfo.objects, _turnInfo.turnNb);
     myMap->updateTiles(_turnInfo.tiles);
-    
-    ZoneManager::get().updateZones();
+
+    if(!m_omniscient)
+    {
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+        ZoneManager::get().updateZones(_turnInfo.npcs);
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        std::stringstream ss;
+
+        ss << "Zone update = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "µs " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
+
+        mLogger.Log(ss.str(), true);
+    }
 
     // Create Influence map
     myMap->createInfluenceMap();
 
     // Log this
-    myMap->logZoneMap(m_turnCount);
-    myMap->logInfluenceMap(m_turnCount);
-    myMap->logMap(m_turnCount);
+    myMap->logZoneMap(_turnInfo.turnNb);
+    myMap->logInfluenceMap(_turnInfo.turnNb);
+    myMap->logMap(_turnInfo.turnNb);
 
     // Update ObjectManager by adding all new discovered objects
     ObjectManager::get()->updateObjects(_turnInfo.objects, _turnInfo.tiles);

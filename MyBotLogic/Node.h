@@ -41,7 +41,7 @@ private:
     float m_influence = { 0 };
     // TODO - Faire en sorte de definir si on sait tout du node ou pas pour eviter d'aller dessus, pour optimiser la recherche de chemin
     bool m_knowEverythingAboutIt;
-
+    bool m_sure;
     // TODO - Ajouter une zone a nos nodes pour les differencier et permettre de tout de suite savoir si on peut acceder a ce node ou pas
 public:
     Node() = delete;
@@ -75,6 +75,16 @@ public:
     unsigned int getZone() const noexcept
     {
         return m_zone;
+    }
+
+    void sure()
+    {
+        m_sure = true;
+    }
+
+    bool isSure() const
+    {
+        return m_sure;
     }
 
     void setEdgeCost(EDirection dir, std::set<EObjectType> types)

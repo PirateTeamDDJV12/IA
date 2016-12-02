@@ -32,6 +32,7 @@ void NPCManager::initNpc(std::pair<unsigned, NPCInfo> curNpcs)
     Node *npcNode = map->getNode(curNpcs.second.tileID);
     npcNode->setNpcIdOnNode(curNpcs.second.npcID);
     npcNode->setZone(zoneId);
+    npcNode->sure();
 }
 
 void NPCManager::initNpcs(std::map<unsigned, NPCInfo> npcs)
