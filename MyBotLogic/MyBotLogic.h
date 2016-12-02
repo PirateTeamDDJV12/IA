@@ -3,7 +3,6 @@
 #include "BotLogicIF.h"
 #include "Logger.h"
 #include "Map.h"
-#include "Npc.h"
 
 #ifdef _DEBUG
    #define BOT_LOGIC_DEBUG

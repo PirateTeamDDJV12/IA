@@ -3,6 +3,8 @@
 #include "Singleton.h"
 #include "Npc.h"
 #include "NPCInfo.h"
+#include "NPCManagerBTAdministrator.h"
+#include "Mission.h"
 #include "NPCManagerBTNpcUpdateAdministrator.h"
 #include "NPCManagerBTDecisionMakingAdministrator.h"
 #include <vector>
@@ -61,6 +63,7 @@ public:
     {
         return m_npcs;
     }
+    
 };
 
 #endif //NPC_MANAGER_HEADER
