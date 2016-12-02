@@ -17,7 +17,7 @@ void NPCManager::setLoggerPath(const std::string &a_path)
     BOT_LOGIC_MAP_LOG(m_logger, "Configure", true);
 }
 
-void NPCManager::initNpc(std::pair<unsigned, NPCInfo> curNpcs)
+void NPCManager::initNpc(const std::pair<unsigned, NPCInfo>& curNpcs)
 {
     Map *map = Map::get();
     ZoneManager &zoneManager = ZoneManager::get();
@@ -34,7 +34,7 @@ void NPCManager::initNpc(std::pair<unsigned, NPCInfo> curNpcs)
     npcNode->setZone(zoneId);
 }
 
-void NPCManager::initNpcs(std::map<unsigned, NPCInfo> npcs)
+void NPCManager::initNpcs(const std::map<unsigned, NPCInfo>& npcs)
 {
     for (std::pair<unsigned int, NPCInfo> curNpcs : npcs)
     {
@@ -55,7 +55,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
     Map *myMap = Map::get();
 
     // Get best goal for each NPCs
-    std::map<unsigned, unsigned> goalMap = myMap->getBestGoalTile(m_npcs);
+    std::map<unsigned, unsigned> goalMap = std::move(myMap->getBestGoalTile(m_npcs));
 
     // Calcul path for npc and set goal tile
     for (Npc* curNpc : m_npcs)

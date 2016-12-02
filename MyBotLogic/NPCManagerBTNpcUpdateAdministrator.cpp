@@ -90,7 +90,7 @@ std::string NPCManagerBTNpcUpdateAdministrator::getNpcNameByID(unsigned int npcI
     {
         if ((*m_npcs)[iter]->getId() == npcID)
         {
-            return this->getNpcNameByIndex(iter);
+            return std::move(this->getNpcNameByIndex(iter));
         }
     }
 

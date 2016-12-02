@@ -49,9 +49,9 @@ public:
         return &m_instance;
     }
     // Instantiate an NPC and save it in the vector
-    void initNpc(std::pair<unsigned int, NPCInfo> curNpcs);
+    void initNpc(const std::pair<unsigned, NPCInfo>& curNpcs);
     // Instantiate all NPCs
-    void initNpcs(std::map<unsigned int, NPCInfo> npcs);
+    void initNpcs(const std::map<unsigned, NPCInfo>& npcs);
     // Create BT and attach all NPCs to it
     void initBT();
     // Update all NPCs

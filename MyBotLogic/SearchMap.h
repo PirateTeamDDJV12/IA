@@ -50,7 +50,7 @@ public:
     {
         return m_isPathFinished;
     }
-    unsigned int pathSize() const
+    size_t pathSize() const
     {
         return m_pathToGoal.size();
     }

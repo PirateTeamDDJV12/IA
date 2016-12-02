@@ -7,7 +7,7 @@
 #include <algorithm>
 
 
-Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone)
+Npc::Npc(unsigned int a_id, unsigned int a_tileId, const std::string& a_path, unsigned int zone)
     : m_currentState{NONE}, m_nextState{EXPLORING}, m_id{a_id}, m_goal{}, m_hasGoal{false}, m_path{a_tileId}, m_nextActions{}, m_historyTiles{a_tileId}, m_turnCount{0}, m_zone {zone}
 {
 #ifdef BOT_LOGIC_DEBUG_NPC
@@ -127,19 +127,17 @@ bool Npc::updatePath()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "\tUpdating Path ", true);
     DisplayVector("\t\tOld path: ", m_path);
-    std::vector<unsigned> reversePath;
-    reversePath.resize(m_path.size());
-    std::reverse_copy(begin(m_path), end(m_path), begin(reversePath));
-    unsigned int oldTileId{reversePath.front()};
-    for(unsigned int tileId : reversePath)
+    unsigned int oldTileId{ m_path.back()};
+    Map* mapManager = Map::get();
+    for(auto reverseIter = m_path.rbegin(); reverseIter != m_path.rend(); ++reverseIter)
     {
-        if(!Map::get()->canMoveOnTile(oldTileId, tileId))
+        if(!mapManager->canMoveOnTile(oldTileId, (*reverseIter)))
         {
-            m_path = Map::get()->getNpcPath(getCurrentTileId(), m_goal);
+            m_path = mapManager->getNpcPath(getCurrentTileId(), m_goal);
             DisplayVector("\t\tPath Updated : ", m_path);
             return true;
         }
-        oldTileId = tileId;
+        oldTileId = (*reverseIter);
     }
     BOT_LOGIC_NPC_LOG(m_logger, "\t\tNo update needed", true);
     return false;
@@ -166,26 +164,28 @@ void Npc::explore()
         return;
     }
 
+    Map* mapPtr = Map::get();
+
     // Get the most influenced tile near the NPC
-    int bestTile = Map::get()->getNearInfluencedTile(getCurrentTileId());
+    int bestTile = mapPtr->getNearInfluencedTile(getCurrentTileId());
 
     // If we have not a best choice around us, let see a little bit futher
     if(bestTile < 0)
     {
         // TODO - Try to get the most influent tile around us in range of 2 instead of looking for a non visited tile
         // Get all non visited tiles
-        std::vector<unsigned> nonVisitedTiles = Map::get()->getNonVisitedTile();
+        std::vector<unsigned> nonVisitedTiles = std::move(mapPtr->getNonVisitedTile());
         DisplayVector("\t-Looking for the non visited tiles : ", nonVisitedTiles);
         for(unsigned index : nonVisitedTiles)
         {
             // Test if we can have a good path to this tile
-            std::vector<unsigned> temp = Map::get()->getNpcPath(getCurrentTileId(), index, 
-                {Node::NodeType::FORBIDDEN, Node::NodeType::NONE, Node::NodeType::OCCUPIED});
+            std::vector<unsigned> temp = std::move(mapPtr->getNpcPath(getCurrentTileId(), index,
+                {Node::NodeType::FORBIDDEN, Node::NodeType::NONE, Node::NodeType::OCCUPIED}));
 
             // If we got a good path, let's configure this
             if(!temp.empty())
             {
-                m_path = temp;
+                m_path = std::move(temp);
                 m_target = index;
                 m_nextState = MOVING;
                 break;
@@ -199,9 +199,9 @@ void Npc::explore()
         m_path = {bestTileUnsigned, getCurrentTileId()};
         m_historyTiles.push_back(bestTile);
 
-        m_nextActions.push_back(new Move{m_id, Map::get()->getNextDirection(getCurrentTileId(), getNextPathTile())});
+        m_nextActions.push_back(new Move{m_id, mapPtr->getNextDirection(getCurrentTileId(), getNextPathTile())});
 
-        BOT_LOGIC_NPC_LOG(m_logger, "Deplacement vers " + std::to_string(bestTile), true);
+        BOT_LOGIC_NPC_LOG(m_logger, std::move("Deplacement vers " + std::to_string(bestTile)), true);
 
         m_nextState = EXPLORING;
     }
