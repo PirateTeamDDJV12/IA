@@ -3,15 +3,12 @@
 
 #include "Singleton.h"
 #include "Mission.h"
-
+#include "Planificateur.h"
 #include <utility>
 #include <vector>
 #include <algorithm>
 #include <map>
 
-// Type de Retour du planificateur. Il suffira de remplacer ici une fois que
-//le vrai planificateur sera fait
-typedef std::vector<Mission> retourPlanificateur;
 
 struct Objectif
 {
@@ -35,27 +32,7 @@ struct Objectif
 };
 
 
-// A enlever quand le vrai Planif sera fait
-class Planificateur
-{
-public:
 
-
-
-
-    static retourPlanificateur planifyMissions(Mission mission, unsigned int npcID)
-    {
-        std::vector<Mission> subMissions;
-        subMissions.push_back(mission);
-        return subMissions;
-    }
-    static retourPlanificateur createMissionsToReachGoal(Objectif newObj)
-    {
-        std::vector<Mission> subMissions;
-        return subMissions;
-    }
-
-};
 
 
 
@@ -65,10 +42,10 @@ public:
 class MissionManager : public Singleton
 {
 private:
-
+    Planificateur planificateur;
     static MissionManager m_instance;
     //Missions sans objectifs (il yen aura ?)
-    retourPlanificateur m_missions;
+    std::vector<Mission> m_missions;
     //objectifs et missions associées
     std::map<Objectif, std::vector<Mission>> m_objectives;
     enum { MissionMax = 200 };
@@ -91,7 +68,7 @@ public:
     }
 
 
-    retourPlanificateur* getMissions()
+    std::vector<Mission>* getMissions()
     {
         return &m_missions;
     }
