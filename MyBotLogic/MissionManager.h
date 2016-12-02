@@ -8,6 +8,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <cstring>
 
 
 struct Objectif
@@ -15,15 +16,16 @@ struct Objectif
     unsigned int m_id;
     unsigned int m_from;
     unsigned int m_destinaton;
+
     bool operator==(Objectif other) const
     {
-        return (m_from == other.m_from && m_destinaton ==other.m_destinaton);
+        return (m_from == other.m_from && m_destinaton == other.m_destinaton);
     }
     bool operator>(Objectif other) const
     {
         return false;
     }
-    bool  operator<( Objectif other) const
+    bool  operator<(Objectif other) const
     {
         return true;
     }
@@ -37,14 +39,13 @@ struct Objectif
 
 
 
-
 //MissionManager
 class MissionManager : public Singleton
 {
 private:
     Planificateur planificateur;
     static MissionManager m_instance;
-    //Missions sans objectifs (il yen aura ?)
+    //Missions sans objectifs
     std::vector<Mission> m_missions;
     //objectifs et missions associées
     std::map<Objectif, std::vector<Mission>> m_objectives;
