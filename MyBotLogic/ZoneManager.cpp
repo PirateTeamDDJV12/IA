@@ -4,7 +4,7 @@
 
 ZoneManager ZoneManager::m_instance;
 
-ZoneManager::ZoneManager()
+ZoneManager::ZoneManager() : m_zones{}, m_count{0}
 {
 }
 
@@ -14,7 +14,7 @@ ZoneManager::~ZoneManager()
 
 size_t ZoneManager::getZoneCount() const
 {
-    return m_zones.size();
+    return m_count;
 }
 
 
@@ -25,6 +25,7 @@ Zone *ZoneManager::getZone(unsigned int zoneId) const
 
 Zone *ZoneManager::addZone()
 {
+    ++m_count;
     unsigned int zoneId = static_cast<unsigned int>(m_zones.size() + 1);
     m_zones[zoneId] = new Zone(zoneId);
     return m_zones[zoneId];
@@ -33,6 +34,7 @@ Zone *ZoneManager::addZone()
 void ZoneManager::addZone(Zone *zone)
 {
     m_zones[zone->getZoneId()] = zone;
+    ++m_count;
 }
 
 bool ZoneManager::addJunction(unsigned int firstZone, unsigned int secondZone, Object *object)
@@ -102,8 +104,8 @@ void ZoneManager::updateTileZone(Node* currentTile, std::set<Node *> &done, std:
                 else if (neighbour->getZone() == 0)
                 {
                     Map *map = Map::get();
-                    map->setZoneCount(map->getZoneCount() + 1);
-                    neighbour->setZone(map->getZoneCount());
+                    addZone();
+                    neighbour->setZone(m_count);
                     toDo.push_back(neighbour);
                 }
             }

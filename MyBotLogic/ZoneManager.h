@@ -28,6 +28,7 @@ public:
 private:
     static ZoneManager              m_instance;
     std::map<unsigned int, Zone*>   m_zones;
+    unsigned int                    m_count;
 
     ZoneManager();
 
