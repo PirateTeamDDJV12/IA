@@ -1,7 +1,7 @@
 #include "Planificateur.h"
 
 
-std::vector<Mission> Planificateur::planifyMissions(Mission mission, unsigned int npcID)
+std::vector<Mission> Planificateur::planifyMissions(Mission mission, unsigned zoneId,unsigned npcId)
 {
     std::vector<Mission> subMissions;
     subMissions.push_back(mission);
@@ -37,15 +37,11 @@ std::pair<std::vector<Mission>, std::vector<Mission>> Planificateur::createMissi
                     //récupérer Zone de la frontière
                     unsigned position = frontiere.getLinkedObjects()[objetCourant]->getTileId();
                     unsigned zoneToGo = ZoneManager::get().getZone(position)->getZoneId();
-
+                    std::vector<Mission> subMissions = planifyMissions(openDoor,zoneToGo,41); //TOCHANGE -> 
+                    subMissionsForOthersNPCs.insert(subMissionsForOthersNPCs.end(), subMissions.begin(), subMissions.end());
                     subMissionsForOthersNPCs.push_back(openDoor);
                 }
-
-
-                //Regarder si l'objet qui active la porte est collé à la porte
-                bool porteAdjacente = false;
-
-
+                
             }
 
 

@@ -1,4 +1,5 @@
 #include "MissionManager.h"
+#include "NPCManager.h"
 
 MissionManager MissionManager::m_instance;
 
@@ -17,11 +18,11 @@ void MissionManager::subscribeGoal(unsigned fromZone, unsigned destinationZone)
 
 
 //Ajouter mission sans objectifs
-void MissionManager::subscribeMission(Mission mission, unsigned int npcId)
+void MissionManager::subscribeMission(Mission mission, unsigned npcId,unsigned zoneId)
 {
 
     //Consulter Planificateur pour obtenir les sous missions et les enregistrer
-    std::vector<Mission> subMissions = planificateur.planifyMissions(mission, npcId);
+    std::vector<Mission> subMissions = planificateur.planifyMissions(mission, npcId, zoneId);
     for (Mission submis : subMissions)
     {
         submis.setId(m_missionsCount);

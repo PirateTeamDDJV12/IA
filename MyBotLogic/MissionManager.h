@@ -79,7 +79,7 @@ public:
 
 
     //Ajouter une mission (Se déplacer/ intéragir)
-    void subscribeMission(Mission mission, unsigned int npcId);
+    void subscribeMission(Mission mission, unsigned npcId, unsigned zoneId);
 
     //Supprimer un Objectif
     void deleteObjectif(unsigned int idToDelete, unsigned int from, unsigned int dest )
