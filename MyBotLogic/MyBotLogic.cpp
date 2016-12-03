@@ -40,7 +40,7 @@ MyBotLogic::MyBotLogic()
 {
     //Write Code Here
 #ifdef BOT_LOGIC_DEBUG
-    Sleep(5000);
+    Sleep(2000);
 #endif
 }
 
@@ -70,7 +70,7 @@ MyBotLogic::MyBotLogic()
     Map *myMap = Map::get();
    
     // Update graph
-    myMap->updateEdges(_turnInfo.objects, m_turnCount);
+    myMap->updateEdges(_turnInfo.objects, _turnInfo.turnNb);
     myMap->updateTiles(_turnInfo.tiles);
     
     ZoneManager::get().updateZones();
@@ -79,9 +79,9 @@ MyBotLogic::MyBotLogic()
     myMap->createInfluenceMap();
 
     // Log this
-    myMap->logZoneMap(m_turnCount);
-    myMap->logInfluenceMap(m_turnCount);
-    myMap->logMap(m_turnCount);
+    myMap->logZoneMap(_turnInfo.turnNb);
+    myMap->logInfluenceMap(_turnInfo.turnNb);
+    myMap->logMap(_turnInfo.turnNb);
 
     // Update ObjectManager by adding all new discovered objects
     ObjectManager::get()->updateObjects(_turnInfo.objects, _turnInfo.tiles);

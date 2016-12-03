@@ -123,6 +123,10 @@ public:
         return m_nextActions;
     }
 
+    unsigned int getGoal() const
+    {
+        return m_goal;
+    }
 private:
     void explore();
     void followPath();

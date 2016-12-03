@@ -8,7 +8,7 @@
 
 
 Npc::Npc(unsigned int a_id, unsigned int a_tileId, const std::string& a_path, unsigned int zone)
-    : m_currentState{NONE}, m_nextState{EXPLORING}, m_id{a_id}, m_goal{}, m_hasGoal{false}, m_path{a_tileId}, m_nextActions{}, m_historyTiles{a_tileId}, m_turnCount{0}, m_zone {zone}
+    : m_currentState{NONE}, m_nextState{EXPLORING}, m_id{a_id}, m_goal{}, m_hasGoal{false}, m_path{a_tileId}, m_nextActions{}, m_historyTiles{a_tileId}, m_turnCount{0}, m_zone{zone}
 {
 #ifdef BOT_LOGIC_DEBUG_NPC
     m_logger.Init(a_path, "Npc_" + std::to_string(m_id) + ".log");
@@ -44,10 +44,14 @@ void Npc::update()
             case(ARRIVED):
                 m_nextState = ARRIVED; // May be useless atm
                 m_currentState = ARRIVED;
+                if(getCurrentTileId() == m_goal)
+                {
+                    Map::get()->getNode(getCurrentTileId())->setType(Node::OCCUPIED);
+                    BOT_LOGIC_NPC_LOG(m_logger, "\tI am out, i am on my goal !", true);
+                }
                 break;
         }
     } while(m_currentState != m_nextState);
-    int test = 0;
 }
 
 bool Npc::stopEverything()
@@ -114,7 +118,7 @@ void Npc::calculPath()
     {
         return;
     }
-    std::vector<unsigned> path = Map::get()->getNpcPath(getCurrentTileId(), m_goal);
+    std::vector<unsigned> path = Map::get()->getNpcPath(getCurrentTileId(), m_goal, {Node::FORBIDDEN, Node::OCCUPIED});
     if(path.size() <= 0)
     {
         m_hasGoal = false;
@@ -127,19 +131,38 @@ bool Npc::updatePath()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "\tUpdating Path ", true);
     DisplayVector("\t\tOld path: ", m_path);
-    unsigned int oldTileId{ m_path.back()};
+    unsigned int saveCurrentTile{m_path.back()};
+    unsigned int oldTileId{m_path.back()};
     Map* mapManager = Map::get();
     for(auto reverseIter = m_path.rbegin(); reverseIter != m_path.rend(); ++reverseIter)
     {
         if(!mapManager->canMoveOnTile(oldTileId, (*reverseIter)))
         {
-            m_path = mapManager->getNpcPath(getCurrentTileId(), m_goal);
-            DisplayVector("\t\tPath Updated : ", m_path);
-            return true;
+            auto newPath = mapManager->getNpcPath(getCurrentTileId(), m_goal, {Node::FORBIDDEN, Node::OCCUPIED});
+            if(newPath.size() > 0)
+            {
+                if(newPath.size() > 30 && m_hasGoal)
+                {
+                    BOT_LOGIC_NPC_LOG(m_logger, "\t\tTo path to the goal is to long... don't want to go there", true);
+                    m_hasGoal = false;
+                    m_path = {saveCurrentTile};
+                    break;
+                }
+                m_path = newPath;
+                DisplayVector("\t\tPath Updated : ", m_path);
+                return true;
+            }
+            else
+            {
+                BOT_LOGIC_NPC_LOG(m_logger, "\t\tCan't access the goal this turn, just wait", true);
+                m_nextState = WAITING;
+                return true;
+            }
         }
         oldTileId = (*reverseIter);
     }
     BOT_LOGIC_NPC_LOG(m_logger, "\t\tNo update needed", true);
+    m_nextState = EXPLORING;
     return false;
 }
 
@@ -180,7 +203,7 @@ void Npc::explore()
         {
             // Test if we can have a good path to this tile
             std::vector<unsigned> temp = std::move(mapPtr->getNpcPath(getCurrentTileId(), index,
-                {Node::NodeType::FORBIDDEN, Node::NodeType::NONE, Node::NodeType::OCCUPIED}));
+            {Node::NodeType::FORBIDDEN, Node::NodeType::NONE, Node::NodeType::OCCUPIED}));
 
             // If we got a good path, let's configure this
             if(!temp.empty())
@@ -209,27 +232,28 @@ void Npc::explore()
 
 void Npc::followPath()
 {
-    BOT_LOGIC_NPC_LOG(m_logger, "-FollowPath", true);
-    // Get the direction between the two last nodes of m_path
-    if(getCurrentTileId() == m_goal)
+    if(getCurrentTileId() == m_goal && m_hasGoal)
     {
         m_nextState = ARRIVED;
         return;
     }
-    if(getCurrentTileId() == m_target && !hasGoal())
+    if(m_path.size() <= 1 || getCurrentTileId() == m_target && !hasGoal())
     {
         m_nextState = EXPLORING;
         return;
     }
-    m_nextActions.push_back(new Move{m_id, Map::get()->getNextDirection(getCurrentTileId(), getNextPathTile())});
-    BOT_LOGIC_NPC_LOG(m_logger, "\tDeplacement vers " + std::to_string(getNextPathTile()), true);
+
+    BOT_LOGIC_NPC_LOG(m_logger, "-FollowPath", true);
+    unsigned int nextTile = getNextPathTile();
+    m_nextActions.push_back(new Move{m_id, Map::get()->getNextDirection(getCurrentTileId(), nextTile)});
+    BOT_LOGIC_NPC_LOG(m_logger, "\tDeplacement vers " + std::to_string(nextTile), true);
     m_nextState = MOVING;
 }
 
 void Npc::wait()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "-Wait", true);
-    // TODO - Test why we are blocked ?
+    m_nextState = WAITING;
 }
 
 void Npc::interact()

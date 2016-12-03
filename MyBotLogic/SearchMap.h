@@ -29,7 +29,7 @@ public:
     {
         return m_isGoalFound;
     }
-    void initSearchMap(Node*, Node*, std::set<Node::NodeType> forbiddenType = {Node::NodeType::FORBIDDEN});
+    void initSearchMap(Node*, Node*, std::set<Node::NodeType> forbiddenType = {Node::NodeType::FORBIDDEN, Node::NodeType::OCCUPIED});
     void prepareNode(int, int, unsigned int, SearchNode*);
     void prepareNode(Node*, unsigned int, SearchNode*);
     std::vector<unsigned int> search();

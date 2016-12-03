@@ -36,7 +36,7 @@ private:
     Node* m_neighboors[8] = { nullptr };
     unsigned int m_ID;
     unsigned int m_edgesCost[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    unsigned int m_npcId = { 0 };
+    int m_npcId;
     unsigned int m_zone = { 0 };
     float m_influence = { 0 };
     // TODO - Faire en sorte de definir si on sait tout du node ou pas pour eviter d'aller dessus, pour optimiser la recherche de chemin
@@ -93,6 +93,11 @@ public:
         }
     }
 
+    bool isTileOccupied() const
+    {
+        return m_npcId > 0;
+    }
+
     bool isEdgeBlocked(EDirection dir) const
     {
         switch(m_edgesCost[dir])
@@ -130,12 +135,12 @@ public:
         return nullptr;
     }
 
-    void setNpcIdOnNode(unsigned npcId)
+    void setNpcIdOnNode(int npcId)
     {
         m_npcId = npcId;
     }
 
-    unsigned getNpcIdOnNode() const
+    int getNpcIdOnNode() const
     {
         return m_npcId;
     }

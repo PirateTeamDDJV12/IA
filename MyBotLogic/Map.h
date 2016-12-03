@@ -30,7 +30,7 @@ class Map : Singleton
     unsigned int m_influenceRange;
     unsigned int m_zoneCount;
     std::map<unsigned int, Node*> m_nodeMap;
-    std::vector<unsigned int> m_goalTiles;
+    std::map<unsigned int, bool> m_goalTiles;
     std::map<unsigned, bool> m_seenTiles;
     std::vector<Node*> m_interestingNodes;
     //std::map<unsigned int, SearchMap*> m_searchMap;
@@ -160,6 +160,7 @@ public:
     void logMap(unsigned);
     void logInfluenceMap(unsigned nbTurn);
     void logZoneMap(unsigned nbTurn);
+    std::string getTileStringToLog(Node* node) const;
 
     void initMap(unsigned int row, unsigned int col, unsigned int range);
     void updateEdges(const std::map<unsigned int, ObjectInfo>& objects, unsigned nbTurn);
