@@ -9,6 +9,7 @@
 
 class Zone
 {
+    friend class Planificateur;
 public:
     // Junction class
     class Junction

@@ -79,7 +79,7 @@ public:
 
 
     //Ajouter une mission (Se déplacer/ intéragir)
-    void subscribeMission(Mission mission, unsigned npcId, unsigned zoneId);
+    std::pair<std::vector<Mission>, std::vector<Mission>> subscribeMission(Mission mission, unsigned npcId, unsigned zoneId);
 
     //Supprimer un Objectif
     void deleteObjectif(unsigned int idToDelete, unsigned int from, unsigned int dest )
@@ -89,16 +89,8 @@ public:
 
     //Supprimer une mission d'un objectif
 
-    void deleteMissionFromObjective(unsigned int idObjective)
-    {
-        auto itObjectiveToCheck = std::find_if(m_objectives.begin(), m_objectives.end(), [idObjective](std::pair<Objectif, std::vector<Mission>> obj)
-        {return obj.first.m_id == idObjective; });
-        //on met la mission à la fin du vector
-        std::remove_if(itObjectiveToCheck->second.begin(), itObjectiveToCheck->second.end(), [itObjectiveToCheck](Mission mission)
-        {return (mission.getId() == itObjectiveToCheck->second.front().getId()); });
-        //et on l'efface
-        itObjectiveToCheck->second.erase(itObjectiveToCheck->second.end());
-    }
+    void deleteMissionFromObjective(unsigned int idObjective);
+   
 
     //Supprimer une mission indépendante
         void deleteMission(unsigned int missionId)

@@ -12,9 +12,9 @@ class Planificateur
 {
 public:
 
-    std::vector<Mission> planifyMissions(Mission mission, unsigned zoneID, unsigned npcID);
+    std::pair<std::vector<Mission>, std::vector<Mission>> planifyMissions(Mission mission, unsigned npcID);
    
-    std::pair<std::vector<Mission>, std::vector<Mission>> createMissionsToReachGoal(unsigned id, unsigned from, unsigned dest);
+    std::pair<std::vector<Mission>, std::vector<Mission>> createMissionsToReachGoal(unsigned from, unsigned dest);
 
 };
 
