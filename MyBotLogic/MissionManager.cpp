@@ -32,6 +32,7 @@ std::pair<std::vector<Mission>, std::vector<Mission>> MissionManager::subscribeM
     return(subMissions);
 }
 
+
 void MissionManager::deleteMissionFromObjective(unsigned int idObjective)
 {
     auto itObjectiveToCheck = std::find_if(m_objectives.begin(), m_objectives.end(), [idObjective](std::pair<Objectif, std::vector<Mission>> obj)
