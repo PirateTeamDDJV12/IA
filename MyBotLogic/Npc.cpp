@@ -4,21 +4,23 @@
 /* INCLUDE FROM CARLE */
 #include "Globals.h"
 
+#include "NPCManager.h"
+
 #include <algorithm>
 
 
 using namespace BehaviourTree;
 
 
-Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone) : 
-    m_currentState{ NONE }, 
-    m_nextState{ EXPLORING }, 
-    m_id{ a_id }, m_goal{}, 
-    m_hasGoal{ false }, 
-    m_path{ a_tileId }, 
-    m_nextActions{}, 
-    m_historyTiles{ a_tileId }, 
-    m_turnCount{ 0 }, 
+Npc::Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone) :
+    m_currentState{ NONE },
+    m_nextState{ EXPLORING },
+    m_id{ a_id }, m_goal{},
+    m_hasGoal{ false },
+    m_path{ a_tileId },
+    m_nextActions{},
+    m_historyTiles{ a_tileId },
+    m_turnCount{ 0 },
     m_zone{ zone },
     m_exploreBT{ BlocFabric::initiateRootAsCompositeBloc<BlocSelect>("NpcExploreRoot") }
 {
@@ -40,33 +42,33 @@ void Npc::update()
     do
     {
         m_currentState = m_nextState;
-        switch(m_currentState)
+        switch (m_currentState)
         {
-            case(MOVING):
-                followPath();
-                break;
-            case(WAITING):
-                wait();
-                break;
-            case(EXPLORING):
-                m_exploreBT();
-                break;
-            case(INTERACTING):
-                interact();
-                break;
-            case(ARRIVED):
-                m_nextState = ARRIVED; // May be useless atm
-                m_currentState = ARRIVED;
-                break;
+        case(MOVING):
+            followPath();
+            break;
+        case(WAITING):
+            wait();
+            break;
+        case(EXPLORING):
+            m_exploreBT();
+            break;
+        case(INTERACTING):
+            interact();
+            break;
+        case(ARRIVED):
+            m_nextState = ARRIVED; // May be useless atm
+            m_currentState = ARRIVED;
+            break;
         }
-    } while(m_currentState != m_nextState);
+    } while (m_currentState != m_nextState);
     int test = 0;
 }
 
 bool Npc::stopEverything()
 {
     // deleting item
-    for(std::vector< Action* >::iterator it = m_nextActions.begin(); it != m_nextActions.end(); ++it)
+    for (std::vector< Action* >::iterator it = m_nextActions.begin(); it != m_nextActions.end(); ++it)
     {
         delete (*it);
     }
@@ -77,10 +79,10 @@ bool Npc::stopEverything()
 void Npc::stopMoving()
 {
     auto it = std::partition(std::begin(m_nextActions),
-                             std::end(m_nextActions),
-                             [](const Action* curAction) { return curAction->actionType != Action_Move; });
+        std::end(m_nextActions),
+        [](const Action* curAction) { return curAction->actionType != Action_Move; });
 
-    for(std::vector< Action* >::iterator itDelete = it; itDelete != m_nextActions.end(); ++itDelete)
+    for (std::vector< Action* >::iterator itDelete = it; itDelete != m_nextActions.end(); ++itDelete)
     {
         delete (*itDelete);
     }
@@ -90,10 +92,10 @@ void Npc::stopMoving()
 void Npc::stopInteract()
 {
     auto it = std::partition(std::begin(m_nextActions),
-                             std::end(m_nextActions),
-                             [](const Action* curAction) { return curAction->actionType == Action_Interact; });
+        std::end(m_nextActions),
+        [](const Action* curAction) { return curAction->actionType == Action_Interact; });
 
-    for(std::vector< Action* >::iterator itDelete = it; itDelete != m_nextActions.end(); ++itDelete)
+    for (std::vector< Action* >::iterator itDelete = it; itDelete != m_nextActions.end(); ++itDelete)
     {
         delete (*itDelete);
     }
@@ -102,20 +104,20 @@ void Npc::stopInteract()
 
 void Npc::unstackActions()
 {
-    while(m_nextActions.size())
+    while (m_nextActions.size())
     {
-        Action* curAction{m_nextActions.back()};
-        switch(curAction->actionType)
+        Action* curAction{ m_nextActions.back() };
+        switch (curAction->actionType)
         {
-            case Action_None:
-                // Do nothing
-                break;
-            case Action_Move:
-                moveForwardOnPath();
-                break;
-            case Action_Interact:
-                // TODO - do nothing atm
-                break;
+        case Action_None:
+            // Do nothing
+            break;
+        case Action_Move:
+            moveForwardOnPath();
+            break;
+        case Action_Interact:
+            // TODO - do nothing atm
+            break;
         }
         m_nextActions.pop_back();
     }
@@ -123,7 +125,7 @@ void Npc::unstackActions()
 
 void Npc::calculPath()
 {
-    if(!hasGoal())
+    if (!hasGoal())
     {
         return;
     }
@@ -137,10 +139,10 @@ bool Npc::updatePath()
     std::vector<unsigned> reversePath;
     reversePath.resize(m_path.size());
     std::reverse_copy(begin(m_path), end(m_path), begin(reversePath));
-    unsigned int oldTileId{reversePath.front()};
-    for(unsigned int tileId : reversePath)
+    unsigned int oldTileId{ reversePath.front() };
+    for (unsigned int tileId : reversePath)
     {
-        if(!Map::get()->canMoveOnTile(oldTileId, tileId))
+        if (!Map::get()->canMoveOnTile(oldTileId, tileId))
         {
             m_path = Map::get()->getNpcPath(getCurrentTileId(), m_goal);
             displayVector("\t\tPath Updated : ", m_path);
@@ -154,7 +156,7 @@ bool Npc::updatePath()
 
 int Npc::getNextPathTile() const
 {
-    if(m_path.size() == 1)
+    if (m_path.size() == 1)
     {
         return -1;
     }
@@ -165,7 +167,7 @@ int Npc::getNextPathTile() const
 void Npc::explore()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "-Explore", true);
-    if(hasGoal())
+    if (hasGoal())
     {
         BOT_LOGIC_NPC_LOG(m_logger, "\tNPC have a goal : " + std::to_string(m_goal), true);
         displayVector("\tNpc base path :", m_path);
@@ -177,20 +179,20 @@ void Npc::explore()
     int bestTile = Map::get()->getNearInfluencedTile(getCurrentTileId());
 
     // If we have not a best choice around us, let see a little bit futher
-    if(bestTile < 0)
+    if (bestTile < 0)
     {
         // TODO - Try to get the most influent tile around us in range of 2 instead of looking for a non visited tile
         // Get all non visited tiles
         std::vector<unsigned> nonVisitedTiles = Map::get()->getNonVisitedTile();
         displayVector("\t-Looking for the non visited tiles : ", nonVisitedTiles);
-        for(unsigned index : nonVisitedTiles)
+        for (unsigned index : nonVisitedTiles)
         {
             // Test if we can have a good path to this tile
-            std::vector<unsigned> temp = Map::get()->getNpcPath(getCurrentTileId(), index, 
-                {Node::NodeType::FORBIDDEN, Node::NodeType::NONE, Node::NodeType::OCCUPIED});
+            std::vector<unsigned> temp = Map::get()->getNpcPath(getCurrentTileId(), index,
+            { Node::NodeType::FORBIDDEN, Node::NodeType::NONE, Node::NodeType::OCCUPIED });
 
             // If we got a good path, let's configure this
-            if(!temp.empty())
+            if (!temp.empty())
             {
                 m_path = temp;
                 m_target = index;
@@ -201,12 +203,12 @@ void Npc::explore()
     }
     else
     {
-        // Set the best tile in path and push the action
+        //Set the best tile in path and push the action
         unsigned int bestTileUnsigned = bestTile;
-        m_path = {bestTileUnsigned, getCurrentTileId()};
+        m_path = { bestTileUnsigned, getCurrentTileId() };
         m_historyTiles.push_back(bestTile);
 
-        m_nextActions.push_back(new Move{m_id, Map::get()->getNextDirection(getCurrentTileId(), getNextPathTile())});
+        m_nextActions.push_back(new Move{ m_id, Map::get()->getNextDirection(getCurrentTileId(), getNextPathTile()) });
 
         BOT_LOGIC_NPC_LOG(m_logger, "Deplacement vers " + std::to_string(bestTile), true);
 
@@ -218,17 +220,17 @@ void Npc::followPath()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "-FollowPath", true);
     // Get the direction between the two last nodes of m_path
-    if(getCurrentTileId() == m_goal)
+    if (getCurrentTileId() == m_goal)
     {
         m_nextState = ARRIVED;
         return;
     }
-    if(getCurrentTileId() == m_target && !hasGoal())
+    if (getCurrentTileId() == m_target && !hasGoal())
     {
         m_nextState = EXPLORING;
         return;
     }
-    m_nextActions.push_back(new Move{m_id, Map::get()->getNextDirection(getCurrentTileId(), getNextPathTile())});
+    m_nextActions.push_back(new Move{ m_id, Map::get()->getNextDirection(getCurrentTileId(), getNextPathTile()) });
     BOT_LOGIC_NPC_LOG(m_logger, "\tDeplacement vers " + std::to_string(getNextPathTile()), true);
     m_nextState = MOVING;
 }
@@ -248,8 +250,8 @@ void Npc::interact()
 template<class T>
 void Npc::displayVector(std::string info, const std::vector<T> v)
 {
-    std::string s{""};
-    for(T u : v)
+    std::string s{ "" };
+    for (T u : v)
     {
         s += std::to_string(u) + " ";
     }
@@ -300,33 +302,35 @@ void Npc::initExploreBT()
     /* Fourth layer                                                         */
     /************************************************************************/
 
-    // tileExplorationSequence's first child (action)
+    // hasTargetSelect's first child (action)
     BlocRef hasTargetActionRef = createHasTargetAction();
 
-    // tileExplorationSequence's second child (loop) - We need to create the loop's child before creating the loop
-    BlocRef checkTileSequenceRef = BlocFabric::createCompositeBloc<BlocSequence>("CheckTileSequence");
-    BlocSequence* checkTileSequence = checkTileSequenceRef->as<BlocSequence>();
+    // hasTargetSelect's second child (loop) - We need to create the loop's child before creating the loop
+    BlocRef checkTileSelectRef = BlocFabric::createCompositeBloc<BlocSelect>("CheckTileSelect");
+    BlocSelect* checkTileSelect = checkTileSelectRef->as<BlocSelect>();
 
-    BlocRef checkTileLoopRef = BlocFabric::createLoopBloc<BlocBreakingLoopOnSuccess>(6, checkTileSequenceRef, "CheckTileLoop");
-    BlocBreakingLoopOnSuccess* checkTileLoop = checkTileLoopRef->as<BlocBreakingLoopOnSuccess>();
+    //BlocRef checkTileLoopRef = BlocFabric::createLoopBloc<BlocBreakingLoopOnSuccess>(6, checkTileSelectRef, general::result::SUCCESS, "CheckTileLoop");
+    //BlocBreakingLoopOnSuccess* checkTileLoop = checkTileLoopRef->as<BlocBreakingLoopOnSuccess>();
 
-    // Connecting tileExplorationSequence's childs to itself
+    // Connecting hasTargetSelect's childs to itself
     hasTargetSelect->connect(hasTargetActionRef);
-    hasTargetSelect->connect(checkTileLoopRef);
+    //hasTargetSelect->connect(checkTileLoopRef);
+    hasTargetSelect->connect(checkTileSelectRef);
 
 
     /************************************************************************/
     /* Fifth layer                                                          */
     /************************************************************************/
 
-    // checkSequence's first child (action)
+    // checkTileSelect's first child (action)
     BlocRef checkTileActionRef = createCheckTileAction();
 
-    // checkSequence's second child (action)
+    // checkTileSelect's second child (action)
     BlocRef changeDirectionActionRef = createChangeDirectionAction();
 
-    checkTileSequence->connect(checkTileActionRef);
-    checkTileSequence->connect(changeDirectionActionRef);
+    // Connecting checkTileSelect's childs to itself
+    checkTileSelect->connect(checkTileActionRef);
+    checkTileSelect->connect(changeDirectionActionRef);
 }
 
 BlocRef Npc::createHasTargetAction()
@@ -353,9 +357,40 @@ BlocRef Npc::createCheckTileAction()
     return BlocFabric::createGeneralAction(
         [this]()
     {
+        // Get the most influenced tile near the NPC
+        int bestTile = Map::get()->getNearInfluencedTile(getCurrentTileId());
 
+        // If we have not a best choice around us, let see a little bit futher
+        if (bestTile < 0)
+        {
+            NPCManager* npcManager = NPCManager::get();
+            Map* mapManager = Map::get();
 
+            Node* n = mapManager->getNode(getCurrentTileId());
+            for (int i = N; i <= NW; ++i)
+            {
+                Node* currentNeighboor = mapManager->getNode(getCurrentTileId())->getNeighboor(i);
+                if (currentNeighboor)
+                {
+                    m_target = currentNeighboor->getId();
+                    if (npcManager->isNextTileFree(this))
+                    {
+                        std::vector<unsigned> temp;
+                        temp.push_back(getCurrentTileId());
+                        temp.push_back(m_target);
 
+                        m_path = temp;
+
+                        m_nextState = MOVING;
+                        return general::result::SUCCESS;
+                    }
+                    else
+                    {
+                        return general::result::FAIL;
+                    }
+                }
+            }
+        }
         return general::result::FAIL;
     },
         "CheckTile"
@@ -367,7 +402,6 @@ BlocRef Npc::createChangeDirectionAction()
     return BlocFabric::createGeneralAction(
         [this]()
     {
-
 
 
         return general::result::FAIL;

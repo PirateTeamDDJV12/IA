@@ -25,6 +25,8 @@ struct Action;
 
 class Npc 
 {
+    friend class NPCManager;
+
 private:
     enum npcState
     {
@@ -36,6 +38,13 @@ private:
         INTERACTING
     };
 
+private:
+    struct ExploreBlackboard
+    {
+       
+    };
+
+private:
     npcState m_currentState, m_nextState;
     unsigned int m_id;
     unsigned int m_goal;
@@ -47,7 +56,15 @@ private:
     std::vector<unsigned int> m_historyTiles;
     std::vector<Action*> m_nextActions;
     Logger m_logger;
+
+
+    /************************************************************************/
+    /* LLOYD PART                                                           */
+    /************************************************************************/
+    ExploreBlackboard m_exploreBlackboard;
     BehaviourTree::BlocRoot m_exploreBT;
+    unsigned int m_targetFromCurrentTile;
+    ///////////////////////////////////////
 
 public:
     Npc(unsigned int a_id, unsigned int a_tileId, std::string a_path, unsigned int zone);
@@ -73,6 +90,7 @@ public:
     void unstackActions();
 
     void calculPath();
+
     // check path integrity, if pass is corrupted, try to find a new path return true if found
     bool updatePath();
 
@@ -83,29 +101,35 @@ public:
     {
         return m_path.back();
     }
-    int getNextPathTile()const;
+
+    int getNextPathTile() const;
+
     unsigned int getPathSize() const
     {
         return m_path.size();
     }
+
     std::vector<unsigned int> getWholePath() const
     {
         return m_path;
     }
-    
+
     void setGoal(unsigned int a_id)
     {
         m_goal = a_id;
         m_hasGoal = true;
     }
+
     void unsetGoal()
     {
         m_hasGoal = false;
     }
+
     bool isOnGoalTile() const
     {
         return m_currentState == ARRIVED;
     }
+
     bool hasGoal() const
     {
         return m_hasGoal;
@@ -115,6 +139,7 @@ public:
     {
         return m_zone;
     }
+
     void setZone(unsigned int zone)
     {
         m_zone = zone;
@@ -130,14 +155,17 @@ public:
         return m_nextActions;
     }
 
-    ///////////////////////////////////////
+    /************************************************************************/
+    /* LLOYD PART                                                           */
+    /************************************************************************/
+    unsigned int getTargetFromCurrentTile() { return m_targetFromCurrentTile; }
+
     void initExploreBT();
 
     BehaviourTree::BlocRef createHasTargetAction();
     BehaviourTree::BlocRef createCheckTileAction();
     BehaviourTree::BlocRef createChangeDirectionAction();
     BehaviourTree::BlocRef createMoveAction();
-
 
     //void swapToExplore();
     //void swapToExploreWall();

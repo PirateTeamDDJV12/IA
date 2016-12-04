@@ -40,23 +40,44 @@ private:
 public:
     // Define the log path for the NPCManager logger and save the path to give it for each npc
     void setLoggerPath(const std::string &a_path);
+
     static NPCManager* get()
     {
         return &m_instance;
     }
     // Instantiate an NPC and save it in the vector
     void initNpc(std::pair<unsigned int, NPCInfo> curNpcs);
+
     // Instantiate all NPCs
     void initNpcs(std::map<unsigned int, NPCInfo> npcs);
+
     // Create BT and attach all NPCs to it
     void initBT();
+
     // Update all NPCs
     void updateNPCs(std::vector<Action*> &_actionList);
+
     // Npc Getter
     const std::vector<Npc *> &getNpcs() const
     {
         return m_npcs;
     }
+
+    /************************************************************************/
+    /* LLOYD PART                                                           */
+    /************************************************************************/
+    bool isNextTileFree(Npc* npc) const
+    {
+        for (auto curOtherNpc : m_npcs)
+        {
+            if (npc->getId() != curOtherNpc->getId() && npc->m_target == curOtherNpc->m_target)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    //////////////////////////////////////////////////////////////////////////
 };
 
 #endif //NPC_MANAGER_HEADER

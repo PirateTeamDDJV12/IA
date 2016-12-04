@@ -59,8 +59,6 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
         }
     }
 
-
-
     // Move Npcs
     m_BTAdministrator();
 
