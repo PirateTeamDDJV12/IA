@@ -4,7 +4,7 @@
 MissionManager MissionManager::m_instance;
 
 //ajout objectif et découpage en mission
-void MissionManager::subscribeGoal(unsigned fromZone, unsigned destinationZone)
+std::vector<Mission> MissionManager::subscribeGoal(unsigned fromZone, unsigned destinationZone)
 {
 
     //Consulter Planificateur pour obtenir les sous missions
@@ -14,6 +14,8 @@ void MissionManager::subscribeGoal(unsigned fromZone, unsigned destinationZone)
 
     m_objectives.insert(std::make_pair(newObj, stepsToReachGoal.first));
     m_missions.insert(m_missions.end(),stepsToReachGoal.second.begin(), stepsToReachGoal.second.end());
+    return stepsToReachGoal.first; //On renvoie au npc les missions qu'il doi faire, les autres sont stockées dans le MissionManager
+                                    // pour etre retirée par les autres npcs.
 }
 
 

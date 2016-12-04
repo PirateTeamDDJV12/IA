@@ -38,7 +38,7 @@ std::pair<std::vector<Mission>, std::vector<Mission>> Planificateur::createMissi
     Zone* destZone = ZoneManager::get().getZone(dest);
 
 
-    auto jonction = fromZone->getZoneJunction(dest); // Crash si zone non adjacentes...
+    auto jonction = fromZone->getZoneJunction(dest); // Crash si zones non adjacentes...
     Object  frontiere = *jonction.m_object;
 
     //On va à la porte
@@ -54,9 +54,6 @@ std::pair<std::vector<Mission>, std::vector<Mission>> Planificateur::createMissi
             //L'objet n'est pas collé à la porte -> On demande à un autre npc de l'ouvrir
             Mission openDoor = Mission(Mission::MissionType::OPEN_DOOR, frontiere.getLinkedObjects()[objetCourant]->getTileId());
 
-            //récupérer Zone de la frontière
-            unsigned position = frontiere.getLinkedObjects()[objetCourant]->getTileId();
-            unsigned zoneToGo = ZoneManager::get().getZone(position)->getZoneId();
 
             //Créer les missions
             std::pair<std::vector<Mission>, std::vector<Mission>> subMissions = planifyMissions(openDoor,-1); //-1 car non attribuée à un NPC 

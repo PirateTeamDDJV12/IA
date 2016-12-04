@@ -75,7 +75,7 @@ public:
     }
 
     //ajouter un Objectif (Changer de Zone)
-    void subscribeGoal(unsigned fromZone, unsigned destinationZone);
+    std::vector<Mission> subscribeGoal(unsigned fromZone, unsigned destinationZone);
 
 
     //Ajouter une mission (Se déplacer/ intéragir)
