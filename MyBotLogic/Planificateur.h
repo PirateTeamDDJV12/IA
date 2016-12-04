@@ -18,4 +18,4 @@ public:
 
 };
 
-#endif // ifndef
+#endif // PLANIFICATEUR_H
