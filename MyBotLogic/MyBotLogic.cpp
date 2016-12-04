@@ -31,6 +31,7 @@ MyBotLogic::MyBotLogic()
     Map::get()->setLoggerPath(_logpath);
     NPCManager::get()->setLoggerPath(_logpath);
     ObjectManager::get()->setLoggerPath(_logpath);
+    ZoneManager::get().setLoggerPath(_logpath);
     m_turnCount = 0;
 
     //Write Code Here

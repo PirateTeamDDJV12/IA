@@ -17,6 +17,8 @@ public:
         return m_instance;
     }
 
+    void setLoggerPath(const std::string& a_path);
+
     void initZones();
 
     size_t getZoneCount() const;
@@ -25,12 +27,19 @@ public:
     void addZone(Zone *zone);
     bool addJunction(unsigned int firstZone, unsigned int secondZone, Object *object);
     void updateZones();
-    void updateTileZone(Node* currentTile, std::set<Node *> &done, std::vector<Node *> &toDo);
+    void updateTileZone(Node* currentTile);
 
 private:
     static ZoneManager              m_instance;
     std::map<unsigned int, Zone*>   m_zones;
+    std::map<unsigned int, Node*>   m_notSure;
+    std::set<Node *>                done;
+    std::vector<Node *>             toDo;
     unsigned int                    m_count;
+
+    // Log stuff
+    Logger m_logger;
+    std::string m_logPath;
 
     ZoneManager();
 
