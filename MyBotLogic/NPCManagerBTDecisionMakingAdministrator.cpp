@@ -1,12 +1,14 @@
 #include "NPCManagerBTDecisionMakingAdministrator.h"
-
+#include "NPCManager.h"
+#include "Map.h"
+#include <iostream>
 
 using namespace BehaviourTree;
 
 
 
 NPCManagerBTDecisionMakingAdministrator::NPCManagerBTDecisionMakingAdministrator() :
-    m_behaviorTreeRoot{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocTernarySelector>("DecisionMakingNpcManagerRoot") }
+    m_behaviorTreeRoot{ BehaviourTree::BlocFabric::initiateRootAsCompositeBloc<BehaviourTree::BlocTernary>("DecisionMakingNpcManagerRoot") }
 {
     this->init();
 }
@@ -14,7 +16,7 @@ NPCManagerBTDecisionMakingAdministrator::NPCManagerBTDecisionMakingAdministrator
 
 void NPCManagerBTDecisionMakingAdministrator::init()
 {
-    BlocTernarySelector* ternarySelectorRoot = m_behaviorTreeRoot.getRoot()->as<BlocTernarySelector>();
+    BlocTernary* ternarySelectorRoot = m_behaviorTreeRoot.getRoot()->as<BlocTernary>();
 
 
     // First Layer => has a goal? 
@@ -25,8 +27,20 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     ternarySelectorRoot->connect(
         BlocFabric::createGeneralAction(
             [this]() {
-                // TODO
-                return /*Has a goal*/true ? general::result::SUCCESS : general::result::FAIL;
+        Map *myMap = Map::get();
+
+        myMap->visitTile(m_currentNpc->getCurrentTileId());
+        if(!m_currentNpc->hasGoal() && m_goalMap.find(m_currentNpc->getId()) != end(m_goalMap))
+        {
+            unsigned int goalTile = m_goalMap[m_currentNpc->getId()];
+            m_currentNpc->setGoal(goalTile);
+            return general::result::SUCCESS;
+        }
+        else if(m_currentNpc->hasGoal())
+        {
+            return general::result::SUCCESS;
+        }
+        return general::result::FAIL;
             },
             "HasAGoal"
         )
@@ -37,7 +51,12 @@ void NPCManagerBTDecisionMakingAdministrator::init()
     ternarySelectorRoot->connect(
         BlocFabric::createGeneralAction(
             [this]() {
-                // TODO
+        if(m_currentNpc->getPathSize() <= 1)
+        {
+                    m_currentNpc->calculPath();
+                    if(m_currentNpc->getPathSize() <= 1)
+                        return general::result::FAIL;
+                }
                 return general::result::SUCCESS;
             },
             "AStar"
@@ -115,7 +134,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
 
 
     //YES : change area
-    exploredAreaTernarySelector->connect(
+    aDoorIsThereTernarySelector->connect(
         BlocFabric::createGeneralAction(
             [this]() {
                 // TODO
@@ -127,7 +146,7 @@ void NPCManagerBTDecisionMakingAdministrator::init()
 
 
     //NO : Find hidden door
-    exploredAreaTernarySelector->connect(
+    aDoorIsThereTernarySelector->connect(
         BlocFabric::createGeneralAction(
             [this]() {
                 // TODO
@@ -136,4 +155,19 @@ void NPCManagerBTDecisionMakingAdministrator::init()
             "FindHiddenDoor"
         )
     );
+}
+
+void NPCManagerBTDecisionMakingAdministrator::operator()()
+{
+    Map *myMap = Map::get();
+
+    const std::vector<Npc *> npcs = NPCManager::get()->getNpcs();
+    // Get best goal for each NPCs
+    m_goalMap = std::move(myMap->getBestGoalTile(npcs));
+    for(auto npc : npcs)
+    {
+        m_currentNpc = npc;
+        m_behaviorTreeRoot();
+    }
+
 }

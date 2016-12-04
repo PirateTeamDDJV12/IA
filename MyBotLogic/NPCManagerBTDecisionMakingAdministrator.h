@@ -3,14 +3,16 @@
 
 
 #include "BehaviourTree/BehaviourTreeModule.h"
+#include "Npc.h"
 
-
+#include <map>
 
 class NPCManagerBTDecisionMakingAdministrator
 {
 private:
-    BehaviourTree::BlocRoot m_behaviorTreeRoot;
-
+    BehaviourTree::BlocRoot     m_behaviorTreeRoot;
+    Npc                         *m_currentNpc;
+    std::map<unsigned, unsigned> m_goalMap;
 
 public:
     NPCManagerBTDecisionMakingAdministrator();
@@ -21,10 +23,7 @@ public:
 
 
 public:
-    void operator()() 
-    {
-        m_behaviorTreeRoot();
-    }
+    void operator()();
 };
 
 #endif //NPCMANAGERBTDECISIONMAKINGADMINISTRATOR_H_INCLUDED
