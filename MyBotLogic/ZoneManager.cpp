@@ -5,12 +5,10 @@
 ZoneManager ZoneManager::m_instance;
 
 ZoneManager::ZoneManager()
-{
-}
+{}
 
 ZoneManager::~ZoneManager()
-{
-}
+{}
 
 size_t ZoneManager::getZoneCount() const
 {
@@ -25,22 +23,29 @@ Zone *ZoneManager::getZone(unsigned int zoneId) const
 
 Zone *ZoneManager::addZone()
 {
-    unsigned int zoneId = static_cast<unsigned int>(m_zones.size() + 1);
+    ++m_zoneCount;
+
+    unsigned int zoneId = static_cast<unsigned int>(m_zoneCount);
     m_zones[zoneId] = new Zone(zoneId);
+
     return m_zones[zoneId];
 }
 
 void ZoneManager::addZone(Zone *zone)
 {
+    // Add the new Zone
     m_zones[zone->getZoneId()] = zone;
+    // Increment the zone count
+    ++m_zoneCount;
 }
 
 bool ZoneManager::addJunction(unsigned int firstZone, unsigned int secondZone, Object *object)
 {
+    // Adds a junction between firstZone and secondZone through objet
     Zone *first = m_zones.at(firstZone);
     Zone *second = m_zones.at(secondZone);
 
-    if (first && second)
+    if(first && second)
     {
         first->addJunction(secondZone, object);
         second->addJunction(firstZone, object);
@@ -51,60 +56,64 @@ bool ZoneManager::addJunction(unsigned int firstZone, unsigned int secondZone, O
 
 void ZoneManager::updateZones()
 {
-    std::vector<Node*> toDo;
-    std::set<Node*> done;
-
-    // Pour chaque npc
     std::vector<Npc *> npcs = NPCManager::get()->getNpcs();
-    for (auto npc : npcs)
+
+    // For every NPC
+    for(auto npc : npcs)
     {
         Node *npcNode = Map::get()->getNode(npc->getCurrentTileId());
-        if (npcNode->getZone() != npc->getZone())
-        {
-            npc->setZone(npcNode->getZone());
-        }
-        done.insert(npcNode);
-        updateTileZone(npcNode, done, toDo);
-        done.clear();
+        m_done.insert(npcNode);
+        updateFromTile(npcNode);
+        m_done.clear();
     }
-    while (!toDo.empty())
+    // For all the toDo tiles
+    while(!m_toDo.empty())
     {
-        done.insert(toDo[0]);
-        updateTileZone(toDo[0], done, toDo);
-        toDo.erase(std::find(toDo.begin(), toDo.end(), toDo[0]));
-        done.clear();
+        m_done.insert(m_toDo[0]);
+        updateFromTile(m_toDo[0]);
+        m_toDo.erase(std::find(m_toDo.begin(), m_toDo.end(), m_toDo[0]));
+        m_done.clear();
     }
 }
 
-void ZoneManager::updateTileZone(Node* currentTile, std::set<Node *> &done, std::vector<Node *> &toDo)
+void ZoneManager::updateFromTile(Node* currentTile)
 {
-    for (unsigned int dir = EDirection::N; dir <= EDirection::NW; ++dir)
+    // Look for all neighbours
+    // Begin by NE because N is always nullptr
+    for(unsigned int dir = EDirection::NE; dir <= EDirection::NW; ++dir)
     {
         // Get the neighbour
         Node *neighbour = currentTile->getNeighboor(static_cast<EDirection>(dir));
-        if (neighbour != nullptr && neighbour->getType() != Node::NONE)
+        if(neighbour != nullptr && neighbour->getType() != Node::NONE)
         {
-            EDirection direction = static_cast<EDirection>(dir);
-            EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
-            if (std::find(done.begin(), done.end(), neighbour) == done.end())
+            // If the neighbour has not been done yet
+            if(std::find(m_done.begin(), m_done.end(), neighbour) == m_done.end())
             {
+                EDirection direction = static_cast<EDirection>(dir);
+                EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
                 // If there is no obstacle between the neighbour and the current tile
-                if ((!currentTile->isEdgeBlocked(direction) && !neighbour->isEdgeBlocked(invDir)))
+                if((!currentTile->isEdgeBlocked(direction) && !neighbour->isEdgeBlocked(invDir)))
                 {
-                    auto itNeighbour = std::find(begin(toDo), end(toDo), neighbour);
-                    if (itNeighbour != end(toDo)) {
-                        toDo.erase(itNeighbour);
+                    // If the neighbour was in the toDo list we erase it
+                    auto itNeighbour = std::find(begin(m_toDo), end(m_toDo), neighbour);
+                    if(itNeighbour != end(m_toDo))
+                    {
+                        m_toDo.erase(itNeighbour);
                     }
-                    done.insert(neighbour);
+                    m_done.insert(neighbour);
+                    // We set the neighbour to the new zone
                     neighbour->setZone(currentTile->getZone());
-                    updateTileZone(neighbour, done, toDo);
+                    updateFromTile(neighbour);
                 }
-                else if (neighbour->getZone() == 0)
+                // If there was a wall and the zoneId is 0
+                else if(neighbour->getZone() == 0)
                 {
                     Map *map = Map::get();
-                    map->setZoneCount(map->getZoneCount() + 1);
-                    neighbour->setZone(map->getZoneCount());
-                    toDo.push_back(neighbour);
+                    // We create a new zone
+                    addZone();
+                    // We set the neighbour to the new zone and we add him to the toDo list
+                    neighbour->setZone(m_zoneCount);
+                    m_toDo.push_back(neighbour);
                 }
             }
         }

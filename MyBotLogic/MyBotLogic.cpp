@@ -73,13 +73,13 @@ MyBotLogic::MyBotLogic()
     myMap->updateEdges(_turnInfo.objects, m_turnCount);
     myMap->updateTiles(_turnInfo.tiles);
     
-    ZoneManager::get().updateZones();
+    //ZoneManager::get().updateZones();
 
     // Create Influence map
     myMap->createInfluenceMap();
 
     // Log this
-    myMap->logZoneMap(m_turnCount);
+    //myMap->logZoneMap(m_turnCount);
     myMap->logInfluenceMap(m_turnCount);
     myMap->logMap(m_turnCount);
 
