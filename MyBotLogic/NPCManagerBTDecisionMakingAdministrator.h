@@ -7,6 +7,8 @@
 
 #include <map>
 
+// This class represents all the decision making of an npc
+// Ex: if there is no goal, did we explore all the zone ? If yes then we need to change of zone
 class NPCManagerBTDecisionMakingAdministrator
 {
 private:

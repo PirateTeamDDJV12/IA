@@ -53,22 +53,6 @@ void NPCManager::initBT()
 void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
 {
     Map *myMap = Map::get();
-//
-//    // Get best goal for each NPCs
-//    std::map<unsigned, unsigned> goalMap = std::move(myMap->getBestGoalTile(m_npcs));
-//
-    // Calcul path for npc and set goal tile
-    //for (Npc* curNpc : m_npcs)
-    //{
-    //    myMap->visitTile(curNpc->getCurrentTileId());
-    //    if (!curNpc->hasGoal() && goalMap.find(curNpc->getId()) != end(goalMap))
-    //    {
-    //        unsigned int goalTile = goalMap[curNpc->getId()];
-    //        curNpc->setGoal(goalTile);
-    //        curNpc->calculPath();
-    //    }
-    //}
-
 
     m_BTDecisionMakingAdministrator();
 
