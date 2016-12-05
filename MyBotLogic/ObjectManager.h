@@ -47,10 +47,7 @@ private:
 
 public:
     // Get the instance of the manager
-    static ObjectManager* get()
-    {
-        return &m_instance;
-    }
+    static ObjectManager* get();
 
 public:
     // Define the log path for the ObjectManager logger and save the path to give it for each object
@@ -72,7 +69,7 @@ public:
     std::vector<ObjectRef> getAllObjectsOnTile(unsigned int tileId) const;
 
     // Get all objects of a specific type
-    const std::vector<ObjectRef>& getAllObjectsByType(Object::ObjectType type) const { return m_allObjects.at(type); }
+    const std::vector<ObjectRef>& getAllObjectsByType(Object::ObjectType type) const;
 
     // Get all objects that is not activated
     std::vector<ObjectRef> getAllUnactivatedObjects() const;
@@ -81,7 +78,7 @@ public:
     std::vector<ObjectRef> getAllActivatedObjects() const;
 
     // Get all objects
-    const std::map<Object::ObjectType, std::vector<ObjectRef>>& getAllObjects() const { return m_allObjects; }
+    const std::map<Object::ObjectType, std::vector<ObjectRef>>& getAllObjects() const;
 
 private:
     // Instantiate an object and save it in the vector

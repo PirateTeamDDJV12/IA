@@ -14,6 +14,11 @@ ObjectManager::ObjectManager()
     m_allObjects[Object::ObjectType::PRESSURE_PLATE].reserve(MAX_OBJECTS);
 }
 
+ObjectManager* ObjectManager::get()
+{
+    return &m_instance;
+}
+
 void ObjectManager::setLoggerPath(const std::string& a_path)
 {
     m_logPath = a_path;
@@ -81,13 +86,18 @@ std::vector<ObjectRef> ObjectManager::getAllObjectsOnTile(unsigned int tileId) c
     {
         for (auto curObject : iterPair.second)
         {
-            if (curObject->getType() == tileId)
+            if (curObject->getId() == tileId)
             {
                 objectsOnTile.push_back(curObject);
             }
         }
     }
     return std::move(objectsOnTile);
+}
+
+const std::vector<ObjectRef>& ObjectManager::getAllObjectsByType(Object::ObjectType type) const
+{
+    return m_allObjects.at(type);
 }
 
 std::vector<ObjectRef> ObjectManager::getAllUnactivatedObjects() const
@@ -120,6 +130,11 @@ std::vector<ObjectRef> ObjectManager::getAllActivatedObjects() const
         }
     }
     return std::move(activatedObjects);
+}
+
+const std::map<Object::ObjectType, std::vector<ObjectRef>>& ObjectManager::getAllObjects() const
+{
+    return m_allObjects;
 }
 
 void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
