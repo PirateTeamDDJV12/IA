@@ -11,7 +11,7 @@ unsigned int Node::getId() const noexcept
     return m_ID;
 }
 
-unsigned Node::getNpcIdOnNode() const
+unsigned Node::getNpcIdOnNode() const noexcept
 {
     return m_npcId;
 }
@@ -21,7 +21,7 @@ unsigned int Node::getZone() const noexcept
     return m_zone;
 }
 
-float Node::getInfluence() const
+float Node::getInfluence() const noexcept
 {
     return m_influence;
 }
@@ -60,22 +60,22 @@ Node* Node::getNeighboor(EDirection dir)
     return m_neighboors[dir];
 }
 
-void Node::setNpcIdOnNode(unsigned npcId)
+void Node::setNpcIdOnNode(unsigned npcId) noexcept
 {
     m_npcId = npcId;
 }
 
-void Node::setZone(unsigned int zoneId)
+void Node::setZone(unsigned int zoneId) noexcept
 {
     m_zone = zoneId;
 }
 
-void Node::setInfluence(float inf)
+void Node::setInfluence(float inf) noexcept
 {
     m_influence = inf;
 }
 
-void Node::setType(Node::NodeType nType)
+void Node::setType(Node::NodeType nType) noexcept
 {
     m_type = nType;
 }
@@ -113,7 +113,7 @@ bool Node::isEdgeBlocked(EDirection dir) const
     }
 }
 
-unsigned int Node::calculateManathan(const Node* goal) const
+unsigned int Node::calculateManathan(const Node* goal) const noexcept
 {
     int x = goal->getPosition()->x - this->m_pos->x;
     int y = goal->getPosition()->y - this->m_pos->y;

@@ -3,7 +3,6 @@
 
 #include "Globals.h"
 
-#include <cmath>
 #include <set>
 
 
@@ -57,9 +56,9 @@ public:
 public:
     // Getters
     unsigned int getId() const noexcept;
-    unsigned getNpcIdOnNode() const;
+    unsigned getNpcIdOnNode() const noexcept;
     unsigned int getZone() const noexcept;
-    float getInfluence() const;
+    float getInfluence() const noexcept;
     Position* getPosition() const noexcept;
     NodeType getType() const noexcept;
     EdgeType getEdge(EDirection dir) const;
@@ -67,10 +66,10 @@ public:
     Node* getNeighboor(EDirection dir);
 
     // Setters
-    void setNpcIdOnNode(unsigned npcId);
-    void setZone(unsigned int zoneId);
-    void setInfluence(float inf);
-    void setType(NodeType nType);
+    void setNpcIdOnNode(unsigned npcId) noexcept;
+    void setZone(unsigned int zoneId) noexcept;
+    void setInfluence(float inf) noexcept;
+    void setType(NodeType nType) noexcept;
     void setEdgeCost(EDirection dir, std::set<EObjectType> types);
     void setNeighboor(EDirection dir, Node* p);
 
@@ -78,7 +77,7 @@ public:
     bool isEdgeBlocked(EDirection dir) const;
 
     // Heuristic for A*
-    unsigned int calculateManathan(const Node* goal) const;
+    unsigned int calculateManathan(const Node* goal) const noexcept;
 };
 
 #endif // NODE_HEADER

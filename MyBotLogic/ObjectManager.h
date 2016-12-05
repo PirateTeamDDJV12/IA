@@ -47,7 +47,7 @@ private:
 
 public:
     // Get the instance of the manager
-    static ObjectManager* get();
+    static ObjectManager* get() noexcept;
 
 public:
     // Define the log path for the ObjectManager logger and save the path to give it for each object
@@ -78,7 +78,7 @@ public:
     std::vector<ObjectRef> getAllActivatedObjects() const;
 
     // Get all objects
-    const std::map<Object::ObjectType, std::vector<ObjectRef>>& getAllObjects() const;
+    const std::map<Object::ObjectType, std::vector<ObjectRef>>& getAllObjects() const noexcept;
 
 private:
     // Instantiate an object and save it in the vector

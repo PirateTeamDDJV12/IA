@@ -14,7 +14,7 @@ ObjectManager::ObjectManager()
     m_allObjects[Object::ObjectType::PRESSURE_PLATE].reserve(MAX_OBJECTS);
 }
 
-ObjectManager* ObjectManager::get()
+ObjectManager* ObjectManager::get() noexcept
 {
     return &m_instance;
 }
@@ -75,7 +75,6 @@ const ObjectRef ObjectManager::getObjectById(Object::ObjectType type, size_t ind
             return iterPair.second[index];
         }
     }
-
     return ObjectRef();
 }
 
@@ -132,7 +131,7 @@ std::vector<ObjectRef> ObjectManager::getAllActivatedObjects() const
     return std::move(activatedObjects);
 }
 
-const std::map<Object::ObjectType, std::vector<ObjectRef>>& ObjectManager::getAllObjects() const
+const std::map<Object::ObjectType, std::vector<ObjectRef>>& ObjectManager::getAllObjects() const noexcept
 {
     return m_allObjects;
 }

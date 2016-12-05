@@ -41,14 +41,14 @@ public:
 
 public:
     // Getters
-    unsigned int getId() const;
-    ObjectType getType() const;
-    unsigned int getTileId() const;
-    bool isActive() const;
-    std::vector<ObjectRef>& getLinkedObjects();
+    unsigned int getId() const noexcept;
+    ObjectType getType() const noexcept;
+    unsigned int getTileId() const noexcept;
+    bool isActive() const noexcept;
+    std::vector<ObjectRef>& getLinkedObjects() noexcept;
 
     // Setter
-    void setIsActive(bool isActive);
+    void setIsActive(bool isActive) noexcept;
 
     // For logger
     void toString(std::stringstream& sstream);
