@@ -125,7 +125,8 @@ namespace BehaviourTree
         */
         template<class DerivatedBloc>
         DerivatedBloc* as() 
-        { 
+        {
+            static_assert(std::is_base_of<BaseBloc, DerivatedBloc>::value, "the specified type is not a base from BaseBloc");
             return static_cast<DerivatedBloc*>(this); 
         }
 

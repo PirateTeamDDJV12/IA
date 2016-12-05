@@ -19,7 +19,7 @@ namespace BehaviourTree
         BlocRef onlyChild;
 
 
-    public:
+    protected:
         BlocDecorator() = delete;
 
         BlocDecorator(BaseBloc* child, const std::string& name = "") noexcept :
