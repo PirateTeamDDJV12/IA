@@ -68,9 +68,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
             curNpc->calculPath();
         }
     }
-
-
-
+    
     // Move Npcs
     m_BTNpcUpdateAdministrator();
 
@@ -88,7 +86,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
                 if (curP->getId() != myNpc->getId()
                     && curP->getNextPathTile() == nextNpcTile)
                 {
-                    // Handle
+                    // Handle: Prioritize npc with longest path
                     if (myNpc->getPathSize() < curP->getPathSize())
                     {
                         myNpc->stopMoving();
@@ -109,7 +107,6 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
                 _actionList.push_back(curAction->Clone());
 
                 // Update NPC position on node
-                // TODO - be careful about the action type, atm it's move but it can be different !!
                 myMap->getNode(myNpc->getCurrentTileId())->setNpcIdOnNode(0);
                 myMap->getNode(nextNpcTile)->setNpcIdOnNode(myNpc->getId());
             }
