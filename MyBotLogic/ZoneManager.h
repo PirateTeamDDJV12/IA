@@ -17,16 +17,19 @@ public:
         return m_instance;
     }
 
-    size_t getZoneCount() const;
-    Zone *getZone(unsigned int zoneId) const;
-    Zone *addZone();
-    void addZone(Zone *zone);
-    bool addJunction(unsigned int firstZone, unsigned int secondZone, Object *object);
-    void updateZones();
-    void updateTileZone(Node* currentTile, std::set<Node *> &done, std::vector<Node *> &toDo);
+    Zone    *getZone(unsigned int zoneId) const;
+    Zone    *addZone();
+    void    addZone(Zone *zone);
+    void    updateZones();
+    void    updateFromTile(Node* currentTile);
+    bool    addJunction(unsigned int firstZone, unsigned int secondZone, Object *object);
+    size_t  getZoneCount() const;
 
 private:
     static ZoneManager              m_instance;
+    unsigned int                    m_zoneCount;
+    std::set<Node*>                 m_done;
+    std::vector<Node*>              m_toDo;
     std::map<unsigned int, Zone*>   m_zones;
 
     ZoneManager();

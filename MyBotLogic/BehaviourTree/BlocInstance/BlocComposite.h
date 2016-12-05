@@ -19,7 +19,7 @@ namespace BehaviourTree
         std::vector<BlocRef> children;
 
 
-    public:
+    protected:
         BlocComposite(const std::string& name = "") :
             BaseBloc{ name }
         {}
@@ -71,9 +71,11 @@ namespace BehaviourTree
         */
         virtual void disconnectByName(const std::string& name)
         {
-            for (size_t iter = 0; iter < children.size(); ++iter)
+            size_t childCount = children.size();
+            size_t nameLength = name.size();
+            for (size_t iter = 0; iter < childCount; ++iter)
             {
-                if (children[iter]->m_name.size() == name.size() && children[iter]->m_name == name)
+                if (children[iter]->m_name.size() == nameLength && children[iter]->m_name == name)
                 {
                     this->disconnect(iter);
                 }

@@ -26,7 +26,7 @@ namespace BehaviourTree
     */
     class BlocAction : public BaseBloc
     {
-    public:
+    protected:
         BlocAction(const std::string& name = "") :
             BaseBloc{ name }
         {}
