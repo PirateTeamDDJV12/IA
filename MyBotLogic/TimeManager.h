@@ -57,16 +57,10 @@ public:
 
 public:
     // Saves the time of the beginning of the game
-    void saveStartGameTime()
-    {
-        m_startGameTime = std::chrono::system_clock::now();
-    }
+    void saveStartGameTime();
 
     // Lets you know how much time has elapsed since the start of the game
-    std::chrono::milliseconds getTimeFromStart() const
-    {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_startGameTime);
-    }
+    std::chrono::milliseconds getTimeFromStart() const;
 
     // Saves a specfic time point in the game and store it in an history 
     std::chrono::time_point<std::chrono::system_clock> savePoint(std::string name);
@@ -75,50 +69,30 @@ public:
     std::chrono::time_point<std::chrono::system_clock> getPoint(std::string name);
 
     // Save the time right now
-    void fastSave()
-    {
-        m_fastSave = std::chrono::system_clock::now();
-    }
+    void fastSave();
 
     // Get the diffrence between a specific time saved previously and the current time
-    std::chrono::milliseconds getFastDifference() const
-    {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(m_fastSave - std::chrono::system_clock::now());
-    }
+    std::chrono::milliseconds getFastDifference() const;
 
     // Get the remaining time between the fast save and now
     std::chrono::milliseconds getRemainingFastTime() const;
 
     // Time between two saved time point (first - second)
-    std::chrono::milliseconds getTimeBetweenTwoPoints(std::string name1, std::string name2)
-    {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(m_saveTimePoints[name1] - m_saveTimePoints[name2]);
-    }
+    std::chrono::milliseconds getTimeBetweenTwoPoints(std::string name1, std::string name2);
 
     // Time between two time point (first - second)
-    std::chrono::milliseconds getTimeBetweenTwoPoints(std::chrono::time_point<std::chrono::system_clock> tp1, 
-        std::chrono::time_point<std::chrono::system_clock> tp2) const
-    {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(tp1 - tp2);
-    }
+    std::chrono::milliseconds getTimeBetweenTwoPoints(std::chrono::time_point<std::chrono::system_clock> tp1,
+                                                      std::chrono::time_point<std::chrono::system_clock> tp2) const;
 
     // Recovers the time between 2 frames
-    float getElapsedTimeFrame() const
-    {
-        auto now = msNow();
-        std::chrono::milliseconds elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_timePreviousFrame);
-        return elapsed.count() * m_timeScale;// <= 0 ? 0.0001f : elapsed.count()
-    }
+    float getElapsedTimeFrame() const;
 
     // Changes the time limit for all turns
     void setTurnLimitTime(std::chrono::milliseconds ms);
     void setTurnLimitTime(std::chrono::seconds s);
 
     // Check if there needs to be an update
-    bool isTimeToUpdate() const
-    {
-        return msNow() > m_timeNextFrame;
-    }
+    bool isTimeToUpdate() const;
 
     // Update the state of the TimeManager
     void update();
