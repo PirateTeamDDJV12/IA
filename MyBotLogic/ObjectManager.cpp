@@ -1,7 +1,6 @@
 #include "ObjectManager.h"
 
-#include "Map.h"
-
+#include <sstream>
 #include <algorithm>
 
 
