@@ -61,7 +61,7 @@ namespace BehaviourTree
         BaseBloc* mParent;
 
 
-    public:
+    protected:
         BaseBloc(const std::string& blocName = "") :
             m_name{ blocName }
         {}
