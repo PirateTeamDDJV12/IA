@@ -10,6 +10,11 @@
 
 class Npc;
 
+/*
+BT that updates NPCs. 
+Just connect, disconnect a Npc bloc to decide if it will be updated. 
+Switch a Npc bloc with another to change the update order.
+*/
 class NPCManagerBTNpcUpdateAdministrator
 {
 public:
@@ -17,6 +22,7 @@ public:
     {
         NO_INDEX = 0xFFFFFFFF
     };
+
 
 private:
     enum
@@ -40,39 +46,27 @@ public:
 public:
     void init();
 
-    void reassignNpcVectorArray(std::vector<Npc*>& npcVectorArray)
-    {
-        m_npcs = &npcVectorArray;
-    }
+    /*Reassign the npc vector to the BT npc administator (in case a new npc appear and the vector resize and chage its address)*/
+    void reassignNpcVectorArray(std::vector<Npc*>& npcVectorArray) noexcept;
 
-    BehaviourTree::BlocRoot& getBTRoot() noexcept
-    {
-        return m_behaviorTreeRoot;
-    }
+    BehaviourTree::BlocRoot& getBTRoot() noexcept;
 
     template<class RootBase>
     RootBase* getBTRootAs() noexcept
     {
         static_assert(
             std::is_base_of<BehaviourTree::BlocComposite, RootBase>::value ||
-            std::is_same<BehaviourTree::BlocComposite, RootBase>::value
-            , "Not a valid root casting");
+            std::is_same<BehaviourTree::BlocComposite, RootBase>::value, 
+            "Not a valid root casting");
 
         return m_behaviorTreeRoot.getRoot()->as<RootBase>();
     }
 
 
     /* Stop Npc */
-    void stopANpcByName(const std::string& npcName)
-    {
-        this->getBTRootAs<BehaviourTree::BlocComposite>()->disconnectByName(npcName);
-    }
-
+    void stopANpcByName(const std::string& npcName);
     void stopANpcByID(unsigned int npcID);
-    void stopANpcByIndex(size_t index)
-    {
-        this->stopANpcByName(this->getNpcNameByIndex(index));
-    }
+    void stopANpcByIndex(size_t index);
 
     /* Restart Npc */
     void restartANpcByID(unsigned int npcIndex, const std::string& npcNameBefore);
@@ -89,58 +83,31 @@ public:
     void restartANpcByIndexAtEnd(size_t index);
 
     /* Swap Npc */
-    void swapNpcByName(const std::string& npc1Name, const std::string& npc2Name)
-    {
-        this->getBTRootAs<BehaviourTree::BlocComposite>()->swapBlocByName(npc1Name, npc2Name);
-    }
-
-    void swapNpcByIndex(size_t indexNpc1, size_t indexNpc2)
-    {
-        if (indexNpc1 < m_npcs->size() && indexNpc2 < m_npcs->size())
-        {
-            this->swapNpcByName(this->getNpcNameByIndex(indexNpc1), this->getNpcNameByIndex(indexNpc2));
-        }
-    }
-
+    void swapNpcByName(const std::string& npc1Name, const std::string& npc2Name);
+    void swapNpcByIndex(size_t indexNpc1, size_t indexNpc2);
     void swapNpcByIDs(unsigned int npc1ID, unsigned int npc2ID);
 
     /* get Npc Name */
     std::string getNpcNameByID(unsigned int NpcID);
-    std::string getNpcNameByIndex(size_t NpcIndex) const noexcept
-    {
-        return std::move("Npc" + std::to_string(NpcIndex));
-    }
+    std::string getNpcNameByIndex(size_t NpcIndex) const noexcept;
     
-    /* Get Npc Index (from its name) */
+    /* Get Npc Index */
     size_t getIndexByNpcName(const std::string& npcName);
-
+    size_t getIndexByID(unsigned int npcID);
 
     /* Utilitary */
-    bool npcByNameIsConnected(const std::string& npcName)
-    {
-        return this->getBTRootAs<BehaviourTree::BlocComposite>()->findByName(npcName) != nullptr;
-    }
+    bool npcByNameIsConnected(const std::string& npcName);
+    bool npcByIndexIsConnected(size_t npcIndex);
+    bool npcByIdIsConnected(unsigned int npcID);
 
-    bool npcByIndexIsConnected(size_t npcIndex)
-    {
-        return npcIndex < m_npcs->size() ? npcByNameIsConnected(this->getNpcNameByIndex(npcIndex)) : false;
-    }
-
-    bool npcByIdIsConnected(unsigned int npcID)
-    {
-        std::string npcName = std::move(this->getNpcNameByID(npcID));
-        return npcName != "" ? npcByNameIsConnected(npcName) : false;
-    }
 
 private:
     BehaviourTree::BlocRef createNpcBloc(Npc* npc, const std::string& npcName);
     
 
 public:
-    void operator()() 
-    {
-        m_behaviorTreeRoot();
-    }
+    void operator()();
 };
+
 
 #endif //NPCMANAGERBTNPCUPDATEADMINISTRATOR_H_INCLUDED

@@ -22,6 +22,16 @@ void NPCManagerBTNpcUpdateAdministrator::init()
     );
 }
 
+void NPCManagerBTNpcUpdateAdministrator::reassignNpcVectorArray(std::vector<Npc*>& npcVectorArray) noexcept
+{
+    m_npcs = &npcVectorArray;
+}
+
+BehaviourTree::BlocRoot& NPCManagerBTNpcUpdateAdministrator::getBTRoot() noexcept
+{
+    return m_behaviorTreeRoot;
+}
+
 BlocRef NPCManagerBTNpcUpdateAdministrator::createNpcBloc(Npc* npc, const std::string& npcName)
 {
     return BlocFabric::createGeneralAction(
@@ -33,9 +43,19 @@ BlocRef NPCManagerBTNpcUpdateAdministrator::createNpcBloc(Npc* npc, const std::s
             );
 }
 
+void NPCManagerBTNpcUpdateAdministrator::operator()()
+{
+    m_behaviorTreeRoot();
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 
+
+void NPCManagerBTNpcUpdateAdministrator::stopANpcByIndex(size_t index)
+{
+    this->stopANpcByName(this->getNpcNameByIndex(index));
+}
 
 void NPCManagerBTNpcUpdateAdministrator::stopANpcByID(unsigned int npcID)
 {
@@ -45,6 +65,11 @@ void NPCManagerBTNpcUpdateAdministrator::stopANpcByID(unsigned int npcID)
     {
         this->stopANpcByName(npcName);
     }
+}
+
+void NPCManagerBTNpcUpdateAdministrator::stopANpcByName(const std::string& npcName)
+{
+    this->getBTRootAs<BehaviourTree::BlocComposite>()->disconnectByName(npcName);
 }
 
 
@@ -86,9 +111,10 @@ void NPCManagerBTNpcUpdateAdministrator::restartANpcByIndex(size_t npcIndex, con
 
 std::string NPCManagerBTNpcUpdateAdministrator::getNpcNameByID(unsigned int npcID)
 {
-    for (size_t iter = 0; iter < m_npcs->size(); ++iter)
+    size_t npcsCount = m_npcs->size();
+    for (size_t iter = 0; iter < npcsCount; ++iter)
     {
-        if ((*m_npcs)[iter]->getId() == npcID)
+        if (m_npcs->operator[](iter)->getId() == npcID)
         {
             return std::move(this->getNpcNameByIndex(iter));
         }
@@ -110,9 +136,39 @@ size_t NPCManagerBTNpcUpdateAdministrator::getIndexByNpcName(const std::string& 
     return NPCManagerBTNpcUpdateAdministrator::NO_INDEX;
 }
 
+std::string NPCManagerBTNpcUpdateAdministrator::getNpcNameByIndex(size_t NpcIndex) const noexcept
+{
+    return std::move("Npc" + std::to_string(NpcIndex));
+}
+
+size_t NPCManagerBTNpcUpdateAdministrator::getIndexByID(unsigned int npcID)
+{
+    size_t npcCount = m_npcs->size();
+    for (size_t iter = 0; iter < npcCount; ++npcCount)
+    {
+        if (m_npcs->operator[](iter)->getId() == npcID)
+        {
+            return iter;
+        }
+    }
+    return NPCManagerBTNpcUpdateAdministrator::NO_INDEX;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 
+void NPCManagerBTNpcUpdateAdministrator::swapNpcByName(const std::string& npc1Name, const std::string& npc2Name)
+{
+    this->getBTRootAs<BehaviourTree::BlocComposite>()->swapBlocByName(npc1Name, npc2Name);
+}
+
+void NPCManagerBTNpcUpdateAdministrator::swapNpcByIndex(size_t indexNpc1, size_t indexNpc2)
+{
+    if (indexNpc1 < m_npcs->size() && indexNpc2 < m_npcs->size())
+    {
+        this->swapNpcByName(this->getNpcNameByIndex(indexNpc1), this->getNpcNameByIndex(indexNpc2));
+    }
+}
 
 void NPCManagerBTNpcUpdateAdministrator::swapNpcByIDs(unsigned int npc1ID, unsigned int npc2ID)
 {
@@ -190,4 +246,24 @@ void NPCManagerBTNpcUpdateAdministrator::restartANpcByIndexAtEnd(size_t npcIndex
     {
         this->getBTRootAs<BlocComposite>()->connect(createNpcBloc((*m_npcs)[npcIndex], this->getNpcNameByIndex(npcIndex)));
     }
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+bool NPCManagerBTNpcUpdateAdministrator::npcByNameIsConnected(const std::string& npcName)
+{
+    return this->getBTRootAs<BehaviourTree::BlocComposite>()->findByName(npcName) != nullptr;
+}
+
+bool NPCManagerBTNpcUpdateAdministrator::npcByIndexIsConnected(size_t npcIndex)
+{
+    return npcIndex < m_npcs->size() ? npcByNameIsConnected(this->getNpcNameByIndex(npcIndex)) : false;
+}
+
+bool NPCManagerBTNpcUpdateAdministrator::npcByIdIsConnected(unsigned int npcID)
+{
+    std::string npcName = std::move(this->getNpcNameByID(npcID));
+    return npcName != "" ? npcByNameIsConnected(npcName) : false;
 }
