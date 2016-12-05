@@ -3,14 +3,12 @@
 
 #include "Singleton.h"
 
-#include "Object.h"
-#include "TurnInfo.h"
 #include "Logger.h"
+#include "TurnInfo.h"
+#include "Object.h"
 
 #include <vector>
 #include <map>
-#include <sstream>
-#include <memory>
 
 
 #ifdef _DEBUG
@@ -33,12 +31,10 @@ private:
     };
 
 private:
-
     // Singleton instance
     static ObjectManager m_instance;
 
 private:
-
     // Log stuff
     Logger m_logger;
     std::string m_logPath;
@@ -50,15 +46,10 @@ private:
     ObjectManager();
 
 public:
-
     // Get the instance of the manager
-    static ObjectManager* get()
-    {
-        return &m_instance;
-    }
+    static ObjectManager* get() noexcept;
 
 public:
-
     // Define the log path for the ObjectManager logger and save the path to give it for each object
     void setLoggerPath(const std::string& a_path);
 
@@ -78,7 +69,7 @@ public:
     std::vector<ObjectRef> getAllObjectsOnTile(unsigned int tileId) const;
 
     // Get all objects of a specific type
-    const std::vector<ObjectRef>& getAllObjectsByType(Object::ObjectType type) const { return m_allObjects.at(type); }
+    const std::vector<ObjectRef>& getAllObjectsByType(Object::ObjectType type) const;
 
     // Get all objects that is not activated
     std::vector<ObjectRef> getAllUnactivatedObjects() const;
@@ -87,11 +78,9 @@ public:
     std::vector<ObjectRef> getAllActivatedObjects() const;
 
     // Get all objects
-    const std::map<Object::ObjectType, std::vector<ObjectRef>>& getAllObjects() const { return m_allObjects; }
-
+    const std::map<Object::ObjectType, std::vector<ObjectRef>>& getAllObjects() const noexcept;
 
 private:
-
     // Instantiate an object and save it in the vector
     void updateDoorObject(const ObjectInfo& objectInfo);
 
@@ -100,7 +89,6 @@ private:
 
     // Link all devices to its object
     void linkObjects(const TileInfo& tileInfo, ObjectRef obj);
-
 };
 
 #endif // OBJECT_MANAGER_HEADER
