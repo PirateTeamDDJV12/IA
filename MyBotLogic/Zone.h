@@ -9,10 +9,12 @@
 
 class Zone
 {
+    friend class Planificateur;
 public:
     // Junction class
     class Junction
     {
+        friend class Planificateur;
     public:
         Junction() = delete;
         Junction(unsigned int destZone, Object *object);

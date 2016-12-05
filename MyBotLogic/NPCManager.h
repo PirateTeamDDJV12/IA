@@ -3,6 +3,8 @@
 #include "Singleton.h"
 #include "Npc.h"
 #include "NPCInfo.h"
+#include "NPCManagerBTNpcUpdateAdministrator.h"
+#include "NPCManagerBTDecisionMakingAdministrator.h"
 #include "Mission.h"
 #include "NPCManagerBTNpcUpdateAdministrator.h"
 #include "NPCManagerBTDecisionMakingAdministrator.h"
