@@ -105,6 +105,7 @@ void Npc::unstackActions()
                 moveForwardOnPath();
                 break;
             case Action_Interact:
+                // TODO - do nothing atm
                 break;
         }
         m_nextActions.pop_back();
@@ -175,6 +176,7 @@ void Npc::explore()
     // If we have not a best choice around us, let see a little bit futher
     if(bestTile < 0)
     {
+        // TODO - Try to get the most influent tile around us in range of 2 instead of looking for a non visited tile
         // Get all non visited tiles
         std::vector<unsigned> nonVisitedTiles = std::move(mapPtr->getNonVisitedTile());
         DisplayVector("\t-Looking for the non visited tiles : ", nonVisitedTiles);
@@ -231,11 +233,13 @@ void Npc::followPath()
 void Npc::wait()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "-Wait", true);
+    // TODO - Test why we are blocked ?
 }
 
 void Npc::interact()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "-Interact", true);
+    // TODO - interact with some fancy stuff
 }
 
 template<class T>
