@@ -63,6 +63,11 @@ public:
         return m_npcs;
     }
 
+    NPCManagerBTNpcUpdateAdministrator& getNpcUpdateBT()
+    {
+        return m_BTNpcUpdateAdministrator;
+    }
+
     bool isGoalAlreadyAssign(unsigned int goalId);
     
 };

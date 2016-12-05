@@ -5,6 +5,7 @@
 #include "Globals.h"
 
 #include <algorithm>
+#include "NPCManager.h"
 
 
 Npc::Npc(unsigned int a_id, unsigned int a_tileId, const std::string& a_path, unsigned int zone)
@@ -48,6 +49,7 @@ void Npc::update()
                 {
                     Map::get()->getNode(getCurrentTileId())->setType(Node::OCCUPIED);
                     BOT_LOGIC_NPC_LOG(m_logger, "\tI am out, i am on my goal !", true);
+                    //NPCManager::get()->getNpcUpdateBT().stopANpcByID(m_id);
                 }
                 break;
         }
@@ -154,7 +156,7 @@ bool Npc::updatePath()
             }
             else
             {
-                BOT_LOGIC_NPC_LOG(m_logger, "\t\tCan't access the goal this turn, just wait", true);
+                BOT_LOGIC_NPC_LOG(m_logger, "\t\tCan't access the goal this turn, just wait, can't go from " + std::to_string(oldTileId) + " to " + std::to_string((*reverseIter)), true);
                 m_nextState = WAITING;
                 return true;
             }

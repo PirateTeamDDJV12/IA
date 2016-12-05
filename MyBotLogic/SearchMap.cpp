@@ -1,11 +1,12 @@
 #include "SearchMap.h"
 #include "Map.h"
 #include "SearchNode.h"
+#include "ObjectManager.h"
 
 void SearchMap::prepareNode(Node* refNode, unsigned int newGValue, SearchNode* parent)
 {
     auto nodeType = refNode->getType();
-    if (std::find(begin(m_forbiddenType), end(m_forbiddenType), nodeType) != end(m_forbiddenType))
+    if(std::find(begin(m_forbiddenType), end(m_forbiddenType), nodeType) != end(m_forbiddenType))
     {
         return;
     }
@@ -22,11 +23,11 @@ void SearchMap::prepareNode(Node* refNode, unsigned int newGValue, SearchNode* p
         }
     }
 
-    for (int i = 0; i < openList.size(); i++)
+    for(int i = 0; i < openList.size(); i++)
     {
-        if (id == openList[i]->getId())
+        if(id == openList[i]->getId())
         {
-            if (node->getF() < openList[i]->getF())
+            if(node->getF() < openList[i]->getF())
             {
                 openList[i]->setG(newGValue);
                 openList[i]->setParent(parent);
@@ -44,9 +45,9 @@ void SearchMap::prepareNode(Node* refNode, unsigned int newGValue, SearchNode* p
 
 std::vector<unsigned int> SearchMap::search()
 {
-    while (!m_isGoalFound)
+    while(!m_isGoalFound)
     {
-        if (openList.empty())
+        if(openList.empty())
         {
             return std::move(std::vector<unsigned int>{});
         }
@@ -54,10 +55,10 @@ std::vector<unsigned int> SearchMap::search()
         SearchNode* currentSearchNode = getNextNodeToSearch();
         Node* currentNode = Map::get()->getNode(currentSearchNode->getId());
 
-        if (currentSearchNode->getId() == m_goal->getId())
+        if(currentSearchNode->getId() == m_goal->getId())
         {
             SearchNode* getPath;
-            for (getPath = currentSearchNode; getPath != nullptr; getPath = getPath->getParent())
+            for(getPath = currentSearchNode; getPath != nullptr; getPath = getPath->getParent())
             {
                 m_pathToGoal.push_back(getPath->getId());
             }
@@ -65,14 +66,55 @@ std::vector<unsigned int> SearchMap::search()
             return std::move(m_pathToGoal);
         }
 
-        for (int i = N; i <= NW; ++i)
+        for(int i = N; i <= NW; ++i)
         {
             EDirection dir = static_cast<EDirection>(i);
             EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
             Node* tempNode = currentNode->getNeighboor(dir);
-            if (tempNode != nullptr && (!currentNode->isEdgeBlocked(dir) && !tempNode->isEdgeBlocked(invDir)))
+            if(tempNode != nullptr)
             {
-                prepareNode(tempNode, currentSearchNode->getG() + 10, currentSearchNode);
+                if(Map::get()->canMoveOnTile(currentNode->getId(), tempNode->getId()))
+                {
+                    prepareNode(tempNode, currentSearchNode->getG() + 10, currentSearchNode);
+                }
+                //if(currentNode->isBlockedByDoor(dir) || tempNode->isBlockedByDoor(invDir))
+                //{
+                //    auto currentObjects = ObjectManager::get()->getAllObjectsOnTile(currentNode->getId());
+                //    auto tempObjects = ObjectManager::get()->getAllObjectsOnTile(tempNode->getId());
+                //    ObjectRef currentPP;
+                //    ObjectRef doorRef;
+                //    for(auto cObject : currentObjects)
+                //    {
+                //        if(cObject->getType() == Object::PRESSURE_PLATE)
+                //        {
+                //            currentPP = cObject;
+                //        }
+                //        if(cObject->getType() == Object::DOOR)
+                //        {
+                //            doorRef = cObject;
+                //        }
+                //    }
+
+                //    for(auto tObject : tempObjects)
+                //    {
+                //        if(tObject->getType() == Object::DOOR)
+                //        {
+                //            doorRef = tObject;
+                //        }
+                //    }
+
+                //    if(currentPP != ObjectRef() && doorRef != ObjectRef())
+                //    {
+                //        if(currentPP->getLinkedObjects()[0] == doorRef)
+                //        {
+                //            prepareNode(tempNode, currentSearchNode->getG() + 10, currentSearchNode);
+                //        }
+                //    }
+                //}
+                //else if(!currentNode->isEdgeBlocked(dir) && !tempNode->isEdgeBlocked(invDir))
+                //{
+                //    prepareNode(tempNode, currentSearchNode->getG() + 10, currentSearchNode);
+                //}
             }
         }
     }

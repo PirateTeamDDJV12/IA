@@ -6,6 +6,7 @@
 #include "TurnInfo.h"
 #include "SearchMap.h"
 #include "NPCManager.h"
+#include "ObjectManager.h"
 
 Map Map::m_instance;
 
@@ -407,10 +408,52 @@ bool Map::canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId)
         return true;
     }
 
-    bool isStateOk = !(getNode(a_toTileId)->getType() == Node::FORBIDDEN || getNode(a_toTileId)->isTileOccupied());
+    if(getNode(a_toTileId)->getType() == Node::FORBIDDEN || getNode(a_toTileId)->isTileHasNpcArrived())
+    {
+        return false;
+    }
+
     EDirection dir = getNextDirection(a_fromTileId, a_toTileId);
     EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
-    return isStateOk && !getNode(a_fromTileId)->isEdgeBlocked(dir) && !getNode(a_toTileId)->isEdgeBlocked(invDir);
+    Node* currentNode = getNode(a_fromTileId);
+    Node* tempNode = getNode(a_toTileId);
+
+    if(currentNode->isBlockedByDoor(dir) || tempNode->isBlockedByDoor(invDir))
+    {
+        auto currentObjects = ObjectManager::get()->getAllObjectsOnTile(currentNode->getId());
+        auto tempObjects = ObjectManager::get()->getAllObjectsOnTile(tempNode->getId());
+        ObjectRef currentPP;
+        ObjectRef doorRef;
+        for(auto cObject : currentObjects)
+        {
+            if(cObject->getType() == Object::PRESSURE_PLATE)
+            {
+                currentPP = cObject;
+            }
+            if(cObject->getType() == Object::DOOR)
+            {
+                doorRef = cObject;
+            }
+        }
+
+        for(auto tObject : tempObjects)
+        {
+            if(tObject->getType() == Object::DOOR)
+            {
+                doorRef = tObject;
+            }
+        }
+
+        if(currentPP != ObjectRef() && doorRef != ObjectRef())
+        {
+            if(currentPP->getLinkedObjects()[0] == doorRef)
+            {
+                return true;
+            }
+        }
+    }
+
+    return !getNode(a_fromTileId)->isEdgeBlocked(dir) && !getNode(a_toTileId)->isEdgeBlocked(invDir);
 }
 
 int Map::getNearInfluencedTile(unsigned int a_currentId)

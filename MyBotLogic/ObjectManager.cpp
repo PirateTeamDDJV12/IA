@@ -3,6 +3,7 @@
 #include "Map.h"
 
 #include <algorithm>
+#include "ZoneManager.h"
 
 
 ObjectManager ObjectManager::m_instance;
@@ -82,7 +83,7 @@ std::vector<ObjectRef> ObjectManager::getAllObjectsOnTile(unsigned int tileId) c
     {
         for (auto curObject : iterPair.second)
         {
-            if (curObject->getType() == tileId)
+            if (curObject->getTileId() == tileId)
             {
                 objectsOnTile.push_back(curObject);
             }
@@ -151,6 +152,19 @@ void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
     }
 
     ObjectRef obj{ new Object(objectInfo.objectID, objectInfo.tileID, Object::ObjectType::DOOR, isActive) };
+    Map* myMap = Map::get();
+    unsigned int currentObjectZone = myMap->getNode(objectInfo.tileID)->getZone();
+    unsigned int targetZone = 0;
+    for(int i = NE; i <= NW; ++i)
+    {
+        if(objectInfo.edgesCost[i] == 0)
+        {
+            Node* neighbour = myMap->getNode(objectInfo.tileID)->getNeighboor(static_cast<EDirection>(i));
+            targetZone = neighbour->getZone();
+        }
+    }
+    ZoneManager::get().addJunction(currentObjectZone, targetZone, obj);
+
     m_allObjects[obj->getType()].push_back(obj);
 }
 

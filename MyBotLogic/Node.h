@@ -3,6 +3,7 @@
 #include <cmath>
 #include "Globals.h"
 #include <set>
+#include "NPCManager.h"
 
 struct Position
 {
@@ -95,7 +96,23 @@ public:
 
     bool isTileOccupied() const
     {
-        return m_npcId > 0;
+        return m_npcId >= 0;
+    }
+
+    bool isTileHasNpcArrived() const
+    {
+        if(m_npcId >= 0)
+        {
+            const std::vector<Npc*> &allNpcs = NPCManager::get()->getNpcs();
+            for(Npc* npc : allNpcs)
+            {
+                if(npc->getId() == m_npcId)
+                {
+                    return npc->getStatus() == Npc::ARRIVED;
+                }
+            }
+        }
+        return false;
     }
 
     bool isEdgeBlocked(EDirection dir) const
@@ -103,12 +120,17 @@ public:
         switch(m_edgesCost[dir])
         {
             case 0: //No wall or anything blocking (default state)
-            case ObjectType_Door + 1: // Add +1 because of the default state which is 0 and HighWall is 0 to, so we save the edges with +1
+            //case ObjectType_Door + 1: // Add +1 because of the default state which is 0 and HighWall is 0 to, so we save the edges with +1
                 return false;
             default:
                 return true;
 
         }
+    }
+
+    bool isBlockedByDoor(EDirection dir) const
+    {
+        return m_edgesCost[dir] == (ObjectType_Door + 1);
     }
 
     void setNeighboor(EDirection dir, Node* p)

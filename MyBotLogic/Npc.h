@@ -20,7 +20,7 @@ struct Action;
 
 class Npc 
 {
-private:
+public:
     enum npcState {
         NONE,
         MOVING,
@@ -30,6 +30,7 @@ private:
         INTERACTING
     };
 
+private:
     npcState m_currentState, m_nextState;
     unsigned int m_id;
     unsigned int m_goal;
@@ -126,6 +127,11 @@ public:
     unsigned int getGoal() const
     {
         return m_goal;
+    }
+
+    npcState getStatus() const
+    {
+        return m_currentState;
     }
 private:
     void explore();
