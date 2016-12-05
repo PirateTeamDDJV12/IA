@@ -37,23 +37,18 @@ private:
 
 public:
     Object() = delete;
-    Object(unsigned int a_id, unsigned int a_tileId, ObjectType a_type, bool is_active) :
-        m_id{ a_id },
-        m_tileId{ a_tileId },
-        m_type{ a_type },
-        m_isActive{ is_active }
-    {}
+    Object(unsigned int a_id, unsigned int a_tileId, ObjectType a_type, bool is_active);
 
 public:
     // Getters
-    unsigned int getId() const { return m_id; }
-    ObjectType getType() const { return m_type; }
-    unsigned int getTileId() const { return m_tileId; }
-    bool isActive() const { return m_isActive; }
-    std::vector<ObjectRef>& getLinkedObjects() { return m_linkedObjects; }
+    unsigned int getId() const;
+    ObjectType getType() const;
+    unsigned int getTileId() const;
+    bool isActive() const;
+    std::vector<ObjectRef>& getLinkedObjects();
 
     // Setter
-    void setIsActive(bool isActive) { m_isActive = isActive; }
+    void setIsActive(bool isActive);
 
     // For logger
     void toString(std::stringstream& sstream);

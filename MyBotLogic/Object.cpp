@@ -3,6 +3,43 @@
 #include <sstream>
 
 
+Object::Object(unsigned int a_id, unsigned int a_tileId, ObjectType a_type, bool is_active) :
+    m_id{ a_id },
+    m_tileId{ a_tileId },
+    m_type{ a_type },
+    m_isActive{ is_active }
+{}
+
+unsigned int Object::getId() const
+{
+    return m_id;
+}
+
+Object::ObjectType Object::getType() const
+{
+    return m_type;
+}
+
+unsigned int Object::getTileId() const
+{
+    return m_tileId;
+}
+
+bool Object::isActive() const
+{
+    return m_isActive;
+}
+
+std::vector<ObjectRef>& Object::getLinkedObjects()
+{
+    return m_linkedObjects;
+}
+
+void Object::setIsActive(bool isActive)
+{
+    m_isActive = isActive;
+}
+
 void Object::toString(std::stringstream& sstream)
 {
     std::string type;
