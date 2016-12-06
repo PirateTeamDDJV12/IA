@@ -214,6 +214,18 @@ int Npc::getNextPathTile() const
     return index;
 }
 
+void Npc::setCurrentTile(unsigned tile_id)
+{
+    if(getCurrentTileId() == tile_id)
+    {
+        return;
+    }
+    Map* myMap = Map::get();
+    myMap->getNode(m_path.back())->setNpcIdOnNode(-1);
+    m_path.push_back(tile_id);
+    myMap->getNode(tile_id)->setNpcIdOnNode(m_id);
+}
+
 void Npc::explore()
 {
     BOT_LOGIC_NPC_LOG(m_logger, "-Explore", true);

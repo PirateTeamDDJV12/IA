@@ -14,7 +14,7 @@ unsigned int Node::getId() const noexcept
     return m_ID;
 }
 
-unsigned Node::getNpcIdOnNode() const noexcept
+int Node::getNpcIdOnNode() const noexcept
 {
     return m_npcId;
 }

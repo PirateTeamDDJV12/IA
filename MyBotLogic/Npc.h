@@ -133,6 +133,8 @@ public:
     {
         return m_currentState;
     }
+
+    void setCurrentTile(unsigned tile_id);  
 private:
     void explore();
     void followPath();

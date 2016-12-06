@@ -99,7 +99,7 @@ MyBotLogic::MyBotLogic()
     ObjectManager::get()->updateLogger(_turnInfo);
 
     // Update all NPCs and fill the action list
-    NPCManager::get()->updateNPCs(_actionList);
+    NPCManager::get()->updateNPCs(_turnInfo.npcs, _actionList);
 }
 
 /*virtual*/ void MyBotLogic::Exit()

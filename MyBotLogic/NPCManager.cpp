@@ -62,9 +62,15 @@ const Npc* NPCManager::getNpcById(int npc_id_on_tile)
     return nullptr;
 }
 
-void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
+void NPCManager::updateNPCs(const std::map<unsigned int, NPCInfo> &_npcs, std::vector<Action*> &_actionList)
 {
     Map *myMap = Map::get();
+
+    for each(auto myNpc in m_npcs)
+    {
+        NPCInfo currentNpcInfo = _npcs.at(myNpc->getId());
+        myNpc->setCurrentTile(currentNpcInfo.tileID);
+    }
 
     // Get best goal for each NPCs
     std::map<unsigned, unsigned> goalMap = std::move(myMap->getBestGoalTile(m_npcs));
@@ -83,13 +89,43 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
     
     // Move Npcs
     m_BTNpcUpdateAdministrator();
+    UpdateNpcActions(myMap, _actionList);
 
+    for each(auto myNpc in m_npcs)
+    {
+        // copy npc's action list into the action list
+        for(Action* curAction : myNpc->getActions())
+        {
+            _actionList.push_back(curAction->Clone());
+
+            if(curAction->actionType == Action_Move)
+            {
+                // Update NPC position on node
+                myMap->getNode(myNpc->getCurrentTileId())->setNpcIdOnNode(-1);
+                myMap->getNode(myNpc->getNextPathTile())->setNpcIdOnNode(static_cast<int>(myNpc->getId()));
+            }
+        }
+    }
+
+    // Empty all NPCs list
+    std::for_each(begin(m_npcs),
+        end(m_npcs),
+        [](Npc* myNpc) {myNpc->unstackActions(); });
+}
+
+bool NPCManager::UpdateNpcActions(Map * myMap, std::vector<Action*> &_actionList)
+{
+    bool isNpcUpdated = false;
     for each(auto myNpc in m_npcs)
     {
         // Get next npc tile
         int nextNpcTile = myNpc->getNextPathTile();
+        if(myNpc->getActions().size() == 0)
+        {
+            continue;
+        }
 
-        if (nextNpcTile >= 0)
+        if(nextNpcTile >= 0)
         {
             // Don't want to move on a tile where an npc is already
             if(myMap->getNode(nextNpcTile)->isTileOccupied())
@@ -99,12 +135,13 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
                 if(npcOnTile->getNextPathTile() < 0)
                 {
                     myNpc->stopMoving();
+                    isNpcUpdated = true;
                     break;
                 }
             }
 
             // check if npc can move on nextTile
-            for (Npc* curP : m_npcs)
+            for(Npc* curP : m_npcs)
             {
                 if(curP->getPathSize() > 1)
                 {
@@ -115,6 +152,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
                         if(myNpc->getPathSize() < curP->getPathSize())
                         {
                             myNpc->stopMoving();
+                            isNpcUpdated = true;
                             break;
                         }
                         // else prioritize by npcs id
@@ -122,6 +160,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
                            && myNpc->getPathSize() == curP->getPathSize())
                         {
                             myNpc->stopMoving();
+                            isNpcUpdated = true;
                             break;
                         }
                     }
@@ -133,36 +172,13 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
                        && curP->getCurrentTileId() == nextNpcTile)
                     {
                         myNpc->stopMoving();
+                        isNpcUpdated = true;
                     }
                 }
             }
-            // copy npc's action list into the action list
-            for (Action* curAction : myNpc->getActions())
-            {
-                _actionList.push_back(curAction->Clone());
-
-                if(curAction->actionType == Action_Move)
-                {
-                    // Update NPC position on node
-                    myMap->getNode(myNpc->getCurrentTileId())->setNpcIdOnNode(-1);
-                    myMap->getNode(nextNpcTile)->setNpcIdOnNode(static_cast<int>(myNpc->getId()));
-                }
-            }
-        }
-        else if(myNpc->getActions().size() > 0)
-        {
-            // copy npc's action list into the action list
-            for(Action* curAction : myNpc->getActions())
-            {
-                _actionList.push_back(curAction->Clone());
-            }
         }
     }
-
-    // Empty all NPCs list
-    std::for_each(begin(m_npcs),
-        end(m_npcs),
-        [](Npc* myNpc) {myNpc->unstackActions(); });
+    return isNpcUpdated;
 }
 
 bool NPCManager::isGoalAlreadyAssign(unsigned goalId)

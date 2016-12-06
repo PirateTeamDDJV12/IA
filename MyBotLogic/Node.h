@@ -50,7 +50,7 @@ public:
 public:
     // Getters
     unsigned int getId() const noexcept;
-    unsigned getNpcIdOnNode() const noexcept;
+    int getNpcIdOnNode() const noexcept;
     unsigned int getZone() const noexcept;
     float getInfluence() const noexcept;
     Position* getPosition() const noexcept;
