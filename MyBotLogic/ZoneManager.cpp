@@ -87,6 +87,7 @@ void ZoneManager::updateZones()
 {
     std::vector<Npc *> npcs = NPCManager::get()->getNpcs();
 
+    m_logger.Log("UPDATE ZONES", true);
     // For every NPC
     for(auto npc : npcs)
     {
@@ -109,30 +110,65 @@ void ZoneManager::updateFromTile(Node* currentTile)
 {
     // Look for all neighbours
     // Begin by NE because N is always nullptr
+    m_logger.Log("CURRENT TILE = " + std::to_string(currentTile->getId()), true);
     for(unsigned int dir = EDirection::NE; dir <= EDirection::NW; ++dir)
     {
         // Get the neighbour
         Node *neighbour = currentTile->getNeighboor(static_cast<EDirection>(dir));
-        if(neighbour != nullptr && neighbour->getType() != Node::NONE)
+        if(neighbour != nullptr)
         {
             // If the neighbour has not been done yet
             if(std::find(m_done.begin(), m_done.end(), neighbour) == m_done.end())
             {
                 EDirection direction = static_cast<EDirection>(dir);
                 EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
-                // If there is no obstacle between the neighbour and the current tile
-                if((!currentTile->isEdgeBlocked(direction) && !neighbour->isEdgeBlocked(invDir)))
+                if(neighbour->getType() == Node::NONE)
                 {
-                    // If the neighbour was in the toDo list we erase it
-                    auto itNeighbour = std::find(begin(m_toDo), end(m_toDo), neighbour);
-                    if(itNeighbour != end(m_toDo))
+                    if(neighbour->getZone() == 0)
                     {
-                        m_toDo.erase(itNeighbour);
+                        Map *map = Map::get();
+                        // We create a new zone
+                        addZone();
+                        // We set the neighbour to the new zone and we add him to the toDo list
+                        neighbour->setZone(m_zoneCount);
+                        m_logger.Log("Set neighbour " + std::to_string(neighbour->getId()) + " to NEW ZONE " + std::to_string(m_zoneCount), true);
                     }
-                    m_done.insert(neighbour);
-                    // We set the neighbour to the new zone
-                    neighbour->setZone(currentTile->getZone());
-                    updateFromTile(neighbour);
+                }
+                // If there is no obstacle between the neighbour and the current tile
+                else if(!currentTile->isEdgeBlocked(direction) && !neighbour->isEdgeBlocked(invDir))
+                {
+                    if(currentTile->getType() != Node::FORBIDDEN && neighbour->getType() == Node::FORBIDDEN)
+                    {
+                        if(neighbour->getZone() == 0)
+                        {
+                            Map *map = Map::get();
+                            // We create a new zone
+                            addZone();
+                            // We set the neighbour to the new zone and we add him to the toDo list
+                            neighbour->setZone(m_zoneCount);
+                            m_logger.Log("Set neighbour " + std::to_string(neighbour->getId()) + " to NEW ZONE " + std::to_string(m_zoneCount), true);
+                            m_toDo.push_back(neighbour);
+                        }
+                    }
+                    else if(currentTile->getType() == Node::FORBIDDEN && neighbour->getType() != Node::FORBIDDEN)
+                    {
+                    }
+                    else
+                    {
+                        // If the neighbour was in the toDo list we erase it
+                        auto itNeighbour = std::find(begin(m_toDo), end(m_toDo), neighbour);
+                        if(itNeighbour != end(m_toDo))
+                        {
+                            m_toDo.erase(itNeighbour);
+                        }
+                        m_done.insert(neighbour);
+                        // We set the neighbour to the new zone
+                        neighbour->setZone(currentTile->getZone());
+                        m_logger.Log("Set neighbour " + std::to_string(neighbour->getId()) + " to zone " + std::to_string(currentTile->getZone()), true);
+                        updateFromTile(neighbour);
+                        m_logger.Log("Back to tile " + std::to_string(currentTile->getId()), true);
+
+                    }
                 }
                 // If there was a wall and the zoneId is 0
                 else if(neighbour->getZone() == 0)
@@ -142,6 +178,7 @@ void ZoneManager::updateFromTile(Node* currentTile)
                     addZone();
                     // We set the neighbour to the new zone and we add him to the toDo list
                     neighbour->setZone(m_zoneCount);
+                    m_logger.Log("Set neighbour " + std::to_string(neighbour->getId()) + " to NEW ZONE " + std::to_string(m_zoneCount), true);
                     m_toDo.push_back(neighbour);
                 }
             }

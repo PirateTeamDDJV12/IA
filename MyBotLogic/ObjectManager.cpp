@@ -145,6 +145,20 @@ void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
     {
         if (curObject->getId() == objectInfo.objectID)
         {
+            for(auto curState : objectInfo.objectStates)
+            {
+                switch(curState)
+                {
+                    case ObjectState_Opened:
+                        curObject->setIsActive(true);
+                        break;
+                    case ObjectState_Closed:
+                        curObject->setIsActive(false);
+                        break;
+                    default:
+                        break;
+                }
+            }
             return;
         }
     }
@@ -192,6 +206,21 @@ void ObjectManager::updatePressurePlateObject(const TileInfo& tileInfo)
     {
         if (curObject->getId() == tileInfo.tileID)
         {
+            std::vector<ObjectRef> &objects = curObject->getLinkedObjects();
+            if(Map::get()->getNode(curObject->getTileId())->isTileOccupied())
+            {
+                for(auto object : objects)
+                {
+                    object->setIsActive(true);
+                }
+            }
+            else
+            {
+                for(auto object : objects)
+                {
+                    object->setIsActive(true);
+                }
+            }
             return;
         }
     }
