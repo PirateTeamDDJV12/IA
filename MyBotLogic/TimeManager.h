@@ -20,11 +20,11 @@ private:
     float m_timeScale = 0.00001f;
 
     std::chrono::milliseconds m_timeDifference = 1000ms / 60;
-    
+
     std::chrono::milliseconds m_timeCurrent;
     std::chrono::milliseconds m_timeNextFrame;
     std::chrono::milliseconds m_timePreviousFrame;
-    
+
     std::chrono::milliseconds m_turnTimeLimit = 0ms;
 
     std::chrono::time_point<std::chrono::system_clock> m_fastSave = std::chrono::system_clock::now();
@@ -72,17 +72,29 @@ public:
     void fastSave();
 
     // Get the diffrence between a specific time saved previously and the current time
-    std::chrono::milliseconds getFastDifference() const;
+    template<class T = std::chrono::milliseconds>
+    T getFastDifference()
+    {
+        return std::chrono::duration_cast<T>(now() - m_fastSave);
+    }
 
     // Get the remaining time between the fast save and now
     std::chrono::milliseconds getRemainingFastTime() const;
-
+    
     // Time between two saved time point (first - second)
-    std::chrono::milliseconds getTimeBetweenTwoPoints(std::string name1, std::string name2);
+    template<class T = std::chrono::milliseconds>
+    T getTimeBetweenTwoPoints(std::string name1, std::string name2)
+    {
+        return std::chrono::duration_cast<T>(m_saveTimePoints[name1] - m_saveTimePoints[name2]);
+    }
 
     // Time between two time point (first - second)
-    std::chrono::milliseconds getTimeBetweenTwoPoints(std::chrono::time_point<std::chrono::system_clock> tp1,
-                                                      std::chrono::time_point<std::chrono::system_clock> tp2) const;
+    template<class T = std::chrono::milliseconds>
+    T getTimeBetweenTwoPoints(std::chrono::time_point<std::chrono::system_clock> tp1,
+                              std::chrono::time_point<std::chrono::system_clock> tp2) const
+    {
+        return std::chrono::duration_cast<T>(tp1 - tp2);
+    }
 
     // Recovers the time between 2 frames
     float getElapsedTimeFrame() const;

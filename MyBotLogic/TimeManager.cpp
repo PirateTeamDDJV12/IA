@@ -37,26 +37,11 @@ void TimeManager::fastSave()
     m_fastSave = system_clock::now();
 }
 
-milliseconds TimeManager::getFastDifference() const
-{
-    return duration_cast<milliseconds>(m_fastSave - system_clock::now());
-}
-
 milliseconds TimeManager::getRemainingFastTime() const
 {
     milliseconds currentDuration = duration_cast<milliseconds>(system_clock::now() - m_fastSave);
     milliseconds remaining = m_turnTimeLimit - currentDuration;
     return remaining <= 0ms ? 0ms : remaining;
-}
-
-milliseconds TimeManager::getTimeBetweenTwoPoints(std::string name1, std::string name2)
-{
-    return duration_cast<milliseconds>(m_saveTimePoints[name1] - m_saveTimePoints[name2]);
-}
-
-milliseconds TimeManager::getTimeBetweenTwoPoints(time_point<system_clock> tp1, time_point<system_clock> tp2) const
-{
-    return duration_cast<milliseconds>(tp1 - tp2);
 }
 
 float TimeManager::getElapsedTimeFrame() const

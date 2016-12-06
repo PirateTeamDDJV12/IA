@@ -11,7 +11,7 @@
 #ifdef BOT_LOGIC_DEBUG
    #define BOT_LOGIC_LOG(logger, text, autoEndLine) logger.Log(text, autoEndLine)
 #else
-   #define BOT_LOGIC_LOG(logger, text, autoEndLine) 0
+   #define BOT_LOGIC_LOG(logger, text, autoEndLine) logger.Log(text, autoEndLine)
 #endif
 
 //Custom BotLogic where the AIBot decision making algorithms should be implemented.

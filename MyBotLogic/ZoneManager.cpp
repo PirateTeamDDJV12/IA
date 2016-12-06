@@ -85,7 +85,7 @@ bool ZoneManager::addJunction(unsigned int firstZone, unsigned int secondZone, O
 
 void ZoneManager::updateZones()
 {
-    std::vector<Npc *> npcs = NPCManager::get()->getNpcs();
+    const std::vector<Npc *> &npcs = NPCManager::get()->getNpcs();
 
     m_logger.Log("UPDATE ZONES", true);
     // For every NPC

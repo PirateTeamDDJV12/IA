@@ -24,8 +24,8 @@ MyBotLogic::MyBotLogic()
 /*virtual*/ void MyBotLogic::Configure(int argc, char *argv[], const std::string& _logpath)
 {
     m_logPath = _logpath;
-#ifdef BOT_LOGIC_DEBUG
     mLogger.Init(_logpath, "MyBotLogic.log");
+#ifdef BOT_LOGIC_DEBUG
 #endif
 
     BOT_LOGIC_LOG(mLogger, "Configure", true);
@@ -81,12 +81,17 @@ MyBotLogic::MyBotLogic()
 {
     Map *myMap = Map::get();
 
+    // Save time before update to know to duration every turn
+    TimeManager::getInstance().fastSave();
 
     // Update all the map (tiles, edges, objects, everything)
     myMap->update(_turnInfo);
 
     // Update all NPCs and fill the action list
     NPCManager::get()->updateNPCs(_turnInfo.npcs, _actionList);
+
+    // Log the time
+    mLogger.Log("elapsed time in turn : " + std::to_string(TimeManager::getInstance().getFastDifference<std::chrono::microseconds>().count()) + "us");
 }
 
 /*virtual*/ void MyBotLogic::Exit()
