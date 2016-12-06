@@ -45,7 +45,7 @@ void Npc::update()
                 interact();
                 break;
             case(ARRIVED):
-                m_nextState = ARRIVED; 
+                m_nextState = ARRIVED;
                 m_currentState = ARRIVED;
                 if(getCurrentTileId() == m_goal)
                 {
@@ -156,6 +156,13 @@ bool Npc::updatePath()
             auto newPath = mapManager->getNpcPath(getCurrentTileId(), m_goal, {Node::FORBIDDEN, Node::OCCUPIED});
             if(newPath.size() > 0)
             {
+                if(newPath.size() > 30 && m_hasGoal)
+                {
+                    BOT_LOGIC_NPC_LOG(m_logger, "\t\tTo path to the goal is to long... don't want to go there", true);
+                    m_hasGoal = false;
+                    m_path = {currentTile};
+                    return true;
+                }
                 m_path = newPath;
                 DisplayVector("\t\tPath Updated : ", m_path);
                 return true;

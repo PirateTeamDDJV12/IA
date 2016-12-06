@@ -57,6 +57,8 @@ public:
     void initNpcs(const std::map<unsigned, NPCInfo>& npcs);
     // Create BT and attach all NPCs to it
     void initBT();
+    // Get a specific npc
+    const Npc *getNpcById(int npc_id_on_tile);
     // Update all NPCs
     void updateNPCs(std::vector<Action*> &_actionList);
     // Npc Getter

@@ -50,6 +50,18 @@ void NPCManager::initBT()
     m_BTNpcUpdateAdministrator.init();
 }
 
+const Npc* NPCManager::getNpcById(int npc_id_on_tile)
+{
+    for(auto npc : m_npcs)
+    {
+        if(npc->getId() == npc_id_on_tile)
+        {
+            return npc;
+        }
+    }
+    return nullptr;
+}
+
 void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
 {
     Map *myMap = Map::get();
@@ -79,6 +91,18 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
 
         if (nextNpcTile >= 0)
         {
+            // Don't want to move on a tile where an npc is already
+            if(myMap->getNode(nextNpcTile)->isTileOccupied())
+            {
+                int npcIdOnTile = myMap->getNode(nextNpcTile)->getNpcIdOnNode();
+                const Npc* npcOnTile = getNpcById(npcIdOnTile);
+                if(npcOnTile->getNextPathTile() < 0)
+                {
+                    myNpc->stopMoving();
+                    break;
+                }
+            }
+
             // check if npc can move on nextTile
             for (Npc* curP : m_npcs)
             {
@@ -100,13 +124,6 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
                             myNpc->stopMoving();
                             break;
                         }
-                    }
-
-                    // Don't want to move on a tile where an npc is already
-                    if(myMap->getNode(nextNpcTile)->isTileOccupied())
-                    {
-                        myNpc->stopMoving();
-                        break;
                     }
                 }
                 else
