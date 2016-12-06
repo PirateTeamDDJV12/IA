@@ -78,6 +78,7 @@ namespace BehaviourTree
                 if (children[iter]->m_name.size() == nameLength && children[iter]->m_name == name)
                 {
                     this->disconnect(iter);
+                    break;
                 }
             }
         }

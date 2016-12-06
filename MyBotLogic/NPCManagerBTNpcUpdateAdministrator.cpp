@@ -9,15 +9,12 @@ using namespace BehaviourTree;
 void NPCManagerBTNpcUpdateAdministrator::init()
 {
     BlocSequence* sequenceRoot = this->getBTRootAs<BlocSequence>();
-
-    size_t iter = 0;
-
+    
     std::for_each(
         m_npcs->begin(),
         m_npcs->end(),
         [&](Npc* npc) {
-            sequenceRoot->connect( this->createNpcBloc(npc, this->getNpcNameByIndex(iter)));
-            ++iter;
+            sequenceRoot->connect( this->createNpcBloc(npc, this->getNpcNameByIndex(npc->getId())));
         }
     );
 }
