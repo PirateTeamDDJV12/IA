@@ -444,11 +444,17 @@ bool Map::canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId)
             }
         }
 
-        if(currentPP != ObjectRef() && doorRef != ObjectRef())
+        if(doorRef != ObjectRef())
         {
-            if(currentPP->getLinkedObjects()[0] == doorRef)
+            auto linkObjects = doorRef->getLinkedObjects();
+            if(linkObjects.size() == 0)
             {
                 return true;
+            }
+
+            if(currentPP != ObjectRef())
+            {
+                return linkObjects[0] == currentPP;
             }
         }
     }
@@ -549,7 +555,7 @@ void Map::logMap(unsigned nbTurn)
         for(unsigned int col = 0; col < m_width; ++col)
         {
             Node* tempNode = getNode(currentTileId++);
-            if(tempNode->getNpcIdOnNode() > 0)
+            if(tempNode->getNpcIdOnNode() >= 0)
             {
                 myLog += std::to_string(tempNode->getNpcIdOnNode()) + "-" + getTileStringToLog(tempNode) + "--";
             }

@@ -126,10 +126,20 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
             {
                 _actionList.push_back(curAction->Clone());
 
-                // Update NPC position on node
-                // TODO - be careful about the action type, atm it's move but it can be different !!
-                myMap->getNode(myNpc->getCurrentTileId())->setNpcIdOnNode(-1);
-                myMap->getNode(nextNpcTile)->setNpcIdOnNode(static_cast<int>(myNpc->getId()));
+                if(curAction->actionType == Action_Move)
+                {
+                    // Update NPC position on node
+                    myMap->getNode(myNpc->getCurrentTileId())->setNpcIdOnNode(-1);
+                    myMap->getNode(nextNpcTile)->setNpcIdOnNode(static_cast<int>(myNpc->getId()));
+                }
+            }
+        }
+        else if(myNpc->getActions().size() > 0)
+        {
+            // copy npc's action list into the action list
+            for(Action* curAction : myNpc->getActions())
+            {
+                _actionList.push_back(curAction->Clone());
             }
         }
     }

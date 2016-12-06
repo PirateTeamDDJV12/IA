@@ -152,6 +152,8 @@ void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
     }
 
     ObjectRef obj{ new Object(objectInfo.objectID, objectInfo.tileID, Object::ObjectType::DOOR, isActive) };
+    m_allObjects[obj->getType()].push_back(obj);
+
     Map* myMap = Map::get();
     unsigned int currentObjectZone = myMap->getNode(objectInfo.tileID)->getZone();
     unsigned int targetZone = 0;
@@ -163,9 +165,11 @@ void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
             targetZone = neighbour->getZone();
         }
     }
+    if(currentObjectZone == targetZone || targetZone == 0)
+    {
+        return;
+    }
     ZoneManager::get().addJunction(currentObjectZone, targetZone, obj);
-
-    m_allObjects[obj->getType()].push_back(obj);
 }
 
 void ObjectManager::updatePressurePlateObject(const TileInfo& tileInfo)
