@@ -69,7 +69,6 @@ std::vector<unsigned int> SearchMap::search()
         for(int i = N; i <= NW; ++i)
         {
             EDirection dir = static_cast<EDirection>(i);
-            EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
             Node* tempNode = currentNode->getNeighboor(dir);
             if(tempNode != nullptr)
             {
@@ -77,44 +76,6 @@ std::vector<unsigned int> SearchMap::search()
                 {
                     prepareNode(tempNode, currentSearchNode->getG() + 10, currentSearchNode);
                 }
-                //if(currentNode->isBlockedByDoor(dir) || tempNode->isBlockedByDoor(invDir))
-                //{
-                //    auto currentObjects = ObjectManager::get()->getAllObjectsOnTile(currentNode->getId());
-                //    auto tempObjects = ObjectManager::get()->getAllObjectsOnTile(tempNode->getId());
-                //    ObjectRef currentPP;
-                //    ObjectRef doorRef;
-                //    for(auto cObject : currentObjects)
-                //    {
-                //        if(cObject->getType() == Object::PRESSURE_PLATE)
-                //        {
-                //            currentPP = cObject;
-                //        }
-                //        if(cObject->getType() == Object::DOOR)
-                //        {
-                //            doorRef = cObject;
-                //        }
-                //    }
-
-                //    for(auto tObject : tempObjects)
-                //    {
-                //        if(tObject->getType() == Object::DOOR)
-                //        {
-                //            doorRef = tObject;
-                //        }
-                //    }
-
-                //    if(currentPP != ObjectRef() && doorRef != ObjectRef())
-                //    {
-                //        if(currentPP->getLinkedObjects()[0] == doorRef)
-                //        {
-                //            prepareNode(tempNode, currentSearchNode->getG() + 10, currentSearchNode);
-                //        }
-                //    }
-                //}
-                //else if(!currentNode->isEdgeBlocked(dir) && !tempNode->isEdgeBlocked(invDir))
-                //{
-                //    prepareNode(tempNode, currentSearchNode->getG() + 10, currentSearchNode);
-                //}
             }
         }
     }
@@ -151,7 +112,6 @@ void SearchMap::initSearchMap(Node* start, Node* goal, std::set<Node::NodeType> 
 
         m_pathToGoal.clear();
 
-        m_isPathFinished = false;
         m_isGoalFound = false;
 
         setStartNode(new SearchNode(start->getPosition()->x, start->getPosition()->y, start->getId()));
@@ -194,36 +154,4 @@ unsigned int SearchMap::calculateManathan(const SearchNode* start, const SearchN
     int x = goal->getX() - start->getX();
     int y = goal->getY() - start->getY();
     return (abs(x) + abs(y)) * 10;
-}
-
-int SearchMap::getNextPathTile()
-{
-    if(m_pathToGoal.size() == 1)
-    {
-        return -1;
-    }
-    unsigned int index = m_pathToGoal[m_pathToGoal.size() - 2];
-    return index;
-}
-
-void SearchMap::FindAnotherPath()
-{
-    m_isInitialized = false;
-    initSearchMap(Map::get()->getNode(m_pathToGoal.back()), Map::get()->getNode(m_goal->getId()));
-    search();
-}
-
-bool SearchMap::checkPathIntegrity()
-{
-    if(m_isGoalFound)
-    {
-        for(int i = 0; i < m_pathToGoal.size(); i++)
-        {
-            if(Map::get()->getNode(m_pathToGoal[i])->getType() == Node::FORBIDDEN)
-            {
-                return false;
-            }
-        }
-    }
-    return true;
 }
