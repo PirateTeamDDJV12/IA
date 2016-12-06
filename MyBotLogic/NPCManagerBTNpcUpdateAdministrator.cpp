@@ -43,6 +43,11 @@ BlocRef NPCManagerBTNpcUpdateAdministrator::createNpcBloc(Npc* npc, const std::s
 void NPCManagerBTNpcUpdateAdministrator::operator()()
 {
     m_behaviorTreeRoot();
+    for(unsigned int npcId : m_npcsToRemove)
+    {
+        this->stopANpcByName("Npc" + std::to_string(npcId));
+    }
+    m_npcsToRemove.clear();
 }
 
 
@@ -263,4 +268,9 @@ bool NPCManagerBTNpcUpdateAdministrator::npcByIdIsConnected(unsigned int npcID)
 {
     std::string npcName = std::move(this->getNpcNameByID(npcID));
     return npcName != "" ? npcByNameIsConnected(npcName) : false;
+}
+
+void NPCManagerBTNpcUpdateAdministrator::addNpcToRemove(unsigned npcID)
+{
+    m_npcsToRemove.emplace_back(npcID);
 }

@@ -51,7 +51,7 @@ void Npc::update()
                 {
                     Map::get()->getNode(getCurrentTileId())->setType(Node::OCCUPIED);
                     BOT_LOGIC_NPC_LOG(m_logger, "\tI am out, i am on my goal !", true);
-                    //NPCManager::get()->getNpcUpdateBT().stopANpcByID(m_id);
+                    NPCManager::get()->getNpcUpdateBT().addNpcToRemove(m_id);
                 }
                 break;
         }
