@@ -84,7 +84,7 @@ MyBotLogic::MyBotLogic()
     // Update graph
     myMap->updateEdges(_turnInfo.objects, _turnInfo.turnNb);
     myMap->updateTiles(_turnInfo.tiles);
-    ZoneManager::get().updateZones();
+    //ZoneManager::get().updateZones();
 
     // Update ObjectManager by adding all new discovered objects
     ObjectManager::get()->updateObjects(_turnInfo.objects, _turnInfo.tiles);
