@@ -150,7 +150,7 @@ void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
     }
 
     // Check if the door is activated (open)
-    bool isActive;
+    bool isActive = false;
     for (auto curState : objectInfo.objectStates)
     {
         switch (curState)
@@ -158,8 +158,7 @@ void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
         case ObjectState_Opened:
             isActive = true;
             break;
-
-        case ObjectState_Closed:
+        default:
             isActive = false;
             break;
         }
