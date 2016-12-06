@@ -1,7 +1,7 @@
 #include "Npc.h"
 #include "Map.h"
 
-/* INCLUDE FROM CARLE */
+
 #include "Globals.h"
 
 #include <algorithm>
@@ -26,6 +26,7 @@ void Npc::update()
     BOT_LOGIC_NPC_LOG(m_logger, "\tEntering State Machine : ", true);
     do
     {
+        //Set npc behaviour according to their state
         m_currentState = m_nextState;
         switch(m_currentState)
         {
@@ -42,17 +43,16 @@ void Npc::update()
                 interact();
                 break;
             case(ARRIVED):
-                m_nextState = ARRIVED; // May be useless atm
+                m_nextState = ARRIVED; 
                 m_currentState = ARRIVED;
                 break;
         }
     } while(m_currentState != m_nextState);
-    int test = 0;
 }
 
 bool Npc::stopEverything()
 {
-    // deleting item
+    // deleting actions
     for(std::vector< Action* >::iterator it = m_nextActions.begin(); it != m_nextActions.end(); ++it)
     {
         delete (*it);
@@ -63,10 +63,12 @@ bool Npc::stopEverything()
 
 void Npc::stopMoving()
 {
+    // separate move and interact actions
     auto it = std::partition(std::begin(m_nextActions),
                              std::end(m_nextActions),
                              [](const Action* curAction) { return curAction->actionType != Action_Move; });
 
+    // deleting move actions
     for(std::vector< Action* >::iterator itDelete = it; itDelete != m_nextActions.end(); ++itDelete)
     {
         delete (*itDelete);
@@ -76,10 +78,11 @@ void Npc::stopMoving()
 
 void Npc::stopInteract()
 {
+    // separate move and interact actions
     auto it = std::partition(std::begin(m_nextActions),
                              std::end(m_nextActions),
-                             [](const Action* curAction) { return curAction->actionType == Action_Interact; });
-
+                             [](const Action* curAction) { return curAction->actionType != Action_Interact; });
+    // deleting interact actions
     for(std::vector< Action* >::iterator itDelete = it; itDelete != m_nextActions.end(); ++itDelete)
     {
         delete (*itDelete);
@@ -98,6 +101,7 @@ void Npc::unstackActions()
                 // Do nothing
                 break;
             case Action_Move:
+                //Go on
                 moveForwardOnPath();
                 break;
             case Action_Interact:
@@ -147,7 +151,7 @@ int Npc::getNextPathTile() const
 {
     if(m_path.size() == 1)
     {
-        return -1;
+        return -1; // empty path, only contains current tile
     }
     unsigned int index = m_path[m_path.size() - 2];
     return index;

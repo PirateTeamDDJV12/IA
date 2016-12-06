@@ -68,9 +68,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
             curNpc->calculPath();
         }
     }
-
-
-
+    
     // Move Npcs
     m_BTNpcUpdateAdministrator();
 
@@ -88,7 +86,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
                 if (curP->getId() != myNpc->getId()
                     && curP->getNextPathTile() == nextNpcTile)
                 {
-                    // Handle
+                    // Handle: Prioritize npc with longest path
                     if (myNpc->getPathSize() < curP->getPathSize())
                     {
                         myNpc->stopMoving();
