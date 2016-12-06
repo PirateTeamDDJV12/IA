@@ -10,6 +10,7 @@
 #include "NPCInfo.h"
 #include <map>
 #include <vector>
+#include "TurnInfo.h"
 
 #ifdef _DEBUG
 #define BOT_LOGIC_DEBUG_MAP
@@ -70,6 +71,9 @@ public:
 
     // return the direction between two points
     EDirection getNextDirection(unsigned int a_start, unsigned int a_end);
+
+    // Update all the map (tiles, edges, objects, everything)
+    void update(const TurnInfo& turn_info);
 
     static Map *get() noexcept
     {

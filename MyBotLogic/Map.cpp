@@ -349,6 +349,28 @@ EDirection Map::getNextDirection(unsigned int a_start, unsigned int a_end)
     return NE;
 }
 
+void Map::update(const TurnInfo& _turnInfo)
+{
+    ObjectManager* ObjManager = ObjectManager::get();
+
+    // Update graph
+    updateEdges(_turnInfo.objects, _turnInfo.turnNb);
+    updateTiles(_turnInfo.tiles);
+    //ZoneManager::get().updateZones();
+
+    // Update ObjectManager by adding all new discovered objects
+    ObjManager->updateObjects(_turnInfo.objects, _turnInfo.tiles);
+
+    // Create Influence map
+    createInfluenceMap();
+
+    // Update loggers
+    logZoneMap(_turnInfo.turnNb);
+    logInfluenceMap(_turnInfo.turnNb);
+    logMap(_turnInfo.turnNb);
+    ObjManager->updateLogger(_turnInfo);
+}
+
 std::string Map::getStringDirection(unsigned int start, unsigned int end)
 {
     Node* nStart = m_nodeMap[start];

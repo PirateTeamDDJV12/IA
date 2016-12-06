@@ -81,22 +81,9 @@ MyBotLogic::MyBotLogic()
 {
     Map *myMap = Map::get();
 
-    // Update graph
-    myMap->updateEdges(_turnInfo.objects, _turnInfo.turnNb);
-    myMap->updateTiles(_turnInfo.tiles);
-    //ZoneManager::get().updateZones();
 
-    // Update ObjectManager by adding all new discovered objects
-    ObjectManager::get()->updateObjects(_turnInfo.objects, _turnInfo.tiles);
-
-    // Create Influence map
-    myMap->createInfluenceMap();
-
-    // Update loggers
-    myMap->logZoneMap(_turnInfo.turnNb);
-    myMap->logInfluenceMap(_turnInfo.turnNb);
-    myMap->logMap(_turnInfo.turnNb);
-    ObjectManager::get()->updateLogger(_turnInfo);
+    // Update all the map (tiles, edges, objects, everything)
+    myMap->update(_turnInfo);
 
     // Update all NPCs and fill the action list
     NPCManager::get()->updateNPCs(_turnInfo.npcs, _actionList);
