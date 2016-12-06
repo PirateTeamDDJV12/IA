@@ -9,10 +9,13 @@
 
 class Zone
 {
+    friend class Planificateur;
 public:
     // Junction class
     struct Junction
     {
+        friend class Planificateur;
+    public:
         Junction() = delete;
         Junction(unsigned int destZone, ObjectRef object, bool isOpenableAlone, Node* nodeFrom, Node* nodeTo);
 

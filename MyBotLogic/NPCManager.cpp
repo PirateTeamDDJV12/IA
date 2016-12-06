@@ -68,9 +68,7 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
             curNpc->calculPath();
         }
     }
-
-
-
+    
     // Move Npcs
     m_BTNpcUpdateAdministrator();
 

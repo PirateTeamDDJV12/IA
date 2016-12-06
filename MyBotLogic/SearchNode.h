@@ -3,12 +3,15 @@
 
 class SearchNode
 {
-    unsigned int m_xpos;
-    unsigned int m_ypos;
-    unsigned int m_id;
     SearchNode* m_parent;
-    unsigned int m_H;
-    unsigned int m_G;
+    
+    unsigned int m_xpos; //x position (column number)
+    unsigned int m_ypos; //y position (row number)
+
+    unsigned int m_id;  // node Id
+    unsigned int m_H;   // heuristic
+    unsigned int m_G;   // total cost
+
 public:
     SearchNode(unsigned xpos, unsigned ypos, unsigned id, SearchNode* search_node)
         : m_xpos(xpos), m_ypos(ypos), m_id(id),
@@ -20,54 +23,34 @@ public:
         m_parent(nullptr), m_H(0), m_G(0)
     {}
 
-    unsigned int getX() const
-    {
-        return m_xpos;
-    }
-    unsigned int getY() const
-    {
-        return m_ypos;
-    }
-    unsigned int getId() const
-    {
-        return m_id;
-    }
-    unsigned int getH() const
-    {
-        return m_H;
-    }
-    unsigned int getG() const
-    {
-        return m_G;
-    }
-    unsigned int getF() const
-    {
-        return m_G + m_H;
-    }
-    SearchNode* getParent() const
-    {
-        return m_parent;
-    }
-    void setX(unsigned int x)
-    {
-        m_xpos = x;
-    }
-    void setY(unsigned int y)
-    {
-        m_ypos = y;
-    }
-    void setH(const  unsigned int H)
-    {
-        m_H = H;
-    }
-    void setG(const  unsigned int G)
-    {
-        m_G = G;
-    }
-    void setParent(SearchNode* parent)
-    {
-        m_parent = parent;
-    }
+
+    /*Get the x node position*/
+    unsigned int getX() const noexcept;
+
+    /*Get the y node position*/
+    unsigned int getY() const noexcept;
+
+    /*Get the Node Id*/
+    unsigned int getId() const noexcept;
+
+    /*get the heuristic of the node*/
+    unsigned int getH() const noexcept;
+
+    /*get the total cost the node*/
+    unsigned int getG() const noexcept;
+
+    /*get the cost and the heuristic of the node*/
+    unsigned int getF() const noexcept;
+
+    /*get the parent of the node*/
+    SearchNode* getParent() const noexcept;
+
+
+    void setX(unsigned int x) noexcept;
+    void setY(unsigned int y) noexcept;
+    void setH(const  unsigned int H) noexcept;
+    void setG(const  unsigned int G) noexcept;
+    void setParent(SearchNode* parent) noexcept;
 };
 
 #endif // SEARCHNODE_HEADER
