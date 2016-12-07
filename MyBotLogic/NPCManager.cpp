@@ -54,7 +54,7 @@ const Npc* NPCManager::getNpcById(int npc_id_on_tile)
 {
     for(auto npc : m_npcs)
     {
-        if(npc->getId() == npc_id_on_tile)
+        if(npc->getId() == static_cast<unsigned int>(npc_id_on_tile))
         {
             return npc;
         }
@@ -89,7 +89,7 @@ void NPCManager::updateNPCs(const std::map<unsigned int, NPCInfo> &_npcs, std::v
     
     // Move Npcs
     m_BTNpcUpdateAdministrator();
-    UpdateNpcActions(myMap, _actionList);
+    UpdateNpcActions(myMap);
 
     for each(auto myNpc in m_npcs)
     {
@@ -113,7 +113,7 @@ void NPCManager::updateNPCs(const std::map<unsigned int, NPCInfo> &_npcs, std::v
         [](Npc* myNpc) {myNpc->unstackActions(); });
 }
 
-bool NPCManager::UpdateNpcActions(Map * myMap, std::vector<Action*> &_actionList)
+bool NPCManager::UpdateNpcActions(Map * myMap)
 {
     bool isNpcUpdated = false;
     for each(auto myNpc in m_npcs)
@@ -169,7 +169,7 @@ bool NPCManager::UpdateNpcActions(Map * myMap, std::vector<Action*> &_actionList
                 {
                     // Don't want to move on a tile where an npc is already and don't want to move
                     if(curP->getId() != myNpc->getId()
-                       && curP->getCurrentTileId() == nextNpcTile)
+                       && curP->getCurrentTileId() == static_cast<unsigned int>(nextNpcTile))
                     {
                         myNpc->stopMoving();
                         isNpcUpdated = true;

@@ -63,7 +63,7 @@ Node* Node::getNeighboor(EDirection dir)
     return m_neighboors[dir];
 }
 
-void Node::setNpcIdOnNode(unsigned npcId) noexcept
+void Node::setNpcIdOnNode(int npcId) noexcept
 {
     m_npcId = npcId;
 }
@@ -121,7 +121,7 @@ bool Node::isTileHasNpcArrived() const
         const std::vector<Npc*> &allNpcs = NPCManager::get()->getNpcs();
         for(Npc* npc : allNpcs)
         {
-            if(npc->getId() == m_npcId)
+            if(npc->getId() == static_cast<unsigned int>(m_npcId))
             {
                 return npc->getStatus() == Npc::ARRIVED;
             }

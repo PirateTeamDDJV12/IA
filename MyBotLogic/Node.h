@@ -60,7 +60,7 @@ public:
     Node* getNeighboor(EDirection dir);
 
     // Setters
-    void setNpcIdOnNode(unsigned npcId) noexcept;
+    void setNpcIdOnNode(int npcId) noexcept;
     void setZone(unsigned int zoneId) noexcept;
     void setInfluence(float inf) noexcept;
     void setType(NodeType nType) noexcept;

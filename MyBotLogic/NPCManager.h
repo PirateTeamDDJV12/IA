@@ -62,7 +62,7 @@ public:
     const Npc *getNpcById(int npc_id_on_tile);
     // Update all NPCs
     void updateNPCs(const std::map<unsigned int, NPCInfo> &_npcs, std::vector<Action*> &_actionList);
-    bool UpdateNpcActions(Map * myMap, std::vector<Action*> &_actionList);
+    bool UpdateNpcActions(Map * myMap);
 
     // Npc Getter
     const std::vector<Npc *> &getNpcs() const

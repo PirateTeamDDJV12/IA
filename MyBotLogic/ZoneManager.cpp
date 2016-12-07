@@ -126,7 +126,6 @@ void ZoneManager::updateFromTile(Node* currentTile)
                 {
                     if(neighbour->getZone() == 0)
                     {
-                        Map *map = Map::get();
                         // We create a new zone
                         addZone();
                         // We set the neighbour to the new zone and we add him to the toDo list
@@ -141,7 +140,6 @@ void ZoneManager::updateFromTile(Node* currentTile)
                     {
                         if(neighbour->getZone() == 0)
                         {
-                            Map *map = Map::get();
                             // We create a new zone
                             addZone();
                             // We set the neighbour to the new zone and we add him to the toDo list
@@ -173,7 +171,6 @@ void ZoneManager::updateFromTile(Node* currentTile)
                 // If there was a wall and the zoneId is 0
                 else if(neighbour->getZone() == 0)
                 {
-                    Map *map = Map::get();
                     // We create a new zone
                     addZone();
                     // We set the neighbour to the new zone and we add him to the toDo list
