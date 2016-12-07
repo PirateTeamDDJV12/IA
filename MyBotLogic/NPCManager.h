@@ -3,10 +3,15 @@
 #include "Singleton.h"
 #include "Npc.h"
 #include "NPCInfo.h"
-#include "NPCManagerBTAdministrator.h"
+#include "NPCManagerBTNpcUpdateAdministrator.h"
+#include "NPCManagerBTDecisionMakingAdministrator.h"
+#include "Mission.h"
+#include "NPCManagerBTNpcUpdateAdministrator.h"
+#include "NPCManagerBTDecisionMakingAdministrator.h"
 #include <vector>
 #include <map>
 #include <string>
+#include "Map.h"
 
 class NPCManager : Singleton
 {
@@ -24,16 +29,19 @@ private:
     std::vector<Npc*> m_npcs;
 
     //BT administrator to manage NPCs via BT. Has plenty of useful methods...
-    NPCManagerBTAdministrator m_BTAdministrator;
+    NPCManagerBTNpcUpdateAdministrator m_BTNpcUpdateAdministrator;
+
+    //BT that stores the decision making algorithm
+    NPCManagerBTDecisionMakingAdministrator m_BTDecisionMakingAdministrator;
 
     // Singleton instance
     static NPCManager m_instance;
 
     NPCManager() :
-        m_BTAdministrator{}
+        m_BTNpcUpdateAdministrator{}
     {
         m_npcs.reserve(MAX_NPCS);
-        m_BTAdministrator.reassignNpcVectorArray(m_npcs);
+        m_BTNpcUpdateAdministrator.reassignNpcVectorArray(m_npcs);
     }
 
 
@@ -45,13 +53,30 @@ public:
         return &m_instance;
     }
     // Instantiate an NPC and save it in the vector
-    void initNpc(std::pair<unsigned int, NPCInfo> curNpcs);
+    void initNpc(const std::pair<unsigned, NPCInfo>& curNpcs);
     // Instantiate all NPCs
-    void initNpcs(std::map<unsigned int, NPCInfo> npcs);
+    void initNpcs(const std::map<unsigned, NPCInfo>& npcs);
     // Create BT and attach all NPCs to it
     void initBT();
+    // Get a specific npc
+    const Npc *getNpcById(int npc_id_on_tile);
     // Update all NPCs
-    void updateNPCs(std::vector<Action*> &_actionList);
+    void updateNPCs(const std::map<unsigned int, NPCInfo> &_npcs, std::vector<Action*> &_actionList);
+    bool UpdateNpcActions(Map * myMap);
+
+    // Npc Getter
+    const std::vector<Npc *> &getNpcs() const
+    {
+        return m_npcs;
+    }
+
+    NPCManagerBTNpcUpdateAdministrator& getNpcUpdateBT()
+    {
+        return m_BTNpcUpdateAdministrator;
+    }
+
+    bool isGoalAlreadyAssign(unsigned int goalId);
+    
 };
 
 #endif //NPC_MANAGER_HEADER

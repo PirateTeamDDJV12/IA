@@ -3,7 +3,6 @@
 #include "BotLogicIF.h"
 #include "Logger.h"
 #include "Map.h"
-#include "Npc.h"
 
 #ifdef _DEBUG
    #define BOT_LOGIC_DEBUG
@@ -12,7 +11,7 @@
 #ifdef BOT_LOGIC_DEBUG
    #define BOT_LOGIC_LOG(logger, text, autoEndLine) logger.Log(text, autoEndLine)
 #else
-   #define BOT_LOGIC_LOG(logger, text, autoEndLine) 0
+   #define BOT_LOGIC_LOG(logger, text, autoEndLine) logger.Log(text, autoEndLine)
 #endif
 
 //Custom BotLogic where the AIBot decision making algorithms should be implemented.
@@ -28,8 +27,7 @@ public:
 	virtual ~MyBotLogic();
 
 	virtual void Configure(int argc, char *argv[], const std::string& _logpath);
-	virtual void Load();
-	virtual void OnBotInitialized();
+	virtual void Start();
 	virtual void Init(LevelInfo& _levelInfo);
 	virtual void OnGameStarted();
 	virtual void FillActionList(TurnInfo& _turnInfo, std::vector<Action*>& _actionList);   //calculate moves for a single turn

@@ -50,7 +50,15 @@ SET( AIBOT_HEADERS
 	MyBotLogic/Singleton.h
 	MyBotLogic/NPCManager.h
 	MyBotLogic/ObjectManager.h
-	MyBotLogic/NPCManagerBTAdministrator.h
+	MyBotLogic/Object.h
+	MyBotLogic/NPCManagerBTNpcUpdateAdministrator.h
+	MyBotLogic/NPCManagerBTDecisionMakingAdministrator.h
+	MyBotLogic/TimeManager.h
+	MyBotLogic/Zone.h
+	MyBotLogic/ZoneManager.h
+	MyBotLogic/Mission.h
+	MyBotLogic/MissionManager.h
+	MyBotLogic/Planificateur.h
 	
 	#MY_BOT_BT
 	MyBotLogic/BehaviourTree/BehaviourTreeModule.h
@@ -69,6 +77,7 @@ SET( AIBOT_HEADERS
 	MyBotLogic/BehaviourTree/BlocInstance/BlocRoot.h
 	MyBotLogic/BehaviourTree/BlocInstance/BlocSelect.h
 	MyBotLogic/BehaviourTree/BlocInstance/BlocSequence.h
+	MyBotLogic/BehaviourTree/BlocInstance/BlocTernarySelector.h
 	MyBotLogic/BehaviourTree/BlocInstance/BlocSuccess.h
 	MyBotLogic/BehaviourTree/BlocInstance/GeneralAction.h
 )
@@ -90,7 +99,15 @@ SET( AIBOT_SRC
 	MyBotLogic/SearchNode.cpp
 	MyBotLogic/NPCManager.cpp
 	MyBotLogic/ObjectManager.cpp
-	MyBotLogic/NPCManagerBTAdministrator.cpp
+	MyBotLogic/Object.cpp
+	MyBotLogic/NPCManagerBTNpcUpdateAdministrator.cpp
+	MyBotLogic/NPCManagerBTDecisionMakingAdministrator.cpp
+	MyBotLogic/TimeManager.cpp
+	MyBotLogic/Zone.cpp
+	MyBotLogic/ZoneManager.cpp
+	MyBotLogic/Mission.cpp
+	MyBotLogic/MissionManager.cpp
+	MyBotLogic/Planificateur.cpp
 	
 	#Main
 	Main.cpp

@@ -1,10 +1,12 @@
+#include <Math.h>
+#include <windows.h>
+#include <algorithm>
+
 #include "Map.h"
 #include "TurnInfo.h"
 #include "SearchMap.h"
-#include <Math.h>
-#include <windows.h>
-#include "Npc.h"
-#include <algorithm>
+#include "NPCManager.h"
+#include "ObjectManager.h"
 
 Map Map::m_instance;
 
@@ -13,17 +15,23 @@ void Map::setLoggerPath(const std::string &a_path)
 #ifdef BOT_LOGIC_DEBUG_MAP
     m_logger.Init(a_path, "Map.log");
     m_loggerInfluence.Init(a_path, "Map_Influence.log");
+    m_loggerZone.Init(a_path, "Map_Zone.log");
     m_loggerEdges.Init(a_path, "Map_Edges.log");
 #endif
 
     BOT_LOGIC_MAP_LOG(m_logger, "Configure", true);
     BOT_LOGIC_MAP_LOG(m_loggerInfluence, "Configure", true);
+    BOT_LOGIC_MAP_LOG(m_loggerZone, "Configure", true);
     BOT_LOGIC_MAP_LOG(m_loggerEdges, "Configure", true);
 }
 
 void Map::setNodeType(unsigned int tileId, Node::NodeType tileType)
 {
-    m_nodeMap[tileId]->setType(tileType);
+    // TODO - Attention si jamais on veut refaire bouger un NPC une fois qu'il est sur une tuile
+    if(m_nodeMap[tileId]->getType() != Node::OCCUPIED)
+    {
+        m_nodeMap[tileId]->setType(tileType);        
+    }
 }
 
 void Map::createNode(Node* node)
@@ -71,7 +79,7 @@ void Map::connectNodes()
 
 Node* Map::getNode(unsigned int x, unsigned int y)
 {
-    if(x < 0 || x > getWidth() - 1 || y < 0 || y > getHeight() - 1)
+    if(x < 0 || x > m_width - 1 || y < 0 || y > m_height - 1)
     {
         return nullptr;
     }
@@ -84,7 +92,7 @@ Node* Map::getNode(unsigned int index)
     return m_nodeMap[index];
 }
 
-float Map::calculateDistance(int indexStart, int indexEnd)
+int Map::calculateDistance(int indexStart, int indexEnd)
 {
     Node* start = m_nodeMap[indexStart];
     Node* end = m_nodeMap[indexEnd];
@@ -93,35 +101,47 @@ float Map::calculateDistance(int indexStart, int indexEnd)
     return abs(x) + abs(y);
 }
 
-std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
+std::map<unsigned, unsigned> Map::getBestGoalTile(const std::vector<Npc*>& npcInfo)
 {
     std::map<unsigned, unsigned> goalMap;
+    NPCManager *NpcMan = NPCManager::get();
     if(m_goalTiles.size() > npcInfo.size())
     {
         auto copyMapGoal = m_goalTiles;
         for(Npc* npc : npcInfo)
         {
             int bestDist = 666;
-            unsigned goalId = -1;
-            std::vector<unsigned>::iterator goalIt = begin(copyMapGoal);
+            int goalId = -1;
+            std::map<unsigned int, bool>::iterator goalIt = begin(copyMapGoal);
+            std::map<unsigned int, bool>::iterator saveGoalIt = end(copyMapGoal);
             for(; goalIt != end(copyMapGoal); ++goalIt)
             {
-                float distance = calculateDistance(npc->getCurrentTileId(), *goalIt);
+                unsigned int currentGoalId = (*goalIt).first;
+                if(NpcMan->isGoalAlreadyAssign(currentGoalId))
+                {
+                    continue;
+                }
+                int distance = calculateDistance(npc->getCurrentTileId(), currentGoalId);
                 if(distance < bestDist)
                 {
-                    goalId = *goalIt;
+                    goalId = currentGoalId;
                     bestDist = distance;
+                    saveGoalIt = goalIt;
                 }
             }
-            goalMap[npc->getId()] = goalId;
-            copyMapGoal.erase(std::find(begin(copyMapGoal), end(copyMapGoal), goalId));
+            goalMap[npc->getId()] = static_cast<unsigned int>(goalId);
+            copyMapGoal.erase(saveGoalIt);
         }
     }
     else
     {
-        for(unsigned goal : m_goalTiles)
+        for(std::pair<unsigned int, bool> goal : m_goalTiles)
         {
-            if(npcInfo.size() <= 0)
+            if(NpcMan->isGoalAlreadyAssign(goal.first))
+            {
+                continue;
+            }
+            if(npcInfo.empty())
             {
                 break;
             }
@@ -130,22 +150,27 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
             for(Npc* npc : npcInfo)
             {
                 // Don't want a npc to have many goal
-                if(goalMap.find(npc->getId()) != end(goalMap))
+                if(goalMap.find(npc->getId()) != end(goalMap) || npc->hasGoal())
                 {
                     continue;
                 }
-                float distance = calculateDistance(npc->getCurrentTileId(), goal);
+                int distance = calculateDistance(npc->getCurrentTileId(), goal.first);
                 if(distance < bestDist)
                 {
                     npcId = npc->getId();
                     bestDist = distance;
                 }
             }
-            goalMap[npcId] = goal;
+            goalMap[npcId] = goal.first;
         }
     }
 
-    return goalMap;
+    BOT_LOGIC_MAP_LOG(m_logger, "Attribution des goals : ", true);
+    for(auto goal : goalMap)
+    {
+        BOT_LOGIC_MAP_LOG(m_logger, "\tNPC " + std::to_string(goal.first) + " a pour goal : " + std::to_string(goal.second), true);
+    }
+    return std::move(goalMap);
 }
 
 // TODO - See if we can implement this
@@ -168,7 +193,7 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(std::vector<Npc*> npcInfo)
 
 void Map::addGoalTile(unsigned int number)
 {
-    if(std::find(begin(m_goalTiles), end(m_goalTiles), number) == end(m_goalTiles))
+    if(m_goalTiles.find(number) == end(m_goalTiles))
     {
         bool canAccesTile = false;
         Node* currentNode = getNode(number);
@@ -186,7 +211,7 @@ void Map::addGoalTile(unsigned int number)
 
         if(canAccesTile)
         {
-            m_goalTiles.push_back(number);
+            m_goalTiles[number] = false;
         }
     }
 }
@@ -273,8 +298,8 @@ void Map::propage(Node* myNode, unsigned curDist, unsigned maxDist, float initia
                 if(newInfluence > tempNode->getInfluence())
                 {
                     tempNode->setInfluence(newInfluence);
+                    propage(tempNode, ++curDist, maxDist, initialInfluence);
                 }
-                propage(tempNode, ++curDist, maxDist, initialInfluence);
             }
         }
     }
@@ -282,7 +307,7 @@ void Map::propage(Node* myNode, unsigned curDist, unsigned maxDist, float initia
 
 EDirection Map::getNextDirection(unsigned int a_start, unsigned int a_end)
 {
-    std::string direction = getStringDirection(a_start, a_end);
+    std::string direction = std::move(getStringDirection(a_start, a_end));
 
     if(direction == "N")
     {
@@ -317,6 +342,28 @@ EDirection Map::getNextDirection(unsigned int a_start, unsigned int a_end)
         return SE;
     }
     return NE;
+}
+
+void Map::update(const TurnInfo& _turnInfo)
+{
+    ObjectManager* ObjManager = ObjectManager::get();
+
+    // Update graph
+    updateEdges(_turnInfo.objects, _turnInfo.turnNb);
+    updateTiles(_turnInfo.tiles);
+    //ZoneManager::get().updateZones();
+
+    // Update ObjectManager by adding all new discovered objects
+    ObjManager->updateObjects(_turnInfo.objects, _turnInfo.tiles);
+
+    // Create Influence map
+    createInfluenceMap();
+
+    // Update loggers
+    logZoneMap(_turnInfo.turnNb);
+    logInfluenceMap(_turnInfo.turnNb);
+    logMap(_turnInfo.turnNb);
+    ObjManager->updateLogger(_turnInfo);
 }
 
 std::string Map::getStringDirection(unsigned int start, unsigned int end)
@@ -362,13 +409,13 @@ std::string Map::getStringDirection(unsigned int start, unsigned int end)
         }
     }
 
-    return direction;
+    return std::move(direction);
 }
 
 std::vector<unsigned int> Map::getNpcPath(unsigned int a_start, unsigned int a_end, std::set<Node::NodeType> forbiddenType)
 {
     SearchMap mySearch{getNode(a_start), getNode(a_end), forbiddenType};
-    return mySearch.search();
+    return std::move(mySearch.search());
 }
 
 bool Map::canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId)
@@ -378,17 +425,65 @@ bool Map::canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId)
         return true;
     }
 
-    bool isStateOk = !(getNode(a_toTileId)->getType() == Node::FORBIDDEN || getNode(a_toTileId)->getType() == Node::OCCUPIED);
+    if(getNode(a_toTileId)->getType() == Node::FORBIDDEN || getNode(a_toTileId)->isTileHasNpcArrived())
+    {
+        return false;
+    }
+
     EDirection dir = getNextDirection(a_fromTileId, a_toTileId);
     EDirection invDir = static_cast<EDirection>((dir + 4) % 8);
-    return isStateOk && !getNode(a_fromTileId)->isEdgeBlocked(dir) && !getNode(a_toTileId)->isEdgeBlocked(invDir);
+    Node* currentNode = getNode(a_fromTileId);
+    Node* tempNode = getNode(a_toTileId);
+
+    if(currentNode->isBlockedByDoor(dir) || tempNode->isBlockedByDoor(invDir))
+    {
+        auto currentObjects = ObjectManager::get()->getAllObjectsOnTile(currentNode->getId());
+        auto tempObjects = ObjectManager::get()->getAllObjectsOnTile(tempNode->getId());
+        ObjectRef currentPP;
+        ObjectRef doorRef;
+        for(auto cObject : currentObjects)
+        {
+            if(cObject->getType() == Object::PRESSURE_PLATE)
+            {
+                currentPP = cObject;
+            }
+            if(cObject->getType() == Object::DOOR)
+            {
+                doorRef = cObject;
+            }
+        }
+
+        for(auto tObject : tempObjects)
+        {
+            if(tObject->getType() == Object::DOOR)
+            {
+                doorRef = tObject;
+            }
+        }
+
+        if(doorRef != ObjectRef())
+        {
+            auto linkObjects = doorRef->getLinkedObjects();
+            if(linkObjects.size() == 0)
+            {
+                return true;
+            }
+
+            if(currentPP != ObjectRef())
+            {
+                return linkObjects[0] == currentPP;
+            }
+        }
+    }
+
+    return !getNode(a_fromTileId)->isEdgeBlocked(dir) && !getNode(a_toTileId)->isEdgeBlocked(invDir);
 }
 
 int Map::getNearInfluencedTile(unsigned int a_currentId)
 {
     Node* current = getNode(a_currentId);
     int bestTile = -1;
-    
+
     if(isAllNeighboorHaveSameInfluence(current))
     {
         return bestTile;
@@ -412,6 +507,19 @@ int Map::getNearInfluencedTile(unsigned int a_currentId)
         }
     }
     return bestTile;
+}
+
+std::vector<unsigned> Map::getNonVisitedTile()
+{
+    std::vector<unsigned> v;
+    for(auto seenTile : m_seenTiles)
+    {
+        if(!seenTile.second)
+        {
+            v.push_back(seenTile.first);
+        }
+    }
+    return std::move(v);
 }
 
 bool Map::isAllNeighboorHaveSameInfluence(Node* node)
@@ -460,7 +568,7 @@ void Map::testAddTile(std::vector<unsigned int>& v, unsigned int fromTileId, uns
 void Map::logMap(unsigned nbTurn)
 {
 #ifdef BOT_LOGIC_DEBUG_MAP
-    std::string myLog = "\nTurn #" + std::to_string(nbTurn) + "\n";
+    std::string myLog = std::move("\nTurn #" + std::to_string(nbTurn) + "\n");
 
     // Printing some infos
     myLog += "\tAccessible Goal Number : " + std::to_string(m_goalTiles.size()) + "\n";
@@ -468,40 +576,22 @@ void Map::logMap(unsigned nbTurn)
     // Printing the map
     myLog += "Map : \n";
     unsigned int currentTileId{};
-    for(int row = 0; row < m_height; ++row)
+    for(unsigned int row = 0; row < m_height; ++row)
     {
         if(row % 2)
         {
             myLog += "   ";
         }
-        for(int col = 0; col < m_width; ++col)
+        for(unsigned int col = 0; col < m_width; ++col)
         {
             Node* tempNode = getNode(currentTileId++);
-            if(tempNode->getNpcIdOnNode() > 0)
+            if(tempNode->getNpcIdOnNode() >= 0)
             {
-                myLog += std::to_string(tempNode->getNpcIdOnNode()) + "----";
+                myLog += std::to_string(tempNode->getNpcIdOnNode()) + "-" + getTileStringToLog(tempNode) + "--";
             }
             else
             {
-                switch(tempNode->getType())
-                {
-                    case Node::NodeType::NONE:
-                        myLog += "-----";
-                        break;
-
-                    case Node::NodeType::FORBIDDEN:
-                        myLog += "F----";
-                        break;
-                    case Node::NodeType::GOAL:
-                        myLog += "G----";
-                        break;
-                    case Node::NodeType::OCCUPIED:
-                        myLog += "X----";
-                        break;
-                    case Node::NodeType::PATH:
-                        myLog += "P----";
-                        break;
-                }
+                myLog += getTileStringToLog(tempNode) + "----";
             }
             myLog += "  ";
         }
@@ -512,21 +602,38 @@ void Map::logMap(unsigned nbTurn)
 
 }
 
+std::string Map::getTileStringToLog(Node* node) const
+{
+    switch(node->getType())
+    {       
+        case Node::NodeType::FORBIDDEN:
+            return"F";
+        case Node::NodeType::GOAL:
+            return"G";
+        case Node::NodeType::OCCUPIED:
+            return"X";
+        case Node::NodeType::PATH:
+            return"P";
+        default:
+            return"-";
+    }
+}
+
 void Map::logInfluenceMap(unsigned nbTurn)
 {
 #ifdef BOT_LOGIC_DEBUG_MAP
-    std::string myLog = "\nTurn #" + std::to_string(nbTurn) + "\n";
+    std::string myLog = std::move("\nTurn #" + std::to_string(nbTurn) + "\n");
 
     // Printing the map
     myLog += "Map : \n";
     unsigned int currentTileId{};
-    for(int row = 0; row < m_height; ++row)
+    for(unsigned int row = 0; row < m_height; ++row)
     {
         if(row % 2)
         {
             myLog += "   ";
         }
-        for(int col = 0; col < m_width; ++col)
+        for(unsigned int col = 0; col < m_width; ++col)
         {
             Node* tempNode = getNode(currentTileId++);
             float influ = std::trunc(100 * tempNode->getInfluence()) / 100;
@@ -547,7 +654,42 @@ void Map::logInfluenceMap(unsigned nbTurn)
 
 }
 
-void Map::initMap(unsigned row, unsigned col, unsigned range)
+void Map::logZoneMap(unsigned nbTurn)
+{
+#ifdef BOT_LOGIC_DEBUG_MAP
+    std::string myLog = std::move("\nTurn #" + std::to_string(nbTurn) + "\n");
+
+    // Printing the map
+    myLog += "Map : \n";
+    unsigned int currentTileId{};
+    for(unsigned int row = 0; row < m_height; ++row)
+    {
+        if(row % 2)
+        {
+            myLog += "  ";
+        }
+        for(unsigned int col = 0; col < m_width; ++col)
+        {
+            Node* tempNode = getNode(currentTileId++);
+            unsigned int zone = tempNode->getZone();
+            if(tempNode->getNpcIdOnNode() > 0)
+            {
+                myLog += std::to_string(zone);
+            }
+            else
+            {
+                myLog += std::to_string(zone);
+            }
+            myLog += "  ";
+        }
+        myLog += "\n";
+    }
+    BOT_LOGIC_MAP_LOG(m_loggerZone, myLog, false);
+#endif
+
+}
+
+void Map::initMap(unsigned int row, unsigned int col, unsigned int range)
 {
     // Init parameters
     m_height = row;
@@ -556,9 +698,9 @@ void Map::initMap(unsigned row, unsigned col, unsigned range)
 
     // Create all Nodes
     unsigned int countIndex = 0;
-    for(int i = 0; i < row; ++i)
+    for(unsigned int i = 0; i < row; ++i)
     {
-        for(int j = 0; j < col; ++j)
+        for(unsigned int j = 0; j < col; ++j)
         {
             createNode(new Node{j, i, countIndex, Node::NONE});
             countIndex++;
@@ -569,9 +711,9 @@ void Map::initMap(unsigned row, unsigned col, unsigned range)
     connectNodes();
 }
 
-void Map::updateEdges(std::map<unsigned int, ObjectInfo> objects, unsigned int nbTurn)
+void Map::updateEdges(const std::map<unsigned int, ObjectInfo>& objects, unsigned int nbTurn)
 {
-    BOT_LOGIC_MAP_LOG(m_loggerEdges, "\nTURN #" + std::to_string(nbTurn), true);
+    BOT_LOGIC_MAP_LOG(m_loggerEdges, std::move("\nTURN #" + std::to_string(nbTurn)), true);
 
     for(std::pair<unsigned, ObjectInfo> info : objects)
     {
@@ -581,35 +723,41 @@ void Map::updateEdges(std::map<unsigned int, ObjectInfo> objects, unsigned int n
             if(info.second.edgesCost[i] == 0)
             {
                 node->setEdgeCost(static_cast<EDirection>(i), info.second.objectTypes);
-                BOT_LOGIC_MAP_LOG(m_loggerEdges, "\tTileID : " + std::to_string(info.second.tileID) + " - Dir : " + std::to_string(i) + " - Type : " + std::to_string(node->getEdge(static_cast<EDirection>(i))), true);
+                BOT_LOGIC_MAP_LOG(m_loggerEdges, std::move("\tTileID : " + std::to_string(info.second.tileID) + " - Dir : " + std::to_string(i) + " - Type : " + std::to_string(node->getEdge(static_cast<EDirection>(i)))), true);
             }
         }
     }
 }
 
-void Map::updateTiles(std::map<unsigned int, TileInfo> tiles)
+void Map::updateTiles(const std::map<unsigned int, TileInfo>& tiles)
 {
     for each(auto info in tiles)
     {
         auto tileInfo = info.second;
 
         auto ITisForbidden = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Forbidden);
-        auto ITisTarget = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Target);
-        auto ITisDescriptor = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Descriptor);
         if(ITisForbidden != tileInfo.tileAttributes.end())
         {
             setNodeType(tileInfo.tileID, Node::FORBIDDEN);
         }
-        else if(ITisTarget != tileInfo.tileAttributes.end())
+        else
         {
-            setNodeType(tileInfo.tileID, Node::GOAL);
-            addGoalTile(tileInfo.tileID);
-            addSeenTile(tileInfo.tileID);
-        }
-        else if(ITisDescriptor != tileInfo.tileAttributes.end())
-        {
-            setNodeType(tileInfo.tileID, Node::PATH);
-            addSeenTile(tileInfo.tileID);
+            auto ITisTarget = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Target);
+            if(ITisTarget != tileInfo.tileAttributes.end())
+            {
+                setNodeType(tileInfo.tileID, Node::GOAL);
+                addGoalTile(tileInfo.tileID);
+                addSeenTile(tileInfo.tileID);
+            }
+            else
+            {
+                auto ITisDescriptor = find(begin(tileInfo.tileAttributes), end(tileInfo.tileAttributes), TileAttribute_Descriptor);
+                if(ITisDescriptor != tileInfo.tileAttributes.end())
+                {
+                    setNodeType(tileInfo.tileID, Node::PATH);
+                    addSeenTile(tileInfo.tileID);
+                }
+            }
         }
     }
 }

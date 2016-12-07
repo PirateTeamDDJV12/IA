@@ -1,15 +1,16 @@
 #ifndef NODE_HEADER
 #define NODE_HEADER
-#include <cmath>
+
 #include "Globals.h"
 #include <set>
 
 struct Position
 {
-    int x;
-    int y;
-    Position(int xVal, int yVal)
-        :x{xVal}, y{yVal}
+    unsigned int x;
+    unsigned int y;
+    Position(unsigned int xVal, unsigned int yVal) :
+        x{ xVal }, 
+        y{ yVal }
     {}
 };
 
@@ -24,120 +25,56 @@ public:
         OCCUPIED,
         PATH,
     };
+
     enum EdgeType
     {
         FREE,
         WALL,
         WINDOW,
     };
-private:
-    Position* m_pos;
-    unsigned int m_ID;
-    NodeType m_type;
-    unsigned int m_edgesCost[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    Node* m_neighboors[8] = {nullptr};
-    unsigned int m_npcId = {0};
-    float m_influence = {0};
-    // TODO - Faire en sorte de definir si on sait tout du node ou pas pour eviter d'aller dessus, pour optimiser la recherche de chemin
-    bool m_knowEverythingAboutIt;
 
-    // TODO - Ajouter une zone a nos nodes pour les differencier et permettre de tout de suite savoir si on peut acceder a ce node ou pas
+private:
+    unsigned int m_ID;
+    unsigned int m_edgesCost[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    int m_npcId;
+    unsigned int m_zone = { 0 };
+    float m_influence = { 0 };
+    Position* m_pos;
+    NodeType m_type;
+    Node* m_neighboors[8] = { nullptr };
+
 public:
     Node() = delete;
-    Node(int xVal, int yVal, unsigned int idVal, NodeType typeVal);
+    Node(unsigned int xVal, unsigned int yVal, unsigned int idVal, NodeType typeVal);
 
-    NodeType getType() const noexcept
-    {
-        return m_type;
-    }
+public:
+    // Getters
+    unsigned int getId() const noexcept;
+    int getNpcIdOnNode() const noexcept;
+    unsigned int getZone() const noexcept;
+    float getInfluence() const noexcept;
+    Position* getPosition() const noexcept;
+    NodeType getType() const noexcept;
+    EdgeType getEdge(EDirection dir) const;
+    Node* getNeighboor(unsigned int tileId);
+    Node* getNeighboor(EDirection dir);
 
-    Position* getPosition() const noexcept
-    {
-        return m_pos;
-    }
+    // Setters
+    void setNpcIdOnNode(int npcId) noexcept;
+    void setZone(unsigned int zoneId) noexcept;
+    void setInfluence(float inf) noexcept;
+    void setType(NodeType nType) noexcept;
+    void setEdgeCost(EDirection dir, std::set<EObjectType> types);
+    void setNeighboor(EDirection dir, Node* p);
 
-    unsigned int getId() const noexcept
-    {
-        return m_ID;
-    }
+    // Verrify if an obstacle blocks the path
+    bool isEdgeBlocked(EDirection dir) const;
+    bool isTileOccupied() const;
+    bool isTileHasNpcArrived() const;
+    bool isBlockedByDoor(EDirection dir) const;
 
-    void setType(NodeType nType)
-    {
-        m_type = nType;
-    }
-
-    void setEdgeCost(EDirection dir, std::set<EObjectType> types)
-    {
-        if(std::find(begin(types), end(types), ObjectType_Door) != end(types))
-        {
-            m_edgesCost[dir] = ObjectType_Door + 1;
-        }
-        else if(std::find(begin(types), end(types), ObjectType_Window) != end(types))
-        {
-            m_edgesCost[dir] = ObjectType_Window + 1;
-        }
-        else if(std::find(begin(types), end(types), ObjectType_HighWall) != end(types))
-        {
-            m_edgesCost[dir] = ObjectType_HighWall + 1;
-        }
-    }
-
-    bool isEdgeBlocked(EDirection dir) const
-    {
-        return m_edgesCost[dir] == 0 ? false : true;
-    }
-
-    void setNeighboor(EDirection dir, Node* p)
-    {
-        m_neighboors[dir] = p;
-    }
-
-    Node* getNeighboor(EDirection dir)
-    {
-        return m_neighboors[dir];
-    }
-
-    void setNpcIdOnNode(unsigned npcId)
-    {
-        m_npcId = npcId;
-    }
-
-    unsigned getNpcIdOnNode() const
-    {
-        return m_npcId;
-    }
-
-    EdgeType getEdge(EDirection dir) const
-    {
-        return static_cast<EdgeType>(m_edgesCost[dir]);
-    }
-
-    float getInfluence() const
-    {
-        return m_influence;
-    }
-
-    void setInfluence(float inf)
-    {
-        m_influence = inf;
-    }
-
-    bool knowEverythingAboutThis() const
-    {
-        return m_knowEverythingAboutIt;
-    }
-
-    void setKnowEverything(bool know)
-    {
-        m_knowEverythingAboutIt = know;
-    }
-
-    unsigned int calculateManathan(const Node* goal) const
-    {
-        int x = goal->getPosition()->x - this->m_pos->x;
-        int y = goal->getPosition()->y - this->m_pos->y;
-        return (abs(x) + abs(y)) * 10;
-    }
+    // Heuristic for A*
+    unsigned int calculateManathan(const Node* goal) const noexcept;
 };
 
 #endif // NODE_HEADER
