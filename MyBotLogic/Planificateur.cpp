@@ -35,10 +35,8 @@ std::pair<std::vector<Mission>, std::vector<Mission>> Planificateur::createMissi
     std::vector<Mission> subMissionsForOthersNPCs;
 
     Zone* fromZone = ZoneManager::get().getZone(from);
-    Zone* destZone = ZoneManager::get().getZone(dest);
 
-
-    auto jonction = fromZone->getZoneJunction(dest); // Crash si zones non adjacentes...
+    auto jonction = fromZone->getJunction(dest); // Crash si zones non adjacentes...
     Object  frontiere = *jonction.m_object;
 
     //On va à la porte
@@ -56,8 +54,8 @@ std::pair<std::vector<Mission>, std::vector<Mission>> Planificateur::createMissi
 
 
             //Créer les missions
-            std::pair<std::vector<Mission>, std::vector<Mission>> subMissions = planifyMissions(openDoor,-1); //-1 car non attribuée à un NPC 
-            subMissionsForOthersNPCs.insert(subMissionsForOthersNPCs.end(), subMissions.second.begin(), subMissions.second.end());
+            std::pair<std::vector<Mission>, std::vector<Mission>> subMissionsPair = planifyMissions(openDoor,-1); //-1 car non attribuée à un NPC 
+            subMissionsForOthersNPCs.insert(subMissionsForOthersNPCs.end(), subMissionsPair.second.begin(), subMissionsPair.second.end());
             subMissionsForOthersNPCs.push_back(openDoor);
         }
 

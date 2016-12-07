@@ -58,6 +58,7 @@ SET( AIBOT_HEADERS
 	MyBotLogic/ZoneManager.h
 	MyBotLogic/Mission.h
 	MyBotLogic/MissionManager.h
+	MyBotLogic/Planificateur.h
 	
 	#MY_BOT_BT
 	MyBotLogic/BehaviourTree/BehaviourTreeModule.h
@@ -106,6 +107,7 @@ SET( AIBOT_SRC
 	MyBotLogic/ZoneManager.cpp
 	MyBotLogic/Mission.cpp
 	MyBotLogic/MissionManager.cpp
+	MyBotLogic/Planificateur.cpp
 	
 	#Main
 	Main.cpp

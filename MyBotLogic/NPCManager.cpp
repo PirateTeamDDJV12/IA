@@ -50,9 +50,27 @@ void NPCManager::initBT()
     m_BTNpcUpdateAdministrator.init();
 }
 
-void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
+const Npc* NPCManager::getNpcById(int npc_id_on_tile)
+{
+    for(auto npc : m_npcs)
+    {
+        if(npc->getId() == static_cast<unsigned int>(npc_id_on_tile))
+        {
+            return npc;
+        }
+    }
+    return nullptr;
+}
+
+void NPCManager::updateNPCs(const std::map<unsigned int, NPCInfo> &_npcs, std::vector<Action*> &_actionList)
 {
     Map *myMap = Map::get();
+
+    for each(auto myNpc in m_npcs)
+    {
+        NPCInfo currentNpcInfo = _npcs.at(myNpc->getId());
+        myNpc->setCurrentTile(currentNpcInfo.tileID);
+    }
 
     // Get best goal for each NPCs
     std::map<unsigned, unsigned> goalMap = std::move(myMap->getBestGoalTile(m_npcs));
@@ -71,45 +89,20 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
     
     // Move Npcs
     m_BTNpcUpdateAdministrator();
+    UpdateNpcActions(myMap);
 
     for each(auto myNpc in m_npcs)
     {
-        // Get next npc tile
-        int nextNpcTile = myNpc->getNextPathTile();
-
-        if (nextNpcTile >= 0)
+        // copy npc's action list into the action list
+        for(Action* curAction : myNpc->getActions())
         {
-            // check if npc can move on nextTile
-            for (Npc* curP : m_npcs)
-            {
+            _actionList.push_back(curAction->Clone());
 
-                if (curP->getId() != myNpc->getId()
-                    && curP->getNextPathTile() == nextNpcTile)
-                {
-                    // Handle: Prioritize npc with longest path
-                    if (myNpc->getPathSize() < curP->getPathSize())
-                    {
-                        myNpc->stopMoving();
-                        break;
-                    }
-                    // else prioritize by npcs id
-                    if (curP->getId() < myNpc->getId()
-                        && myNpc->getPathSize() == curP->getPathSize())
-                    {
-                        myNpc->stopMoving();
-                        break;
-                    }
-                }
-            }
-            // copy npc's action list into the action list
-            for (Action* curAction : myNpc->getActions())
+            if(curAction->actionType == Action_Move)
             {
-                _actionList.push_back(curAction->Clone());
-
                 // Update NPC position on node
-                // TODO - be careful about the action type, atm it's move but it can be different !!
-                myMap->getNode(myNpc->getCurrentTileId())->setNpcIdOnNode(0);
-                myMap->getNode(nextNpcTile)->setNpcIdOnNode(myNpc->getId());
+                myMap->getNode(myNpc->getCurrentTileId())->setNpcIdOnNode(-1);
+                myMap->getNode(myNpc->getNextPathTile())->setNpcIdOnNode(static_cast<int>(myNpc->getId()));
             }
         }
     }
@@ -118,4 +111,89 @@ void NPCManager::updateNPCs(std::vector<Action*> &_actionList)
     std::for_each(begin(m_npcs),
         end(m_npcs),
         [](Npc* myNpc) {myNpc->unstackActions(); });
+}
+
+bool NPCManager::UpdateNpcActions(Map * myMap)
+{
+    bool isNpcUpdated = false;
+    for each(auto myNpc in m_npcs)
+    {
+        // Get next npc tile
+        int nextNpcTile = myNpc->getNextPathTile();
+        if(myNpc->getActions().size() == 0)
+        {
+            continue;
+        }
+
+        if(nextNpcTile >= 0)
+        {
+            // Don't want to move on a tile where an npc is already
+            if(myMap->getNode(nextNpcTile)->isTileOccupied())
+            {
+                int npcIdOnTile = myMap->getNode(nextNpcTile)->getNpcIdOnNode();
+                const Npc* npcOnTile = getNpcById(npcIdOnTile);
+                if(npcOnTile->getNextPathTile() < 0)
+                {
+                    myNpc->stopMoving();
+                    isNpcUpdated = true;
+                    break;
+                }
+            }
+
+            // check if npc can move on nextTile
+            for(Npc* curP : m_npcs)
+            {
+                if(curP->getPathSize() > 1)
+                {
+                    if(curP->getId() != myNpc->getId()
+                       && curP->getNextPathTile() == nextNpcTile)
+                    {
+                        // Handle
+                        if(myNpc->getPathSize() < curP->getPathSize())
+                        {
+                            myNpc->stopMoving();
+                            isNpcUpdated = true;
+                            break;
+                        }
+                        // else prioritize by npcs id
+                        if(curP->getId() < myNpc->getId()
+                           && myNpc->getPathSize() == curP->getPathSize())
+                        {
+                            myNpc->stopMoving();
+                            isNpcUpdated = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // Don't want to move on a tile where an npc is already and don't want to move
+                    if(curP->getId() != myNpc->getId()
+                       && curP->getCurrentTileId() == static_cast<unsigned int>(nextNpcTile))
+                    {
+                        myNpc->stopMoving();
+                        isNpcUpdated = true;
+                    }
+                }
+            }
+        }
+    }
+    return isNpcUpdated;
+}
+
+bool NPCManager::isGoalAlreadyAssign(unsigned goalId)
+{
+    for(auto npc : m_npcs)
+    {
+        if(!npc->hasGoal())
+        {
+            continue;
+        }
+
+        if(npc->getGoal() == goalId)
+        {
+            return true;
+        }
+    }
+    return false;
 }

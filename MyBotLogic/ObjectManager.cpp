@@ -2,6 +2,8 @@
 
 #include <sstream>
 #include <algorithm>
+#include "ZoneManager.h"
+#include "Map.h"
 
 
 ObjectManager ObjectManager::m_instance;
@@ -85,7 +87,7 @@ std::vector<ObjectRef> ObjectManager::getAllObjectsOnTile(unsigned int tileId) c
     {
         for (auto curObject : iterPair.second)
         {
-            if (curObject->getId() == tileId)
+            if (curObject->getTileId() == tileId)
             {
                 objectsOnTile.push_back(curObject);
             }
@@ -143,12 +145,26 @@ void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
     {
         if (curObject->getId() == objectInfo.objectID)
         {
+            for(auto curState : objectInfo.objectStates)
+            {
+                switch(curState)
+                {
+                    case ObjectState_Opened:
+                        curObject->setIsActive(true);
+                        break;
+                    case ObjectState_Closed:
+                        curObject->setIsActive(false);
+                        break;
+                    default:
+                        break;
+                }
+            }
             return;
         }
     }
 
     // Check if the door is activated (open)
-    bool isActive;
+    bool isActive = false;
     for (auto curState : objectInfo.objectStates)
     {
         switch (curState)
@@ -156,8 +172,7 @@ void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
         case ObjectState_Opened:
             isActive = true;
             break;
-
-        case ObjectState_Closed:
+        default:
             isActive = false;
             break;
         }
@@ -165,6 +180,23 @@ void ObjectManager::updateDoorObject(const ObjectInfo& objectInfo)
 
     ObjectRef obj{ new Object(objectInfo.objectID, objectInfo.tileID, Object::ObjectType::DOOR, isActive) };
     m_allObjects[obj->getType()].push_back(obj);
+
+    Map* myMap = Map::get();
+    unsigned int currentObjectZone = myMap->getNode(objectInfo.tileID)->getZone();
+    unsigned int targetZone = 0;
+    for(int i = NE; i <= NW; ++i)
+    {
+        if(objectInfo.edgesCost[i] == 0)
+        {
+            Node* neighbour = myMap->getNode(objectInfo.tileID)->getNeighboor(static_cast<EDirection>(i));
+            targetZone = neighbour->getZone();
+        }
+    }
+    if(currentObjectZone == targetZone || targetZone == 0)
+    {
+        return;
+    }
+    ZoneManager::get().addJunction(currentObjectZone, targetZone, obj);
 }
 
 void ObjectManager::updatePressurePlateObject(const TileInfo& tileInfo)
@@ -174,6 +206,21 @@ void ObjectManager::updatePressurePlateObject(const TileInfo& tileInfo)
     {
         if (curObject->getId() == tileInfo.tileID)
         {
+            std::vector<ObjectRef> &objects = curObject->getLinkedObjects();
+            if(Map::get()->getNode(curObject->getTileId())->isTileOccupied())
+            {
+                for(auto object : objects)
+                {
+                    object->setIsActive(true);
+                }
+            }
+            else
+            {
+                for(auto object : objects)
+                {
+                    object->setIsActive(true);
+                }
+            }
             return;
         }
     }

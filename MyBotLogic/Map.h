@@ -10,6 +10,7 @@
 #include "NPCInfo.h"
 #include <map>
 #include <vector>
+#include "TurnInfo.h"
 
 #ifdef _DEBUG
 #define BOT_LOGIC_DEBUG_MAP
@@ -29,7 +30,7 @@ class Map : Singleton
     unsigned int m_height;
     unsigned int m_influenceRange;
     std::map<unsigned int, Node*> m_nodeMap;
-    std::vector<unsigned int> m_goalTiles;
+    std::map<unsigned int, bool> m_goalTiles;
     std::map<unsigned, bool> m_seenTiles;
     std::vector<Node*> m_interestingNodes;
     //std::map<unsigned int, SearchMap*> m_searchMap;
@@ -46,15 +47,64 @@ private:
     int calculateDistance(int start, int end);
     std::string getStringDirection(unsigned int, unsigned int);
     void testAddTile(std::vector<unsigned>& v, unsigned int, unsigned int tileId);
+
 public:
+
+    static Map *get() noexcept
+    {
+        return &m_instance;
+    }
+
     // Set the logger path and initialise all map logger
     void setLoggerPath(const std::string &a_path);
 
+    // Update all the map (tiles, edges, objects, everything)
+    void update(const TurnInfo& turn_info);
+
+    // Initialise the map with row and col number.
+    void initMap(unsigned int row, unsigned int col, unsigned int range);
+
+    // Update map edges
+    void updateEdges(const std::map<unsigned int, ObjectInfo>& objects, unsigned int nbTurn);
+
+    // Update map tiles
+    void updateTiles(const std::map<unsigned int, TileInfo>& tiles);
+
+    // Logger
+    void logMap(unsigned);
+    void logInfluenceMap(unsigned nbTurn);
+    void logZoneMap(unsigned nbTurn);
+
+    // Return node
+    Node* getNode(unsigned int x, unsigned int y);
+    Node* getNode(unsigned int index);
+
+    // Get a path between two points with an A* algorithm
+    std::vector<unsigned int> getNpcPath(unsigned int a_start, unsigned int a_end, std::set<Node::NodeType> forbiddenType = {Node::FORBIDDEN});
+
+    // Return the direction between two points
+    EDirection getNextDirection(unsigned int a_start, unsigned int a_end);
+
+    // Return if we can move on a tile or not
+    bool canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId);
+
+    // Return for each NPCs the best goal
+    std::map<unsigned, unsigned> getBestGoalTile(const std::vector<Npc*>& npcInfo);
+
+    // Return all influence tiles near a position
+    int getNearInfluencedTile(unsigned int a_currentId);
+
+    // Return all non visited tiles
+    std::vector<unsigned> getNonVisitedTile();
+
+    // Set a tile as visited
+    void visitTile(unsigned tileId)
+    {
+        m_seenTiles[tileId] = true;
+    }
+private:
     // Change the node type
     void setNodeType(unsigned int, Node::NodeType);
-
-    // Change the node zone
-    void setNodeZone(unsigned int tileId, unsigned int zoneId);
 
     // Create a new node
     void createNode(Node*);
@@ -62,98 +112,43 @@ public:
     // Connect all the nodes together (neighboor) to create the graph
     void connectNodes();
 
-    Node* getNode(unsigned int, unsigned int);
-    Node* getNode(unsigned int);
-
-    // Return for each NPCs the best goal
-    std::map<unsigned, unsigned> getBestGoalTile(const std::vector<Npc*>& npcInfo);
-
-    // return the direction between two points
-    EDirection getNextDirection(unsigned int a_start, unsigned int a_end);
-
-    static Map *get() noexcept
-    {
-        return &m_instance;
-    }
-
-    unsigned int getWidth() const
-    {
-        return m_width;
-    }
-    void setWidth(unsigned int w)
-    {
-        m_width = w;
-    }
-    unsigned int getHeight() const
-    {
-        return m_height;
-    }
-    void setHeight(unsigned int h)
-    {
-        m_height = h;
-    }
-    unsigned int getInfluenceRange() const
-    {
-        return m_influenceRange;
-    }
+    // Set the influence range
     void setInfluenceRange(unsigned int range)
     {
         m_influenceRange = range;
     }
 
+    // Add a seen tile (we see it but we don't visit it)
     void addSeenTile(unsigned tileId)
     {
-        if (m_seenTiles[tileId])
+        if(m_seenTiles[tileId])
         {
             return;
         }
         m_seenTiles[tileId] = false;
     }
 
-    void visitTile(unsigned tileId)
-    {
-        m_seenTiles[tileId] = true;
-    }
-
+    // Return if the selected tile is visited
     bool isVisited(unsigned tileId)
     {
         return m_seenTiles[tileId];
     }
 
-    std::vector<unsigned> getNonVisitedTile()
-    {
-        std::vector<unsigned> v;
-        for (auto seenTile : m_seenTiles)
-        {
-            if (!seenTile.second)
-            {
-                v.push_back(seenTile.first);
-            }
-        }
-        return std::move(v);
-    }
-
-    //std::vector<unsigned> getMostInfluencedTile();
-    //std::vector<unsigned int> getNearUnVisitedTile(unsigned int a_currentId);
-
+    // Add a goal to the goal list to define wich NPC go to this goal
     void addGoalTile(unsigned int number);
+
+    // Create the influence map
     void createInfluenceMap();
+
+    // Propagate the influence from the highest spots
     void propagateInfluence();
     void propage(Node* myNode, unsigned curDist, unsigned maxDist, float initialInfluence) const;
-
-    std::vector<unsigned int> getNpcPath(unsigned int a_start, unsigned int a_end, std::set<Node::NodeType> forbiddenType = { Node::FORBIDDEN });
-
-    bool canMoveOnTile(unsigned int a_fromTileId, unsigned int a_toTileId);
-
-    int getNearInfluencedTile(unsigned int a_currentId);
+    
+    // Return if all neighbour of a tile have the same influence
     bool isAllNeighboorHaveSameInfluence(Node* node);
-    void logMap(unsigned);
-    void logInfluenceMap(unsigned nbTurn);
-    void logZoneMap(unsigned nbTurn);
 
-    void initMap(unsigned int row, unsigned int col, unsigned int range);
-    void updateEdges(const std::map<unsigned int, ObjectInfo>& objects, unsigned nbTurn);
-    void updateTiles(const std::map<unsigned int, TileInfo>& tiles);
+    // Log string function
+    std::string getTileStringToLog(Node* node) const;
 };
 
 #endif // MAP_HEADER

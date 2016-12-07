@@ -1,7 +1,10 @@
 #include "Node.h"
+#include <vector>
+#include "Npc.h"
+#include "NPCManager.h"
 
-
-Node::Node(unsigned int xVal, unsigned int yVal, unsigned int idVal, NodeType typeVal): m_ID(idVal), m_type(typeVal)
+Node::Node(unsigned int xVal, unsigned int yVal, unsigned int idVal, NodeType typeVal)
+    : m_ID(idVal), m_type(typeVal), m_npcId(-1)
 {
     m_pos = new Position(xVal, yVal);
 }
@@ -11,7 +14,7 @@ unsigned int Node::getId() const noexcept
     return m_ID;
 }
 
-unsigned Node::getNpcIdOnNode() const noexcept
+int Node::getNpcIdOnNode() const noexcept
 {
     return m_npcId;
 }
@@ -60,7 +63,7 @@ Node* Node::getNeighboor(EDirection dir)
     return m_neighboors[dir];
 }
 
-void Node::setNpcIdOnNode(unsigned npcId) noexcept
+void Node::setNpcIdOnNode(int npcId) noexcept
 {
     m_npcId = npcId;
 }
@@ -82,15 +85,15 @@ void Node::setType(Node::NodeType nType) noexcept
 
 void Node::setEdgeCost(EDirection dir, std::set<EObjectType> types)
 {
-    if (std::find(begin(types), end(types), ObjectType_Door) != end(types))
+    if(std::find(begin(types), end(types), ObjectType_Door) != end(types))
     {
         m_edgesCost[dir] = ObjectType_Door + 1;
     }
-    else if (std::find(begin(types), end(types), ObjectType_Window) != end(types))
+    else if(std::find(begin(types), end(types), ObjectType_Window) != end(types))
     {
         m_edgesCost[dir] = ObjectType_Window + 1;
     }
-    else if (std::find(begin(types), end(types), ObjectType_HighWall) != end(types))
+    else if(std::find(begin(types), end(types), ObjectType_HighWall) != end(types))
     {
         m_edgesCost[dir] = ObjectType_HighWall + 1;
     }
@@ -103,14 +106,33 @@ void Node::setNeighboor(EDirection dir, Node* p)
 
 bool Node::isEdgeBlocked(EDirection dir) const
 {
-    switch (m_edgesCost[dir])
+    return m_edgesCost[dir] == 0 ? false : true;
+}
+
+bool Node::isTileOccupied() const
+{
+    return m_npcId >= 0;
+}
+
+bool Node::isTileHasNpcArrived() const
+{
+    if(m_npcId >= 0)
     {
-    case 0: //No wall or anything blocking (default state)
-    case ObjectType_Door + 1: // Add +1 because of the default state which is 0 and HighWall is 0 to, so we save the edges with +1
-        return false;
-    default:
-        return true;
+        const std::vector<Npc*> &allNpcs = NPCManager::get()->getNpcs();
+        for(Npc* npc : allNpcs)
+        {
+            if(npc->getId() == static_cast<unsigned int>(m_npcId))
+            {
+                return npc->getStatus() == Npc::ARRIVED;
+            }
+        }
     }
+    return false;
+}
+
+bool Node::isBlockedByDoor(EDirection dir) const
+{
+    return m_edgesCost[dir] == (ObjectType_Door + 1);
 }
 
 unsigned int Node::calculateManathan(const Node* goal) const noexcept

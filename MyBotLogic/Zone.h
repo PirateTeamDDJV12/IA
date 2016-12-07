@@ -12,17 +12,17 @@ class Zone
     friend class Planificateur;
 public:
     // Junction class
-    class Junction
+    struct Junction
     {
         friend class Planificateur;
     public:
         Junction() = delete;
-        Junction(unsigned int destZone, Object *object);
+        Junction(unsigned int destZone, ObjectRef object, bool isOpenableAlone, Node* nodeFrom, Node* nodeTo);
 
-    private:
         unsigned int    m_destinationZone;
+        ObjectRef       m_object;
         Node            *m_nodes[2];
-        Object          *m_object;
+        bool            m_isOpenableAlone;
     };
 
     // Zone Class
@@ -30,10 +30,10 @@ public:
     Zone(unsigned int id);
     ~Zone();
 
-    const Junction  &getZoneJunction(unsigned int zoneId) const;
+    const Junction  &getJunction(unsigned int zoneId) const;
     unsigned int    getZoneId() const;
     bool            isExplored() const;
-    void            addJunction(unsigned int neighboorZone, Object *object);
+    void            addJunction(unsigned int neighboorZone, ObjectRef object, bool isOpenableAlone, Node* nodeFrom, Node* nodeTo);
 
 private:
     std::map<unsigned int, Junction *>  m_junctions;

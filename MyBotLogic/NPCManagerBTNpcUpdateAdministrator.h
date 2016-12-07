@@ -35,6 +35,7 @@ private:
     BehaviourTree::BlocRoot m_behaviorTreeRoot;
 
     std::vector<Npc*>* m_npcs;
+    std::vector<unsigned int> m_npcsToRemove;
 
 
 public:
@@ -100,6 +101,8 @@ public:
     bool npcByIndexIsConnected(size_t npcIndex);
     bool npcByIdIsConnected(unsigned int npcID);
 
+    /* Method to add a npc to remove*/
+    void addNpcToRemove(unsigned int npcID);
 
 private:
     BehaviourTree::BlocRef createNpcBloc(Npc* npc, const std::string& npcName);

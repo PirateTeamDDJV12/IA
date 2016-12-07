@@ -2,9 +2,7 @@
 #define NODE_HEADER
 
 #include "Globals.h"
-
 #include <set>
-
 
 struct Position
 {
@@ -37,17 +35,13 @@ public:
 
 private:
     unsigned int m_ID;
-    unsigned int m_npcId = { 0 };
     unsigned int m_edgesCost[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    int m_npcId;
     unsigned int m_zone = { 0 };
     float m_influence = { 0 };
-
     Position* m_pos;
     NodeType m_type;
-
     Node* m_neighboors[8] = { nullptr };
-
-    // TODO - Add an area to our nodes to differentiate them and let us know immediately if we can access this node or not
 
 public:
     Node() = delete;
@@ -56,7 +50,7 @@ public:
 public:
     // Getters
     unsigned int getId() const noexcept;
-    unsigned getNpcIdOnNode() const noexcept;
+    int getNpcIdOnNode() const noexcept;
     unsigned int getZone() const noexcept;
     float getInfluence() const noexcept;
     Position* getPosition() const noexcept;
@@ -66,7 +60,7 @@ public:
     Node* getNeighboor(EDirection dir);
 
     // Setters
-    void setNpcIdOnNode(unsigned npcId) noexcept;
+    void setNpcIdOnNode(int npcId) noexcept;
     void setZone(unsigned int zoneId) noexcept;
     void setInfluence(float inf) noexcept;
     void setType(NodeType nType) noexcept;
@@ -75,6 +69,9 @@ public:
 
     // Verrify if an obstacle blocks the path
     bool isEdgeBlocked(EDirection dir) const;
+    bool isTileOccupied() const;
+    bool isTileHasNpcArrived() const;
+    bool isBlockedByDoor(EDirection dir) const;
 
     // Heuristic for A*
     unsigned int calculateManathan(const Node* goal) const noexcept;

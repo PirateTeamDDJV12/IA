@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "Map.h"
 
 class NPCManager : Singleton
 {
@@ -57,13 +58,24 @@ public:
     void initNpcs(const std::map<unsigned, NPCInfo>& npcs);
     // Create BT and attach all NPCs to it
     void initBT();
+    // Get a specific npc
+    const Npc *getNpcById(int npc_id_on_tile);
     // Update all NPCs
-    void updateNPCs(std::vector<Action*> &_actionList);
+    void updateNPCs(const std::map<unsigned int, NPCInfo> &_npcs, std::vector<Action*> &_actionList);
+    bool UpdateNpcActions(Map * myMap);
+
     // Npc Getter
     const std::vector<Npc *> &getNpcs() const
     {
         return m_npcs;
     }
+
+    NPCManagerBTNpcUpdateAdministrator& getNpcUpdateBT()
+    {
+        return m_BTNpcUpdateAdministrator;
+    }
+
+    bool isGoalAlreadyAssign(unsigned int goalId);
     
 };
 
