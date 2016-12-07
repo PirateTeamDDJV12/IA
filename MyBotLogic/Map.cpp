@@ -34,11 +34,6 @@ void Map::setNodeType(unsigned int tileId, Node::NodeType tileType)
     }
 }
 
-void Map::setNodeZone(unsigned int tileId, unsigned int zoneId)
-{
-    m_nodeMap[tileId]->setZone(zoneId);
-}
-
 void Map::createNode(Node* node)
 {
     m_nodeMap[node->getId()] = node;
@@ -84,7 +79,7 @@ void Map::connectNodes()
 
 Node* Map::getNode(unsigned int x, unsigned int y)
 {
-    if(x < 0 || x > getWidth() - 1 || y < 0 || y > getHeight() - 1)
+    if(x < 0 || x > m_width - 1 || y < 0 || y > m_height - 1)
     {
         return nullptr;
     }
@@ -116,7 +111,7 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(const std::vector<Npc*>& npcIn
         for(Npc* npc : npcInfo)
         {
             int bestDist = 666;
-            unsigned goalId = -1;
+            int goalId = -1;
             std::map<unsigned int, bool>::iterator goalIt = begin(copyMapGoal);
             std::map<unsigned int, bool>::iterator saveGoalIt = end(copyMapGoal);
             for(; goalIt != end(copyMapGoal); ++goalIt)
@@ -134,7 +129,7 @@ std::map<unsigned, unsigned> Map::getBestGoalTile(const std::vector<Npc*>& npcIn
                     saveGoalIt = goalIt;
                 }
             }
-            goalMap[npc->getId()] = goalId;
+            goalMap[npc->getId()] = static_cast<unsigned int>(goalId);
             copyMapGoal.erase(saveGoalIt);
         }
     }
@@ -514,6 +509,19 @@ int Map::getNearInfluencedTile(unsigned int a_currentId)
     return bestTile;
 }
 
+std::vector<unsigned> Map::getNonVisitedTile()
+{
+    std::vector<unsigned> v;
+    for(auto seenTile : m_seenTiles)
+    {
+        if(!seenTile.second)
+        {
+            v.push_back(seenTile.first);
+        }
+    }
+    return std::move(v);
+}
+
 bool Map::isAllNeighboorHaveSameInfluence(Node* node)
 {
     float startInf = 0.0f;
@@ -596,7 +604,6 @@ void Map::logMap(unsigned nbTurn)
 
 std::string Map::getTileStringToLog(Node* node) const
 {
-#ifdef BOT_LOGIC_DEBUG_MAP
     switch(node->getType())
     {       
         case Node::NodeType::FORBIDDEN:
@@ -610,8 +617,6 @@ std::string Map::getTileStringToLog(Node* node) const
         default:
             return"-";
     }
-#endif
-    return "";
 }
 
 void Map::logInfluenceMap(unsigned nbTurn)
